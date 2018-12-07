@@ -1,0 +1,7 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="Details.aspx.cs" Inherits="Logged_Contrarecibos_Details" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" Runat="Server">
+<br /><br /><br /><br />
+
+</asp:Content>
+

@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+	<meta charset="utf-8" />
+    <link href="../Css/SLoging.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+    <style>
+         #Cuadro { min-height:100px;  margin-left:auto;  margin-right:auto; max-width:500px;}
+         #Cuadro img {min-height:100px; max-height:150px; max-width:400px; }
+        #Mensaje { text-align:center; justify-content:center; margin-left:auto;  margin-right:auto; max-width:500px;}
+.button {
+   border: 1px solid #0a3c59;
+   background: #3e779d;
+   background: -webkit-gradient(linear, left top, left bottom, from(#65a9d7), to(#3e779d));
+   background: -webkit-linear-gradient(top, #65a9d7, #3e779d);
+   background: -moz-linear-gradient(top, #65a9d7, #3e779d);
+   background: -ms-linear-gradient(top, #65a9d7, #3e779d);
+   background: -o-linear-gradient(top, #65a9d7, #3e779d);
+   background-image: -ms-linear-gradient(top, #65a9d7 0%, #3e779d 100%);
+   padding: 10.5px 21px;
+   -webkit-border-radius: 6px;
+   -moz-border-radius: 6px;
+   border-radius: 6px;
+   -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+   text-shadow: #7ea4bd 0 1px 0;
+   color: #06426c;
+   font-size: 14px;
+   font-family: helvetica, serif;
+   text-decoration: none;
+   vertical-align: middle;
+   }
+   .button {
+border: none;
+background: #3a7999;
+color: #f2f2f2;
+padding: 10px;
+font-size: 18px;
+border-radius: 5px;
+position: relative;
+box-sizing: border-box;
+transition: all 500ms ease;
+}
+.button:hover {
+   border: 1px solid #0a3c59;
+   text-shadow: #1e4158 0 1px 0;
+   background: #3e779d;
+   background: -webkit-gradient(linear, left top, left bottom, from(#65a9d7), to(#3e779d));
+   background: -webkit-linear-gradient(top, #65a9d7, #3e779d);
+   background: -moz-linear-gradient(top, #65a9d7, #3e779d);
+   background: -ms-linear-gradient(top, #65a9d7, #3e779d);
+   background: -o-linear-gradient(top, #65a9d7, #3e779d);
+   background-image: -ms-linear-gradient(top, #65a9d7 0%, #3e779d 100%);
+   color: #fff;
+   }
+.button:active {
+   text-shadow: #1e4158 0 1px 0;
+   border: 1px solid #0a3c59;
+   background: #65a9d7;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#3e779d));
+   background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+   background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+   background: -o-linear-gradient(top, #3e779d, #65a9d7);
+   background-image: -ms-linear-gradient(top, #3e779d 0%, #65a9d7 100%);
+   color: #fff;
+   }
+        /*#General { width :80%; min-height:500px; margin-left:auto; margin-right:auto;}*/
+    </style>
+    <div id="General">
+
+        <center id="Cuadro">
+            <img src="https://www.multiconsulting.com.mx/Encabezado.png"  width="90%"/>
+        </center>
+
+        <center>
+            <h2>APROBACION DE USUARIO</h2>
+        </center>
+
+        <center id="Mensaje">
+            <br />
+            <h4>Estimado proveedor.</h4>
+            <br />
+            <h5>!!Felicidades !!</h5>
+            <br />
+            <p> Te notificamos que el día de hoy se realizó el alta de tu usuario para poder ingresar a nuestro portal.</p>
+            <br />
+            <p> Estas a un solo paso de poder concluir el tramite, ingresa para iniciar con el tramite
+            de alta de tus documentos.</p>
+            <br />
+            <p>Recuerda tener a la mano :</p>
+            <br />
+            <p><strong >*Acta Constitutiva</strong></p>
+            <br />
+            <p><strong>*Registro Federal del Contribuyente</strong></p>
+            <br />
+            <p><strong>*Poder Notarial</strong></p>
+            <br />
+            <p><strong>*Identificacion Oficial</strong></p>
+            <br />
+            <p><strong>*Opinion de Obligaciones Fiscales</strong></p>
+            <br />
+            <p><strong>*Contrato y/o Carta de Peestación</strong></p>
+            <br />
+
+            <br />
+            <br />
+            <br />
+            <p> Tu Usuario de Acceso Es: </p> <strong>{UserTemp}</strong>
+            <br />
+            <br />
+            <p> Y Tu contraseña Es: </p> <strong>{PassTemp}</strong>
+            <br />
+            <br />
+            <a href="https://tsys-tesoreria.com.mx/Account/Login.aspx" class='button'>Ingresar ahora</a>
+            <br />
+            <br />
+            <br />
+            <p>Si no reconoces este cambio o para cualquier duda o aclaración por favor comunícate a nuestro Centro de Atención.</p>
+        </center>
+
+    </div>
+
+</body>
+</html>

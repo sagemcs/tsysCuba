@@ -1,0 +1,211 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="SiteVal.master.cs" Inherits="SiteMaster" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - T|SYS|®</title>
+
+    
+    <link rel="stylesheet" href="~/Css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+<link rel="stylesheet" href="~/Css/bootstrap-theme.min.css">
+<link href ="~/Css/HojaProv.css" rel="stylesheet" type ="text/css" />
+<!-- Latest compiled and minified JavaScript -->
+<%--<script src="~/Css/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>--%>
+<%--    <link href="~/Content/Site.css" rel="stylesheet" type ="text/css" />--%>
+
+<%--    <link href ="Content/bootstrap.css" rel ="stylesheet" type ="text/css" />   --%> 
+<%--        <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/bundles/modernizr") %>
+    </asp:PlaceHolder>--%>
+<%--<webopt:bundlereference runat="server" path="~/Content/css" />--%>
+
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="~/Scripts/dataTable-1.10.16/datatables.css" rel="stylesheet" />
+    <link href="~/Css/sweetalert.css" rel="stylesheet" />
+    <asp:ContentPlaceHolder ID="CustomStyles" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body>
+    <div class="bloqueo" style="display: none">
+        <div class="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+    </div>
+    <form runat="server">
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
+                <%--Framework Scripts--%>
+            <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="bootstrap" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+                <asp:ScriptReference  Path="~/Css/sweetalert.min.js" />
+                <asp:ScriptReference  Path="~/Scripts/jquery.blockui.min.js" />
+                <%--Site Scripts--%>
+
+                    <%--
+                <asp:ScriptReference Name="datatables.min.js" Path="~/Scripts/dataTable-1.10.16/datatables.min.js" />
+                <asp:ScriptReference Name="datatables.checkboxes.min.js" Assembly="System.Web" Path="~/Scripts/dataTable-1.10.16/datatables.checkboxes.min.js" />
+                <asp:ScriptReference Name="data-tables-facturas.js" Assembly="System.Web" Path="~/Scripts/data-tables-facturas.js" />
+            
+               --%>  
+
+            </Scripts>
+                 <Services>
+                <asp:ServiceReference Path="~/Servicios/AccesosWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/ChequeSolicitudesWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/ContrarecibosWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/DocumentosProveedoresWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/EmpresasWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/FacturasWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/PagosWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/ProveedoresWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/RolesWebService.asmx" />
+                <asp:ServiceReference Path="~/Servicios/UsuariosWebService.asmx" />
+            </Services>
+        </asp:ScriptManager>
+
+
+<%--        <div id="MP">
+           <div id="Contenedor">
+
+           </div>
+        </div>--%>
+
+        <div class="navbar navbar-inverse navbar-fixed-top" id="Portada">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a runat="server" href="~/Logged/Administradores/Default">
+                    <img src="/Img/Lgtys.png" style="border:0px solid black;">
+                    </a>
+                </div>
+                <div class="navbar-collapse collapse" >
+                    <ul class="nav navbar-nav">
+                        <li><a runat="server" href="~/Logged/Administradores/About">Acerca</a></li>
+                        <li><a runat ="server" href="~/Logged/Administradores/Contact">Contacto</a></li>
+                        
+                    </ul>
+                    <asp:LoginView runat="server" ViewStateMode="Enabled">
+                        <AnonymousTemplate>
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a runat="server" href="~/Account/Login">Log in</a></li>
+                            </ul>
+                        </AnonymousTemplate>
+                        <LoggedInTemplate>
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a runat="server" href="~/Account/Manage" title="Usuario"><%: Context.User.Identity.GetUserName()  %></a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Administrar<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/AdmFacturas" title="Adminsitrar Facturas">Administrar Facturas</a>
+                                </li>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/Administracion_Pago" title="Adminsitrar Facturas">Administrar Pagos</a>
+                                </li>
+                                </ul>
+                                </li>
+
+
+                                 <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/Contrarecibo">Generar contrarecibo</a>
+                                        </li>
+                                         <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/SolicitudCheque">Generar solicitud de cheque</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/AccesosFilter">Accesos</a>
+                                        </li>
+                                       
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/EmpresasFilter">Empresas</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/ErroresFilter">Errores</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/FacturasFilter">Facturas</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/FacturasEstadoFilter">Estado de Facturas</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/PagosFilter">Pagos</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/RolesFilter">Roles</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/UsuariosFilter">Usuarios</a>
+                                        </li>  
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/ProveedoresFilter">Proveedores</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/DocumentosProveedoresFilter">Documentos de proveedores</a>
+                                        </li>    
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/ContrarecibosFilter">Contrarecibos</a>
+                                        </li>     
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/SolicitudesChequesFilter">Solicitudes de cheques</a>
+                                        </li>        
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/ValidacionesFilter">Validaciones</a>
+                                        </li>     
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/CargaFacturasFilter">Carga de Facturas</a>
+                                        </li>    
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/CargaArticulosFilter">Carga de Artículos</a>
+                                        </li> 
+                                    </ul>
+                                </li>
+                                <li>
+                                    <asp:LoginStatus runat="server" LogoutAction="Redirect" LogoutText="Log off" LogoutPageUrl="~/" OnLoggingOut="Unnamed_LoggingOut" />
+                                </li>                            
+                            </ul>
+                        </LoggedInTemplate>
+                    </asp:LoginView>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="container body-content">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+            <hr />
+            <footer>
+                <%--<p class="serif">&copy; <%: DateTime.Now.Year %> - T|SYS|®</p>--%>
+            </footer>
+        </div>
+    </form>
+</body>
+</html>

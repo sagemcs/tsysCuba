@@ -1,0 +1,19 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Detalles.aspx.cs" Inherits="Logged_Contrarecibos_Detalles" %>
+
+<%@ Register assembly="CrystalDecisions.Web, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" namespace="CrystalDecisions.Web" tagprefix="CR" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+     <link href ="~/Css/reports.css" rel="stylesheet" type ="text/css" />
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <CR:CrystalReportViewer ID="Reporte_Contrarecibo" runat="server" AutoDataBind="true" BestFitPage="False" DisplayStatusbar="False" HasCrystalLogo="False" HasDrilldownTabs="False" HasToggleGroupTreeButton="False" HasToggleParameterPanelButton="False" ToolPanelView="None" ClientIDMode="Inherit" />
+        </div>
+    </form>
+</body>
+</html>

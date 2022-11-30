@@ -6,7 +6,11 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" type="text/css" />--%>
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
@@ -35,24 +39,24 @@
                     <div class="col-md-3">
                     
                         <div class="form-group">
-                            
-                            <asp:TextBox ID="inputUserID"  placeholder="UserID" runat="server" CssClass="form-control filter" ToolTip="UserID" MaxLength="256"></asp:TextBox>   
+                            <label>Usuario / Razón Social</label>
+                            <asp:TextBox ID="inputUserID" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter" ToolTip="UserID" MaxLength="256"></asp:TextBox>   
                             
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            
-                        <asp:TextBox ID="inputUsername"  placeholder="Usuario" runat="server" CssClass="form-control filter" ToolTip="Usuario" MaxLength="256"></asp:TextBox>   
-                            
+                          <label>Fecha de Acceso</label>  
+                        <%-- <asp:TextBox ID="inputUsername" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter" ToolTip="Usuario" MaxLength="256"></asp:TextBox>   --%>
+                         <asp:TextBox type="date" name="fecha" ID="inputUsername" AutoComplete = "off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" step="1"  class="form-control"  runat="server"/>   
                         </div>
 
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-3" style="visibility :hidden">
                         <div class="form-group">
-                            
-                            <asp:TextBox ID="inputIP"  placeholder="IP" runat="server" CssClass="form-control filter" ToolTip="IP" MaxLength="39"></asp:TextBox>
+                            <label>IP</label>
+                            <asp:TextBox ID="inputIP" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter" ToolTip="IP" MaxLength="39"></asp:TextBox>
                         </div>
                     </div>
 
@@ -60,10 +64,10 @@
           
                     <div class="col-md-3">
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
           
@@ -81,9 +85,9 @@
                 <table id="list" class="datatable table table-bordered table-striped" width="100%">
                     <thead>
                     <tr>
-                        <th>Usuario</th>
-                        <th>Nombre</th>
-                        <th>Fecha</th>
+                        <th></th>
+                        <th>Usuario / Razón Social</th>
+                        <th>Fecha de Acceso</th>
                         <th>IP</th>
                     </tr>
                     </thead>

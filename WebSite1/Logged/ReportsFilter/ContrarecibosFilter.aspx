@@ -6,7 +6,11 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    Version 16-Octubre-2019 By Luis Angel Garcia P
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <link href="../../Css/tables.css" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
    
@@ -39,15 +43,15 @@
                     <div class="col-md-2">
                     
                         <div class="form-group">
-                            
-                            <asp:TextBox ID="inputFolio" MaxLength="10" placeholder="Folio" runat="server" CssClass="form-control filter" ToolTip="Folio"></asp:TextBox>   
+                            <label>Folio Contrarecibo</label>
+                            <asp:TextBox ID="inputFolio" AutoComplete = "off" AutoCompleteType="Disabled" MaxLength="10" runat="server" CssClass="form-control filter" ToolTip="Folio"></asp:TextBox>   
                          
                         </div>
                     </div>
                    <div class="col-md-2">
                     
                         <div class="form-group">
-                            
+                            <label>Proveedor</label>
                             <asp:DropDownList ID="comboProveedores" runat="server" CssClass="form-control select2 filter">
                             </asp:DropDownList>
                            
@@ -57,8 +61,8 @@
                    <div class="col-md-2">
                     
                         <div class="form-group">
-                            
-                        <asp:TextBox ID="inputRFC" MaxLength="40"  placeholder="RFC" runat="server" CssClass="form-control filter" ToolTip="RFC"></asp:TextBox>   
+                        <label>RFC</label>  
+                        <asp:TextBox ID="inputRFC" MaxLength="40" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter" ToolTip="RFC"></asp:TextBox>   
                          
                         </div>
                     </div>
@@ -66,24 +70,31 @@
                    <div class="col-md-2">
                     
                         <div class="form-group">
-                            
-                        <asp:TextBox ID="inputTotal"  placeholder="Total" runat="server" CssClass="form-control filter" ToolTip="Total"></asp:TextBox>   
+                        <label>Total</label>  
+                        <asp:TextBox ID="inputTotal" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter" ToolTip="Total"></asp:TextBox>   
                          <span id="error_inputTotal" class="no-valid-message">Dato no válido</span>
                         </div>
                     </div>
+                   <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Fecha de Creación</label>                         
+                           <asp:TextBox type="date" ID="inputFechaRecepcion" AutoComplete = "off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" CssClass="form-control filter"  runat="server" ></asp:TextBox>
+                        </div>
+                    </div>
+
                     <div class="col-md-2">
-                        <div class="form-group">                           
-                        
-                              <asp:TextBox ID="inputFechaRecepcion"  placeholder="Fecha recepción" runat="server"  ToolTip="Fecha recepción" CssClass="form-control datepicker filter"></asp:TextBox>
-                       
+                        <div class="form-group">
+                            <label>Fecha de Pago</label>  
+                            <asp:TextBox type="date" ID="inputPago" min="1980-01-01" max="2050-12-31" CssClass="form-control filter" runat="server" ></asp:TextBox>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <br />
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
           
@@ -102,12 +113,13 @@
                     <thead>
                     <tr>           
                         <th></th>
-                        <th>Folio</th>
-                        <th>Proveedor</th>
+                        <th>Folio Contrarecibo</th>
+                        <th>Razón Social</th>
                         <th>RFC</th>
-                        <th>Condiciones</th>
-                        <th>Fecha recepción</th>
-                        <th>Fecha programada</th>
+                        <th>Condiciones de Pago</th>
+                        <th>Fecha de Creación Contrarrecibo</th>
+                        <th>Fecha Programada de Pago</th>
+                        <th style="width:13%;">Total</th>
                         <th></th>
                      
                     </tr>

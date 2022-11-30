@@ -1,5 +1,7 @@
-
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     var url_list = CargaArticulosWebService.get_path() + "/listar";
@@ -14,7 +16,8 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.ItemID = $('#MainContent_inputArticulo').val();
                 data.Qty = $('#MainContent_inputCantidad').val();
                 data.Status = $('#MainContent_comboEstado').val();
@@ -31,8 +34,8 @@ $(document).ready(function () {
             { "data": "Articulo" , 'className': "centrar-data", "orderable": false},
             { "data": "Articulo" , 'className': "centrar-data text_align_left"},
             { "data": "Cantidad" , 'className': "centrar-data text_align_left"},
-            { "data": "Costo", 'className': "centrar-data" },
-            { "data": "Monto", 'className': "centrar-data" },
+            { "data": "Costo", 'className': "centrar-data text_align_right" },
+            { "data": "Monto", 'className': "centrar-data text_align_right" },
             { "data": "Comentario", 'className': "centrar-data" },
             { "data": "Estado" , 'className': "centrar-data"}
         ],

@@ -1,12 +1,19 @@
-﻿using Microsoft.AspNet.Identity;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : ADRIAN QUIALA
+
+//REFERENCIAS UTILIZADAS
+
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.Google;
 using Owin;
 
 namespace WebSite1
 {
-    public partial class Startup {
+    public partial class Startup
+    {
 
         // For more information on configuring authentication, please visit https://go.microsoft.com/fwlink/?LinkId=301883
         public void ConfigureAuth(IAppBuilder app)

@@ -1,4 +1,11 @@
-﻿using EASendMail;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//PANTALLA MANTENIMIENTO A CUENTA DE EMISION DE CORREOS T|SYS|
+
+//REFERENCIAS UTILIZADAS
+using EASendMail;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -20,6 +27,26 @@ public partial class Logged_Administradores_SettingsEmail : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+        Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+        Page.Response.Cache.SetNoStore();
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
+        bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
+
+        if (!isAuth)
+        {
+            HttpContext.Current.Session.RemoveAll();
+            Response.AppendHeader("Pragma", "no-cache");
+            Response.AppendHeader("Cache-Control", "no-cache");
+            Response.CacheControl = "no-cache"; Response.Expires = -1;
+            Response.ExpiresAbsolute = new DateTime(1900, 1, 1);
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
+
+
         if (!IsPostBack)
         {
             if (HttpContext.Current.Session["IDCompany"] == null)
@@ -61,15 +88,6 @@ public partial class Logged_Administradores_SettingsEmail : System.Web.UI.Page
     {
         try
         {
-            bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
-
-            if (!isAuth)
-            {
-                HttpContext.Current.Session.RemoveAll();
-                Context.GetOwinContext().Authentication.SignOut();
-                Response.Redirect("~/Account/Login.aspx");
-            }
-
             if (HttpContext.Current.Session["RolUser"].ToString() != "T|SYS| - Admin")
             {
                 HttpContext.Current.Session.RemoveAll();
@@ -501,6 +519,15 @@ public partial class Logged_Administradores_SettingsEmail : System.Web.UI.Page
         try
         {
 
+            //string Body, PassNew;
+            //PassNew = "1234568";
+            //using (StreamReader reader = new StreamReader(Server.MapPath("~/Account/Templates Email/ConfirmacionOKUser.html")))
+            //{
+            //    Body = reader.ReadToEnd();
+            //    Body = Body.Replace("{PassTemp}", PassNew);
+            //    Body = Body.Replace("{UserTemp}", "lgarcia@multiconsulting.com");
+            //}
+
             string Body = "Este es un Email de Prueba , Configuracion Exitosa!";
             rest = Global.EmailGlobal(Destinatario, Body, "Correo de Prueba");
 
@@ -512,51 +539,6 @@ public partial class Logged_Administradores_SettingsEmail : System.Web.UI.Page
         }
         return rest;
     }
-
-    //private bool EmailTest()
-    //{
-    //    bool Resut = false;
-    //    try
-    //    {
-    //        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-    //        {
-    //            string body = string.Empty;
-    //            body = "Este es un Email de Prueba , Configuracion Exitosa!";
-    //            //CORREO
-    //            MailMessage Correo = new MailMessage();
-    //            Correo.From = new System.Net.Mail.MailAddress(EmailC.Text);
-    //            string Destinatario;
-    //            Destinatario = test.Text;
-    //            Correo.To.Add(Destinatario);
-    //            Correo.Subject = ("Email Test");
-    //            Correo.Body = body;
-    //            Correo.Priority = System.Net.Mail.MailPriority.Normal;
-    //            Correo.IsBodyHtml = true;
-
-    //            //SMPT
-    //            System.Net.Mail.SmtpClient ServerMail = new System.Net.Mail.SmtpClient();
-    //            ServerMail.Credentials = new NetworkCredential(EmailC.Text, Pass.Text);
-    //            ServerMail.Host = Host.Text;
-    //            ServerMail.Port = Convert.ToInt16(Puert.Text);
-    //            ServerMail.EnableSsl = true;
-    //            try
-    //            {
-    //                ServerMail.Send(Correo);
-    //                Resut = true;
-    //            }
-    //            catch
-    //            {
-    //                Correo.Dispose();
-    //                Resut = false;
-    //            }
-    //        }
-    //    }
-    //    catch (Exception b)
-    //    {
-    //        Resut = false;
-    //    }
-    //    return Resut;
-    //}
 
     protected void EmailTest1(object sender, EventArgs e)
     {

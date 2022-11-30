@@ -1,5 +1,7 @@
-
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     var url_list = ErroresWebService.get_path() + "/listar";
@@ -13,10 +15,9 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
-                //data.VendID = $('#MainContent_comboProveedores').val();
-                
-               
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
+                data.Fecha = $('#MainContent_inputFecha').val();
             }
         },
         searching: false,
@@ -52,8 +53,7 @@ $(document).ready(function () {
     });
     $('.limpiar').click(function (e) {
         e.preventDefault();
-
-       
+        $('#MainContent_inputFecha').val('');
         table.ajax.reload(  );
     });
 
@@ -79,9 +79,9 @@ redirectToReport(); return false;
     });
 
     function redirectToReport() {
-       
+        var fecha = $('#MainContent_inputFecha').val();
         var url_report = "/Logged/Reports/Errores";
-             
+        url_report += "?fecha=" + fecha;
         window.open(url_report, '_blank');
     }
 } );

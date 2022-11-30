@@ -1,5 +1,7 @@
-
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     hide_combo_proveedores(CargaFacturasWebService.get_path());
@@ -15,7 +17,8 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.NumVoucher = $('#MainContent_inputFactura').val();
                 data.Vendkey = $('#MainContent_comboProveedores').val();
                 data.RFC = $('#MainContent_inputRFC').val();
@@ -37,10 +40,9 @@ $(document).ready(function () {
             { "data": "Proveedor" , 'className': "centrar-data text_align_left"},
             { "data": "RFC", 'className': "centrar-data" },
             { "data": "Orden" , 'className': "centrar-data"},
-            { "data": "Subtotal" , 'className': "centrar-data"},
-            { "data": "Impuestos", 'className': "centrar-data" },
-            //{ "data": "Traslados", 'className': "centrar-data" },
-            { "data": "Total", 'className': "centrar-data" },
+            { "data": "Subtotal", 'className': "centrar-data text_align_right" },
+            { "data": "Impuestos", 'className': "centrar-data text_align_right" },
+            { "data": "Total", 'className': "centrar-data text_align_right" },
             { "data": "Estado", 'className': "centrar-data" }
         ],
 

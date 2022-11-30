@@ -1,5 +1,7 @@
-
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     hide_combo_proveedores(FacturasWebService.get_path());
@@ -15,10 +17,12 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.VendorId= $('#MainContent_comboProveedores').val();
                 data.Folio = $('#MainContent_inputFolio').val();
                 data.Fecha = $('#MainContent_inputFecha').val();
+                data.FechaR = $('#MainContent_inputFechaR').val();
                 data.contrarecibo = $('#MainContent_inputContrarecibo').val();
                 data.solicitud = $('#MainContent_inputSolicitud').val();               
                 data.Estado = $('#MainContent_comboEstado').val();
@@ -36,7 +40,7 @@ $(document).ready(function () {
             { "data": "Proveedor_Nombre", 'className': "centrar-data" },
             { "data": "Fecha" , 'className': "centrar-data"},
             { "data": "Fecha_Recepcion", 'className': "centrar-data" },
-            { "data": "Total", 'className': "centrar-data" },
+            { "data": "Total", 'className': "cetrar-data text_align_right" },
             { "data": "Contrarecibo_Folio", 'className': "centrar-data" },
             { "data": "Solicitud_Folio", 'className': "centrar-data" },
             { "data": "Estado", 'className': "centrar-data" },
@@ -81,6 +85,7 @@ $(document).ready(function () {
         $("#MainContent_comboEstado").val($("#MainContent_comboEstado option:first").val()).change();
         $('#MainContent_inputFolio').val('');
         $('#MainContent_inputFecha').val('');
+        $('#MainContent_inputFechaR').val('');
         $('#MainContent_inputContrarecibo').val('');
         $('#MainContent_inputSolicitud').val('');
 
@@ -116,6 +121,7 @@ $(document).ready(function () {
         var folio = $('#MainContent_inputFolio').val();
         var provId = $('#MainContent_comboProveedores').val();
         var fecha = $('#MainContent_inputFecha').val();
+        var fechaR = $('#MainContent_inputFechaR').val();
         var contrarecibo = $('#MainContent_inputContrarecibo').val();
         var solicitud = $('#MainContent_inputSolicitud').val();
         var estado = $('#MainContent_comboEstado').val();
@@ -124,6 +130,7 @@ $(document).ready(function () {
         
         url_report += "?folio=" + folio;
         url_report += "&fecha=" + fecha;
+        url_report += "&fechaR=" + fechaR;
         url_report += "&provId=" + provId;
         url_report += "&contrarecibo=" + contrarecibo;
         url_report += "&solicitud=" + solicitud;

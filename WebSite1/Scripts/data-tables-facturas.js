@@ -1,10 +1,14 @@
-
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
+var cli;
 $(document).ready(function () {
+
     hide_combo_proveedores(FacturasWebService.get_path());
-    var url_list = FacturasWebService.get_path() + "/listar";
-    
+    var url_list = FacturasWebService.get_path() + "/listar20";
+    cli = '1';
     table = $('#list').DataTable({
         language: window.datatableLang,
         "ajax": {
@@ -15,14 +19,17 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.Folio = $('#MainContent_inputFolio').val();
                 data.Serie = $('#MainContent_inputSerie').val();
-                data.Fecha = $('#MainContent_inputFecha').val();
+                data.Fecha  = $('#MainContent_inputFecha').val();
+                data.FechaR = $('#MainContent_inputFechaR').val();
                 data.VendID = $('#MainContent_comboProveedores').val();
                 data.Total = $('#MainContent_inputTotal').val();
                 data.UUID = $('#MainContent_inputUUID').val();
                 data.Status = $('#MainContent_comboEstado').val();
+                data.Cont = cli;
             }
         },
         searching: false,
@@ -33,14 +40,15 @@ $(document).ready(function () {
         "serverSide": true,
         "stateSave": true,
         "columns": [
-            { "data": "UUID" , 'className': "centrar-data", "orderable": false},
+            { "data": "UUID", 'className': "centrar-data", "orderable": false },
+            { "data": "Proveedor_Nombre", 'className': "centrar-data" },
             { "data": "Folio" , 'className': "centrar-data text_align_left"},
             { "data": "Serie", 'className': "centrar-data" },
-            { "data": "Fecha" , 'className': "centrar-data"},
-            { "data": "Proveedor" , 'className': "centrar-data"},
-            { "data": "Subtotal", 'className': "centrar-data" },
-            { "data": "Retenciones", 'className': "centrar-data" },
-            { "data": "Traslados", 'className': "centrar-data" }
+            { "data": "Fecha_Recepcion", 'className': "centrar-data"},
+            { "data": "Fecha", 'className': "centrar-data" },
+            { "data": "Subtotal", 'className': "centrar-data text_align_right"},
+            { "data": "Traslados", 'className': "centrar-data text_align_right"},
+            { "data": "Total", 'className': "cetrar-data text_align_right" }
         ],
 
         "columnDefs": [ {
@@ -65,14 +73,14 @@ $(document).ready(function () {
             $('#error_inputTotal').css('display', 'block');
     });
 
-    $('.buscar').click(function (e) {
-        if (IsNumber('MainContent_inputTotal')) {
-            e.preventDefault();
-            table.ajax.reload();
-        }
-        else
-            $('#error_inputTotal').css('display', 'block');
-    });
+    //$('.buscar').click(function (e) {
+    //    if (IsNumber('MainContent_inputTotal')) {
+    //        e.preventDefault();
+    //        table.ajax.reload();
+    //    }
+    //    else
+    //        $('#error_inputTotal').css('display', 'block');
+    //});
     $('.limpiar').click(function (e) {
         e.preventDefault();
 
@@ -81,9 +89,10 @@ $(document).ready(function () {
         $('#MainContent_inputFolio').val('');
         $('#MainContent_inputSerie').val('');
         $('#MainContent_inputFecha').val('');
+        $('#MainContent_inputFechaR').val('');
         $('#MainContent_inputTotal').val('');
         $('#MainContent_inputUUID').val('');
-
+        cli = '1';
         table.ajax.reload(  );
     });
 
@@ -116,6 +125,7 @@ $(document).ready(function () {
         var folio = $('#MainContent_inputFolio').val();
         var serie = $('#MainContent_inputSerie').val();
         var fecha = $('#MainContent_inputFecha').val();
+        var fechaR = $('#MainContent_inputFechaR').val();
         var provId = $('#MainContent_comboProveedores').val();
         var total = $('#MainContent_inputTotal').val();
         var uuid = $('#MainContent_inputUUID').val();
@@ -126,11 +136,17 @@ $(document).ready(function () {
         url_report += "?folio=" + folio;
         url_report += "&serie=" + serie;
         url_report += "&fecha=" + fecha;
+        url_report += "&fechaR=" + fechaR;
         url_report += "&provId=" + provId;
         url_report += "&total=" + total;
         url_report += "&uuid=" + uuid;
         url_report += "&estado=" + estado;
         window.open(url_report, '_blank');
-    }   
-} );
+    }  
+});
+
+function Test(e, v) {
+    cli = '0';
+    table.ajax.reload();
+}
 

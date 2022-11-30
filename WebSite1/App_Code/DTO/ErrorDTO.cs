@@ -1,8 +1,13 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using Proveedores_Model;
 
 /// <summary>
 /// Summary description for ErrorDTO
@@ -12,16 +17,18 @@ public class ErrorDTO
     public string Usuario { get; set; }
     public string Compania { get; set; }
     public string Fecha { get; set; }
+    public DateTime Date { get; set; }
     public string Comentario { get; set; }
 
     public ErrorDTO()
     { }
 
-    public ErrorDTO(string Usuario, string Compañía, string Fecha, string Comentario)
+    public ErrorDTO(string Usuario, string Compañía, string Fecha, string Comentario, DateTime Dat)
     {
         this.Usuario = Usuario;
         this.Compania = Compañía;
         this.Fecha = Fecha;
+        this.Date = Dat == null ? DateTime.MinValue : Dat;
         this.Comentario = Comentario;
     }
 }
@@ -30,6 +37,23 @@ public class Errores
 {
     public Errores()
     {
+    }
+
+    public static List<ErrorDTO> FiltroErrores(string Fecha, bool directo_en_vista = false)
+    {
+        try
+        {
+            List<ErrorDTO> Errores = ObtenerErrores();
+            if (!string.IsNullOrWhiteSpace(Fecha) && Fecha != "null")
+                Errores = Errores.Where(f => f.Fecha == Fecha).ToList();
+            return Errores;
+        }
+        catch (Exception exp)
+        {
+            if (directo_en_vista)
+                throw new MulticonsultingException(exp.ToString());
+            return new List<ErrorDTO>();
+        }
     }
 
     public static List<ErrorDTO> ObtenerErrores(bool directo_en_vista = false)
@@ -55,7 +79,19 @@ public class Errores
             List<ErrorDTO> errores = new List<ErrorDTO>();
 
             foreach (ErrorLog error in list.Where(a => a.CompanyID == company.CompanyID))
-                errores.Add(new ErrorDTO(error.Users.UserID, error.Users.Company.FirstOrDefault() != null ? error.Users.Company.First().CompanyID : string.Empty, error.ErrorDate != null ? error.ErrorDate.ToShortDateString() : string.Empty, error.Message));
+            {
+
+                Company comp = error.Users.Company.FirstOrDefault();
+                errores.Add(new ErrorDTO(
+                    error.Users != null ? error.Users.UserID : string.Empty,
+                    comp != null ? comp.CompanyID : string.Empty,
+                    error.ErrorDate != null ? error.ErrorDate.Date.ToString("dd/MM/yyyy") : string.Empty,
+                    error.Message,
+                    error.ErrorDate));
+            }
+
+
+
 
             return errores;
         }

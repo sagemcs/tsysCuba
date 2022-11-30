@@ -1,8 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//12 MARZO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : ADRIAN QUIALA
+
+//REFERENCIAS UTILIZADAS
+
+using System;
 using System.Text.RegularExpressions;
-using System.Web;
 
 /// <summary>
 /// Summary description for NumLetra
@@ -13,16 +17,18 @@ public class NumLetra
     private String[] DECENAS = {"diez ", "once ", "doce ", "trece ", "catorce ", "quince ", "dieciseis ",
         "diecisiete ", "dieciocho ", "diecinueve", "veinte ", "treinta ", "cuarenta ",
         "cincuenta ", "sesenta ", "setenta ", "ochenta ", "noventa "};
-    private String[] CENTENAS = {"", "ciento ", "doscientos ", "trecientos ", "cuatrocientos ", "quinientos ", "seiscientos ",
+    private String[] CENTENAS = {"", "ciento ", "doscientos ", "trescientos ", "cuatrocientos ", "quinientos ", "seiscientos ",
         "setecientos ", "ochocientos ", "novecientos "};
 
     private Regex r;
 
-    public String Convertir(string numero, bool mayusculas)
+    public String Convertir(string numero, bool mayusculas, string Moneda)
     {
 
-        String literal = "";
-        String parte_decimal;
+        string literal = "";
+        string parte_decimal;
+        string Denominacion;
+        Denominacion = Moneda;
         //si el numero utiliza (.) en lugar de (,) -> se reemplaza
         numero = numero.Replace(".", ",");
 
@@ -40,7 +46,11 @@ public class NumLetra
             String[] Num = numero.Split(',');
 
             //de da formato al numero decimal
+
             parte_decimal = Num[1] + "/100 M.N.";
+            if (Denominacion == "USD") { parte_decimal = Num[1] + "/100 USD"; }
+            if (Denominacion == "EUR") { parte_decimal = Num[1] + "/100 EUR"; }
+
             //se convierte el numero a literal
             if (int.Parse(Num[0]) == 0)
             {//si el valor es cero                

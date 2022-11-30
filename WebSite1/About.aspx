@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="About" Language="C#" MasterPageFile="Site.master" AutoEventWireup="true" CodeFile="About.aspx.cs" Inherits="About" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
-    <h2><%: Title %>.</h2>
-    <h3>Your application description page.</h3>
-    <p>Use this area to provide additional information.</p>
+    Version 16-Octubre-2019 By Luis Angel Garcia P
+    <h3></h3>
+    <p></p>
 </asp:Content>

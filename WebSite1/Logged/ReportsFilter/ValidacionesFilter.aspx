@@ -6,7 +6,11 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" />--%>
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
@@ -38,8 +42,8 @@
                      <div class="col-md-5">
                     
                         <div class="form-group">
-                            
-                       <asp:TextBox ID="inputItemID" Maxlength="30" placeholder="ID" runat="server" CssClass="form-control filter" ToolTip="ID Artículo"></asp:TextBox>   
+                        <label>Articulo</label>    
+                       <asp:TextBox ID="inputItemID" Maxlength="30" AutoComplete = "off" AutoCompleteType="Disabled" placeholder="ID" runat="server" CssClass="form-control filter" ToolTip="ID Artículo"></asp:TextBox>   
                          
                             </div>
                     </div>
@@ -47,19 +51,19 @@
 
                     <div class="col-md-4">
                         <div class="form-group">
-
-                              <asp:TextBox ID="inputFecha"  placeholder="Fecha" runat="server" ToolTip="Fecha" CssClass="form-control datepicker filter"></asp:TextBox>
-                        
+                         <label>Fecha </label>
+                         <asp:TextBox type="date" name="fecha" ID="inputFecha" AutoComplete = "off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" step="1"  class="form-control"  runat="server"/>   
                         </div>
                     </div>
                    
           
                     <div class="col-md-3" >
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <br />
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
           

@@ -1,15 +1,22 @@
-﻿using Microsoft.Owin;
-using Owin;
+﻿
+//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+
+//REFERENCIAS UTILIZADAS
 using Microsoft.AspNet.Identity;
-using WebSite1;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Owin;
+using Owin;
 
 
 [assembly: OwinStartupAttribute(typeof(WebSite1.Startup))]
 namespace WebSite1
 {
-    public partial class Startup {
-        public void Configuration(IAppBuilder app) {
+    public partial class Startup
+    {
+        public void Configuration(IAppBuilder app)
+        {
             ConfigureAuth(app);
             CreateRolesandUsers();
         }
@@ -40,7 +47,7 @@ namespace WebSite1
 
 
             // creating Creating Manager role    
-            if (!roleManager.RoleExists("T|SYS|- Admin"))
+            if (!roleManager.RoleExists("T|SYS| - Admin"))
             {
                 var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
                 role.Name = "T|SYS| - Admin";
@@ -49,13 +56,46 @@ namespace WebSite1
             }
 
             // creating Creating Manager role    
-            if (!roleManager.RoleExists("T|SYS|- Validador"))
+            if (!roleManager.RoleExists("T|SYS| - Validador"))
             {
                 var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
                 role.Name = "T|SYS| - Validador";
                 roleManager.Create(role);
-
             }
+
+            // creating Creating Manager role    
+            if (!roleManager.RoleExists("T|SYS| - Empleado"))
+            {
+                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
+                role.Name = "T|SYS| - Empleado";
+                roleManager.Create(role);
+            }
+
+            // creating Creating Manager role    
+            if (!roleManager.RoleExists("T|SYS| - Gerente"))
+            {
+                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
+                role.Name = "T|SYS| - Gerente";
+                roleManager.Create(role);
+            }
+
+            // creating Creating Manager role    
+            if (!roleManager.RoleExists("T|SYS| - Tesoreria"))
+            {
+                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
+                role.Name = "T|SYS| - Tesoreria";
+                roleManager.Create(role);
+            }
+
+            // creating Creating Manager role    
+            if (!roleManager.RoleExists("T|SYS| - Finanzas"))
+            {
+                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
+                role.Name = "T|SYS| - Finanzas";
+                roleManager.Create(role);
+            }
+
+
 
             //var user = new ApplicationUser();
             //user.UserName = "tsys";
@@ -90,8 +130,13 @@ namespace WebSite1
 
             }
 
+            //Creating Gerencia de Capital Humano role
+            if (!roleManager.RoleExists("T|SYS| - Gerencia de Capital Humano"))
+            {
+                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
+                role.Name = "T|SYS| - Gerencia de Capital Humano";
+                roleManager.Create(role);
+            }
         }
     }
-
-    
 }

@@ -1,4 +1,10 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -6,7 +12,6 @@ using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
-using Proveedores_Model;
 
 /// <summary>
 /// Summary description for EmpresasWebService
@@ -27,7 +32,7 @@ public class EmpresasWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(UseHttpGet = true)]
-    public void listar(string CompanyName, string CodigoNIT, int start, int length)
+    public void listar(string order_col, string order_dir, string CompanyName, string CodigoNIT, int start, int length)
     {
         try
         {
@@ -46,7 +51,29 @@ public class EmpresasWebService : System.Web.Services.WebService
                 if (list_dto != null)
                 {
                     int total = list_dto.Count();
-                    list_dto = list_dto.Skip(start).Take(length).ToList();
+
+                    if (order_col == "1")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Nombre).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Nombre).ToList();
+                    else if (order_col == "2")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.RFC).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.RFC).ToList();
+                    else if (order_col == "3")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Date).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Date).ToList();
+                    else if (order_col == "4")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Estado).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Estado).ToList();
+
+                    list_dto = length == -1 ? list_dto.Skip(start).ToList() : list_dto.Skip(start).Take(length).ToList();
                     int cantidad = list_dto.Count();
 
                     var result = new

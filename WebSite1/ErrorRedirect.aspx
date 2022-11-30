@@ -4,20 +4,33 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title></title>
+    <title>Error</title>
+    <link href="~/Css/errorpage.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<%--                <div>
+    <%--                <div>
                     <a runat="server" href="~/">
                     <img src="/Img/Lgtys.png" style="border:0px solid black;"/>
                     </a>
                 </div>--%>
-     <b>La página ha dejado de trabajar</b>
-     <br>
-     <h1>Disculpa las molestias.</h1>
-    <form id="form1" runat="server">
-        <div>
+    <div class="navbar navbar-inverse navbar-fixed-top" id="Portada">
+        <div class="container">
+            <div class="navbar-header">
+                <%-- <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    </button> --%>
+                <a runat="server">
+                    <img src="/Img/Lgtys.png" style="border: 0px solid black;" />
+                </a>
+            </div>
         </div>
-    </form>
+    </div>
+    <div class="ti1" id="M1">
+        <h1>Ha ocurrido un error</h1>
+    </div>
+
+    <%--<b>La página ha dejado de trabajar</b>--%>
+    <br>
+    <h3>El servidor tuvo un error interno y no pudo completar su petición.</h3>
+    <h3>Disculpe los inconvenientes causados.</h3>
 </body>
 </html>

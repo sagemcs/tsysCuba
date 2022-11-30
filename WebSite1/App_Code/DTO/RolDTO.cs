@@ -1,22 +1,31 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA.
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using Proveedores_Model;
 
 public class RolDTO
 {
+    public int Key { get; set; }
     public string ID { get; set; }
     public string Descripcion { get; set; }
     public string Fecha { get; set; }
+    public DateTime Date { get; set; }
 
     public RolDTO()
     { }
-    public RolDTO(string ID, string Descripcion, string Fecha)
+    public RolDTO(int Key, string ID, string Descripcion, string Fecha, DateTime Date)
     {
+        this.Key = Key;
         this.ID = ID;
         this.Descripcion = Descripcion;
         this.Fecha = Fecha;
+        this.Date = Date == null ? DateTime.MinValue : Convert.ToDateTime(Date);
     }
 }
 
@@ -49,11 +58,16 @@ public class Roles_on_DTO
             List<Roles> list = db.Roles.ToList();
             List<RolDTO> roles = new List<RolDTO>();
             foreach (var rol in list)
-                roles.Add(new RolDTO(rol.RoleID, rol.Description, rol.CreateDate != null ? rol.CreateDate.Value.ToShortDateString() : string.Empty));
+                roles.Add(new RolDTO(
+                    rol.RoleKey,
+                    rol.RoleID,
+                    rol.RoleID,
+                    rol.CreateDate != null ? rol.CreateDate.Value.ToString("dd/MM/yyyy") : string.Empty,
+                    rol.CreateDate != null ? rol.CreateDate.Value : DateTime.MinValue));
 
             return roles;
         }
-        catch(Exception exp)
+        catch (Exception exp)
         {
             if (directo_en_vista)
                 throw new MulticonsultingException(exp.ToString());

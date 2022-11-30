@@ -1,6 +1,16 @@
-﻿using Microsoft.AspNet.Identity;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//PANTALLA ACTUALIZACION DE PASSWORD PARA PROVEEDORES
+
+//REFERENCIAS UTILIZADAS
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -31,6 +41,11 @@ public partial class Account_Manage : System.Web.UI.Page
 
     protected void Page_Load()
     {
+        Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+        Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+        Page.Response.Cache.SetNoStore();
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
         if (!IsPostBack)
         {
             if (HttpContext.Current.Session["IDCompany"] == null)
@@ -71,6 +86,21 @@ public partial class Account_Manage : System.Web.UI.Page
 
                         if (message.ToString() == "ChangePwdSuccess")
                         {
+
+                            string key = HttpContext.Current.Session["UserKey"].ToString();
+                            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+                            {
+                                SqlCommand cmd = new SqlCommand("PassTemp", conn);
+                                cmd.CommandType = CommandType.StoredProcedure;
+
+                                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Userkey", Value = key });
+                                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Opcion", Value = 3 });
+                                if (conn.State == ConnectionState.Open) { conn.Close(); }
+
+                                conn.Open();
+                                SqlDataReader rdr = cmd.ExecuteReader();
+                            }
+                            HttpContext.Current.Session["Passw"] = "0";
                             string tipo = "success";
                             string Msj = "Su contraseña ha cambiado";
                             string titulo = "Actualización de Password Exitosa";
@@ -103,15 +133,65 @@ public partial class Account_Manage : System.Web.UI.Page
             }
 
             Global.Docs();
-            if ((HttpContext.Current.Session["Docs"].ToString() == "0"))
+            int Valor = Convert.ToInt16(HttpContext.Current.Session["Docs"].ToString());
+            int Dias = Valor;
+            if (Dias == 0)
             {
                 Page.MasterPageFile = "MenuP.master";
             }
-            else if ((HttpContext.Current.Session["Status"].ToString() == "Activo"))
+            else if (Dias < 0)
             {
-                if (HttpContext.Current.Session["UpDoc"].ToString() == "1") { Page.MasterPageFile = "MenuP.master"; }
-                else { Page.MasterPageFile = "MenuPreP.master"; }
+                Page.MasterPageFile = "MenuP.master";
             }
+            else if (Dias == 30)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias == 25)
+            {
+                Page.MasterPageFile = "MenuP.master";
+            }
+            else if (Dias == 26)
+            {
+                Page.MasterPageFile = "MenuP.master";
+            }
+            else if (Dias == 27)
+            {
+                Page.MasterPageFile = "MenuP.master";
+            }
+            else if (Dias == 28)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias == 22)
+            {
+                Page.MasterPageFile = "MenuP.master";
+            }
+            else if (Dias <= 10 && Dias > 0)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias > 10)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+
+            //if ((HttpContext.Current.Session["Docs"].ToString() == "1"))
+            //{
+            //    Global.RevDocs();
+            //    if ((HttpContext.Current.Session["Docs"].ToString() == "1"))
+            //    {
+            //        //Page.MasterPageFile = "MenuP.master";
+            //        Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+
+            //    }
+            //    //Page.MasterPageFile = "MenuP.master";
+            //}
+            //else if ((HttpContext.Current.Session["Status"].ToString() == "Activo"))
+            //{
+            //    //if (HttpContext.Current.Session["UpDoc"].ToString() == "1") { Page.MasterPageFile = "MenuP.master"; }
+            //    //else { Page.MasterPageFile = "MenuPreP.master"; }
+            //}
         }
         catch
         {

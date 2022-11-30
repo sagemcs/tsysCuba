@@ -1,4 +1,7 @@
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     hide_combo_proveedores(PagosWebService.get_path());
@@ -14,16 +17,16 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
-                //data.VendID = $('#MainContent_comboProveedores').val();
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.Folio = $('#MainContent_inputFolio').val();
                 data.Serie = $('#MainContent_inputSerie').val();
                 data.Fecha = $('#MainContent_inputFecha').val();
+                data.FechaR = $('#MainContent_inputFechaR').val();
                 data.VendID = $('#MainContent_comboProveedores').val();
                 data.Total = $('#MainContent_inputTotal').val();
                 data.UUID = $('#MainContent_inputUUID').val();
-                data.Status = $('#MainContent_comboEstado').val();
-               
+                data.Status = $('#MainContent_comboEstado').val();               
             }
         },
         searching: false,
@@ -34,14 +37,14 @@ $(document).ready(function () {
         "serverSide": true,
         "stateSave": true,
         "columns": [
-            { "data": "UUID" , 'className': "centrar-data", "orderable": false},
-          
+            { "data": "UUID", 'className': "centrar-data", "orderable": false },
+            { "data": "Proveedor", 'className': "centrar-data" },
             { "data": "Folio" , 'className': "centrar-data text_align_left"},
             { "data": "Serie", 'className': "centrar-data" },
-            { "data": "Fecha" , 'className': "centrar-data"},
-            { "data": "Proveedor" , 'className': "centrar-data"},
-            { "data": "Subtotal", 'className': "centrar-data" },
-            { "data": "Total", 'className': "centrar-data" },
+            { "data": "FechaR", 'className': "centrar-data" },
+            { "data": "Fecha", 'className': "centrar-data" },
+            { "data": "Subtotal", 'className': "cetrar-data text_align_right" },
+            { "data": "Total", 'className': "cetrar-data text_align_right" },
             { "data": "Estado", 'className': "centrar-data" }
         ],
 
@@ -84,6 +87,7 @@ $(document).ready(function () {
         $('#MainContent_inputFolio').val('');
         $('#MainContent_inputSerie').val('');
         $('#MainContent_inputFecha').val('');
+        $('#MainContent_inputFechaR').val('');
         $('#MainContent_inputTotal').val('');
         $('#MainContent_inputUUID').val('');
  
@@ -115,6 +119,7 @@ redirectToReport(); return false;
         var folio = $('#MainContent_inputFolio').val();
         var serie = $('#MainContent_inputSerie').val();
         var fecha = $('#MainContent_inputFecha').val();
+        var fechaR = $('#MainContent_inputFechaR').val();
         var provId = $('#MainContent_comboProveedores').val();
         var total = $('#MainContent_inputTotal').val();
         var uuid = $('#MainContent_inputUUID').val();
@@ -125,6 +130,7 @@ redirectToReport(); return false;
         url_report += "?folio=" + folio;
         url_report += "&serie=" + serie;
         url_report += "&fecha=" + fecha;
+        url_report += "&fechaR=" + fechaR;
         url_report += "&provId=" + provId;
         url_report += "&total=" + total;
         url_report += "&uuid=" + uuid;

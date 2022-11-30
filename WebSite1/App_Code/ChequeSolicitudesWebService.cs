@@ -1,5 +1,14 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+
+using Proveedores_Model;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -7,8 +16,6 @@ using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
-using Proveedores_Model;
-
 
 /// <summary>
 /// Summary description for ChequeSolicitudesWebService
@@ -16,7 +23,7 @@ using Proveedores_Model;
 [WebService(Namespace = "http://tempuri.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
- [System.Web.Script.Services.ScriptService]
+[System.Web.Script.Services.ScriptService]
 public class ChequeSolicitudesWebService : System.Web.Services.WebService
 {
     private PortalProveedoresEntities db = new PortalProveedoresEntities();
@@ -29,7 +36,7 @@ public class ChequeSolicitudesWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(UseHttpGet = true)]
-    public void listar(string Serie, string VendID, string UserID, string Total, string ChkReqDate, int start, int length)
+    public void listar(string order_col, string order_dir, string Serie, string VendID, string UserID, string Total, string ChkReqDate, string PagoDate, int start, int length)
     {
         try
         {
@@ -37,9 +44,29 @@ public class ChequeSolicitudesWebService : System.Web.Services.WebService
 
             if (Tools.EsTokenValido(supuesto_token) && Tools.UsuarioAutenticado() != null && HttpContext.Current.Session["RolUser"].ToString() != "Proveedor")
             {
-                List<ChequeSolicitudDTO> list_dto = new List<ChequeSolicitudDTO>();
-                ChkReqDate = Tools.ObtenerFechaEnFormato(ChkReqDate);
-                list_dto = ChequeSolicitudes.ObtenerSolicitudesCheque(Serie, VendID, UserID, Total, ChkReqDate);
+                List<ChequeSolicitudesDTO> list_dto = new List<ChequeSolicitudesDTO>();
+                ChkReqDate = Tools.ObtenerFechaEnFormatoNew(ChkReqDate);
+                PagoDate = Tools.ObtenerFechaEnFormatoNew(PagoDate);
+
+                list_dto = ChequeSolicitudess.ObtenerSolicitudesCheque(Serie, VendID, UserID, Total, ChkReqDate, PagoDate);
+
+                for (int i = 0; i <= list_dto.Count() - 1; i++)
+                {
+                    string regin = "es-MX";
+                    if (list_dto[i].Moneda == "USD")
+                    {
+                        regin = "en-US";
+                    }
+                    else if (list_dto[i].Moneda == "EUR")
+                    {
+                        regin = "fr-FR";
+                    }
+
+                    CultureInfo gbCulture = new CultureInfo(regin);
+                    string Simbol = gbCulture.NumberFormat.CurrencySymbol;
+                    list_dto[i].Total = Simbol + " " + Convert.ToDecimal(list_dto[i].Total).ToString("#,##0.00");
+                }
+
 
                 var js = new JavaScriptSerializer();
                 Context.Response.Clear();
@@ -48,7 +75,39 @@ public class ChequeSolicitudesWebService : System.Web.Services.WebService
                 if (list_dto != null)
                 {
                     int total = list_dto.Count();
-                    list_dto = list_dto.Skip(start).Take(length).ToList();
+
+                    if (order_col == "1")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Serie).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Serie).ToList();
+                    else if (order_col == "2")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Proveedor).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Proveedor).ToList();
+                    else if (order_col == "3")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Solicitante).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Solicitante).ToList();
+                    else if (order_col == "4")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Total_In_Double).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Total_In_Double).ToList();
+                    else if (order_col == "5")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Date).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Date).ToList();
+                    else if (order_col == "6")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.DatePr).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.DatePr).ToList();
+
+                    list_dto = length == -1 ? list_dto.Skip(start).ToList() : list_dto.Skip(start).Take(length).ToList();
                     int cantidad = list_dto.Count();
 
                     var result = new

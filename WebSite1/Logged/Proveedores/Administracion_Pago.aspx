@@ -1,6 +1,7 @@
 ﻿<%@ Page Title="Consulta de Pagos" Language="C#" MasterPageFile="MenuPreP.Master" AutoEventWireup="true" CodeFile="Administracion_Pago.aspx.cs" Inherits="Logged_Administrar" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+   Version 16-Octubre-2019 By Luis Angel Garcia P
         <script src ="../../Css/sweetalert.min.js" type="text/javascript"></script>
 
    <script>
@@ -10,15 +11,27 @@
     }
     </script>
 
+    <SCRIPT language="JavaScript">
+  function numbersonly(e)
+  {
+    var unicode=e.charCode? e.charCode : e.keyCode
+    if (unicode!=8 && unicode!=44)
+    {
+        if (unicode < 46 || unicode > 57) //if not a number
+      { return false} //disable key press    
+    }  
+  }  
+</SCRIPT>
+
   <asp:UpdatePanel runat="server" id="UpdatePanel" updatemode="Conditional">
   <ContentTemplate>
-
+      
     <div class="col-lg-12 col-sm-12 col-12" id="M1">
         <h3>Consulta de Pagos</h3>
     </div>
 
       <div class="row">
-
+          <br />
       <div class="col-xs-12 md-3 col-lg-3">
          <label>Folio</label>
         <asp:TextBox runat="server" type="text" MaxLength="20" ID="Folio" class="form-control" TabIndex="3" />
@@ -26,12 +39,12 @@
 
       <div class="col-xs-12 md-3 col-lg-3">
           <label>Factura</label>
-        <asp:TextBox runat="server" type="text" MaxLength="20" ID="Factura" class="form-control" TabIndex="4" />
+        <asp:TextBox runat="server" type="text" MaxLength="20" ID="Factura" class="form-control" TabIndex="4"  />
       </div>
 
       <div class="col-xs-12 md-3 col-lg-3">
           <label>Monto</label>
-        <asp:TextBox runat="server" type="text" MaxLength="20" ID="Monto" class="form-control" TabIndex="2" />
+        <asp:TextBox runat="server" type="text" MaxLength="20" ID="Monto" class="form-control" TabIndex="2"  onkeypress="return numbersonly(event);"/>
       </div>
 
       <div class="col-xs-12 col-md-3 col-lg-3">
@@ -39,7 +52,7 @@
         <asp:DropDownList ID="List" runat="server" class="selectpicker show-tick form-control" OnSelectedIndexChanged="List_SelectedIndexChanged" AutoPostBack="True">
            <asp:ListItem Value="2">Aprobado</asp:ListItem>
            <asp:ListItem Value="1">Pendiente</asp:ListItem>
-           <asp:ListItem Value="3">Cancelado</asp:ListItem>
+           <asp:ListItem Value="3">Rechazado</asp:ListItem>
            <asp:ListItem Value="4">Eliminado</asp:ListItem>
         </asp:DropDownList>
       </div>
@@ -74,7 +87,7 @@
                   <div class="form-group row">
                       <label class="col-form-label col-xs-11 col-sm-11 col-md-11"></label>
                       <div class="col-xs-4 col-sm-2 col-md-2">
-                          <asp:Button Text="Buscar" ID="Button1" runat="server" CssClass="btn btn-info" OnClick="Buscar" title="Generar Busqueda" />
+                          <asp:Button Text="Buscar" ID="Button1" runat="server" CssClass="btn btn-primary" OnClick="Buscar" title="Generar Busqueda" />
                       </div>
                   </div>
 
@@ -84,7 +97,7 @@
                   <div class="form-group row">
                       <label class="col-form-label col-xs-11 col-sm-11 col-md-11"></label>
                       <div class="col-xs-4 col-sm-2 col-md-2">
-                          <asp:Button Text="Limpiar" ID="Button2" runat="server" CssClass="btn btn-success" OnClick="Limpia" title="Generar Busqueda" />
+                          <asp:Button Text="Limpiar" ID="Button2" runat="server" CssClass="btn btn-tsys" OnClick="Limpia" title="Generar Busqueda" />
                       </div>
                   </div>
 
@@ -128,7 +141,7 @@
 
                 <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="50px">
                     <ItemTemplate>
-                        <asp:Button ID="Documento_2" CssClass="btn btn-danger" runat="server" CommandName="Documento_2" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" Text="PDF" />
+                        <asp:Button ID="Documento_2" CssClass="btn btn-default" runat="server" CommandName="Documento_2" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" Text="PDF" />
                     </ItemTemplate>
                 <HeaderStyle Width="50px"></HeaderStyle>
                 <ItemStyle HorizontalAlign="Center"></ItemStyle>
@@ -188,7 +201,7 @@
    <Triggers>
     <asp:AsyncPostBackTrigger controlid="Button1" eventname="Click" />
     <asp:AsyncPostBackTrigger ControlID="SelProv" EventName="selectedindexchanged" />
-    <asp:PostBackTrigger ControlID="GridView1"/>
+    <asp:PostBackTrigger ControlID="GridView1" />
     </Triggers>
   </asp:UpdatePanel>
 

@@ -1,3 +1,7 @@
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     hide_combo_proveedores(ContrarecibosWebService.get_path());
@@ -13,12 +17,14 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.Folio = $('#MainContent_inputFolio').val();
                 data.VendID = $('#MainContent_comboProveedores').val();
                 data.AliasDBA = $('#MainContent_inputRFC').val();
                 data.Total = $('#MainContent_inputTotal').val();
                 data.RcptDate = $('#MainContent_inputFechaRecepcion').val();
+                data.RcptPago = $('#MainContent_inputFechaPago').val();
                 data.sin_solicitud = true;
             }
         },
@@ -35,8 +41,9 @@ $(document).ready(function () {
             { "data": "Proveedor", 'className': "centrar-data text_align_left" },
             { "data": "RFC", 'className': "centrar-data text_align_left" },
             { "data": "Condiciones", 'className': "centrar-data text_align_left" },
-            { "data": "Fecha_Recepcion", 'className': "centrar-data" },
-            { "data": "Fecha_Programada_Pago", 'className': "centrar-data" }
+            { "data": "Fecha_AprobacionF", 'className': "centrar-data" },
+            { "data": "Fecha_Programada_Pago", 'className': "centrar-data" },
+            { "data": "Total", 'className': "cetrar-data text_align_right" }
         ],
 
         "columnDefs": [ {
@@ -57,12 +64,18 @@ $(document).ready(function () {
         e.preventDefault();
         table.ajax.reload(  );
     });
+
     $('.limpiar').click(function (e) {
         e.preventDefault();
 
         $("#MainContent_comboProveedores").val($("#MainContent_comboProveedores option:first").val()).change();
-        $('#MainContent_inputFecha').val('');
+        $('#MainContent_inputRFC').val('');
+        $('#MainContent_inputTotal').val('');
+        $('#MainContent_inputFolio').val('');
+        $('#MainContent_inputFechaRecepcion').val('');
+        $('#MainContent_inputFechaPago').val('');
         table.ajax.reload(  );
+    
     });
 
     function getSelected() {

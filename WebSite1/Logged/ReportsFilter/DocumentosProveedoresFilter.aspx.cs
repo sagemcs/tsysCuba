@@ -1,4 +1,11 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : ADRIAN QUIALA
+//PANTALLA DE CONFIGURACION PARA REPORTE DE DOCUMENTOS DE PROVEEDOR
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,6 +16,11 @@ public partial class Logged_ReportsFilter_DocumentosProveedoresFilter : System.W
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+        Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+        Page.Response.Cache.SetNoStore();
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
         bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
         if (!isAuth)
         {
@@ -37,10 +49,10 @@ public partial class Logged_ReportsFilter_DocumentosProveedoresFilter : System.W
         Page.Title = "Documentos proveedores";
         try
         {
-            List<EstadoDocumentoDTO> list_dto_estados = EstadosDocumento.Obtener();
+            List<EstadoDocumentosDTO> list_dto_estados = EstadosDocumentos.Obtener();
             if (list_dto_estados != null && list_dto_estados.Count != 0)
             {
-                EstadoDocumentoDTO vacio = new EstadoDocumentoDTO();
+                EstadoDocumentosDTO vacio = new EstadoDocumentosDTO();
                 vacio.Id = "0";
                 vacio.Descripcion = "[-Seleccione estado-]";
                 list_dto_estados.Insert(0, vacio);

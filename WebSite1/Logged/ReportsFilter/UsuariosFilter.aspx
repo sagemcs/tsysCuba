@@ -6,7 +6,11 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" />--%>
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
@@ -35,23 +39,24 @@
                     <div class="col-md-3">
                     
                         <div class="form-group">
-                            
-                        <asp:TextBox ID="inputNombre" MaxLength="256"  placeholder="Nombre" runat="server" CssClass="form-control filter" ToolTip="Nombre"></asp:TextBox>   
+                        <label>Nombre / Razón Social</label> 
+                        <asp:TextBox ID="inputNombre" MaxLength="256" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter" ToolTip="Nombre"></asp:TextBox>   
                          
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <asp:DropDownList ID="comboProveedores" runat="server" CssClass="form-control select2 filter">
-                            </asp:DropDownList>
-                           
-                        </div>
 
+                   <div class="col-md-3">
+                    
+                        <div class="form-group">
+                         <label>Correo</label>    
+                        <asp:TextBox ID="inputCorreo" MaxLength="256" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter" ToolTip="Correo"></asp:TextBox>   
+                         
+                        </div>
                     </div>
 
                     <div class="col-md-2">
                         <div class="form-group">
-                          
+                          <label>Usuario Interno</label> 
                             <asp:DropDownList ID="comboInterno" runat="server" CssClass="form-control select2 filter">
                                 <asp:ListItem Value="">[-Seleccione interno-]</asp:ListItem>
                                 <asp:ListItem Value="si">SI</asp:ListItem>
@@ -62,23 +67,33 @@
                     </div>
                     
                     <div class="col-md-2">
-                        <div class="form-group">                          
+                        <div class="form-group">
+                            <label>Estado</label>                           
                             <asp:DropDownList ID="comboEstado" runat="server" CssClass="form-control select2 filter">                    
                             </asp:DropDownList>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <br />
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
           
                         </div>
                     </div>
 
+                    <div class="col-md-3" style ="visibility:hidden">
+                        <div class="form-group">
+                            <asp:DropDownList ID="comboProveedores" runat="server" CssClass="form-control select2 filter">
+                            </asp:DropDownList>
+                           
+                        </div>
+
+                    </div>
                     
 
                 </div>
@@ -94,8 +109,8 @@
                     <tr>
                         <th></th>
                         <th>Correo</th>
-                        <th>Nombre</th>
-                        <th>Proveedor</th>
+                        <th>Nombre / Razón Social</th>
+<%--                        <th>Proveedor</th>--%>
                         <th>Interno</th>
                         <th>Estado</th>
                     </tr>

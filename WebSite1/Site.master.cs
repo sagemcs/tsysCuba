@@ -43,7 +43,10 @@ public partial class SiteMaster : MasterPage
         }
 
         try {
-            Text_Sec.Text = HttpContext.Current.Session["JWTKey"].ToString();
+            if (HttpContext.Current.Session["JWTKey"]!=null)
+            {
+                Text_Sec.Text = HttpContext.Current.Session["JWTKey"].ToString();
+            }            
         }
         catch { }
         Page.PreLoad += master_Page_PreLoad;
@@ -51,6 +54,19 @@ public partial class SiteMaster : MasterPage
 
     protected void master_Page_PreLoad(object sender, EventArgs e)
     {
+        bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
+
+        if (!isAuth)
+        {
+            HttpContext.Current.Session.RemoveAll();
+            Response.AppendHeader("Cache-Control", "no-cache");
+            Response.CacheControl = "no-cache"; Response.Expires = -1;
+            Response.ExpiresAbsolute = new DateTime(1900, 1, 1);
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Context.GetOwinContext().Authentication.SignOut();
+        }
+
+
         if (!IsPostBack)
         {
             // Set Anti-XSRF token
@@ -76,46 +92,91 @@ public partial class SiteMaster : MasterPage
     protected void Unnamed_LoggingOut(object sender, LoginCancelEventArgs e)
     {
         Context.GetOwinContext().Authentication.SignOut();
-        Response.Redirect("~/Account/Login.aspx");
         HttpContext.Current.Session.RemoveAll();
+        Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        Session.Clear();
+        Session.Abandon();
+        Session.RemoveAll();
+        Response.Redirect("~/Account/Login.aspx");
     }
 
-    public void Load_Empresas(DropDownList Caja)
+    public bool HasRightsForSpecifiedMenu(string menuItemName)
+    {
+
+        int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+
+        if (menuItemName == "Facturas")
+        {
+            return vermenu(pUserKey, "Facturas");
+        }
+        else if (menuItemName == "Reembolso")
+        {
+            return vermenu(pUserKey, "Reembolso");
+        }
+        else if (menuItemName == "Anticipo")
+        {
+            return vermenu(pUserKey, "Anticipo");
+        }
+        else if (menuItemName == "Tarjeta")
+        {
+            return vermenu(pUserKey, "Tarjeta");
+        }
+        else if (menuItemName == "GMedicos")
+        {
+            return vermenu(pUserKey, "GMedicos");
+        }
+
+        return true;
+    }
+
+    protected bool vermenu(int userkey, string Menu)
     {
         try
         {
-            Caja.Items.Clear();
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+            string sql;
+            string Cuenta;
+
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+
+            sqlConnection1.Open();
+            sql = @"SELECT " + Menu + " FROM PermEmpleados WHERE UserKey = " + userkey + "";
+
+            using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
             {
-                SqlCommand cmd = new SqlCommand("spSelectCompany", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                if (conn.State == ConnectionState.Open)
-                {
-                    conn.Close();
-                }
-
-                conn.Open();
-                string Errores = string.Empty;
-                SqlDataReader rdr = cmd.ExecuteReader();
-                while (rdr.Read())
-                {
-                    if (rdr["Empresas"].ToString() != "")
-                    {
-                        Caja.Items.Add(rdr["Empresas"].ToString());
-                    }
-                    else
-                    {
-                        throw new Exception(Errores); 
-                    } 
-                }
-
-                conn.Close();
+                sqlQuery.CommandType = CommandType.Text;
+                sqlQuery.CommandText = sql;
+                Cuenta = sqlQuery.ExecuteScalar().ToString();
             }
+
+            sqlConnection1.Close();
+
+            if (Cuenta == "True")
+                return true;
+            else
+                return false;
         }
-        catch (Exception b)
+        catch (Exception ex) { }
+        return false;
+    }
+
+    public static SqlConnection SqlConnectionDB(string cnx)
+    {
+        try
         {
-            Caja.Items.Add("N/D");
+            SqlConnection SqlConnectionDB = new SqlConnection();
+            ConnectionStringSettings connSettings = ConfigurationManager.ConnectionStrings[cnx];
+            if ((connSettings != null) && (connSettings.ConnectionString != null))
+            {
+                SqlConnectionDB.ConnectionString = ConfigurationManager.ConnectionStrings[cnx].ConnectionString;
+            }
+
+            return SqlConnectionDB;
+        }
+        catch (Exception ex)
+        {
+
+            return null;
         }
     }
 }

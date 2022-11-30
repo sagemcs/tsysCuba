@@ -1,4 +1,7 @@
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     var url_list = ProveedoresWebService.get_path() + "/listar";
@@ -12,8 +15,8 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
-                //data.VendID = $('#MainContent_comboProveedores').val();
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.VendID = $('#MainContent_inputID').val();
                 data.UserID = $('#MainContent_inputNombre').val();
                 data.VendName = $('#MainContent_inputSocial').val();

@@ -9,6 +9,11 @@ public partial class Logged_Subir : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+        Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+        Page.Response.Cache.SetNoStore();
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
         bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
         if (!isAuth)
         {

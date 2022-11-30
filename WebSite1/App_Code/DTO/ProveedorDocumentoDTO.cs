@@ -1,18 +1,24 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Web;
-using Proveedores_Model;
 
 public class ProveedorDocumentoDTO
 {
     public string ID_Documento { get; set; }
-    public string ID_Proveedor{ get; set; }
+    public string ID_Proveedor { get; set; }
     public string Social { get; set; }
     public string Compania { get; set; }
-    public string Descripcion{ get; set; }
+    public string Descripcion { get; set; }
     public string Fecha { get; set; }
+    public DateTime Date { get; set; }
     public string Actualizacion { get; set; }
     public string Estado { get; set; }
     public string Estado_Id { get; set; }
@@ -21,7 +27,7 @@ public class ProveedorDocumentoDTO
     public ProveedorDocumentoDTO()
     { }
 
-    public ProveedorDocumentoDTO(string ID_Documento,string ID_Proveedor, string Social,string Compañía, string Descripción,string Fecha, string Actualización,string Estado_Id, string Estado, string Usuario)
+    public ProveedorDocumentoDTO(string ID_Documento, string ID_Proveedor, string Social, string Compañía, string Descripción, string Fecha, string Actualización, string Estado_Id, string Estado, string Usuario, DateTime Dat)
     {
         this.ID_Documento = ID_Documento;
         this.ID_Proveedor = ID_Proveedor;
@@ -29,6 +35,7 @@ public class ProveedorDocumentoDTO
         this.Compania = Compañía;
         this.Descripcion = Descripción;
         this.Fecha = Fecha;
+        this.Date = Dat == null ? DateTime.MinValue : Convert.ToDateTime(Dat);
         this.Actualizacion = Actualización;
         this.Estado_Id = Estado_Id;
         this.Estado = Estado;
@@ -37,7 +44,7 @@ public class ProveedorDocumentoDTO
 }
 
 public class ProveedorDocumentos
-{    
+{
     public ProveedorDocumentos()
     {
     }
@@ -47,18 +54,24 @@ public class ProveedorDocumentos
         try
         {
             Company company = Tools.EmpresaAutenticada();
+
             if (company == null)
                 return null;
             Users user = Tools.UsuarioAutenticado();
             if (user == null)
                 return null;
 
-            Expression<Func<Documents, bool>> predicate;
+            Expression<Func<Documents, bool>> predicate = null;
+
             bool is_tsys_user = user.UsersInRoles.Where(r => r.Roles.RoleID.Contains("T|SYS|")).FirstOrDefault() != null;
             if (is_tsys_user)
+            {
                 predicate = (a => a.CompanyID == company.CompanyID);
+            }
             else
+            {
                 return null;
+            }
             //else
             //{
             //    List<int> VendorsIds = user.Vendors.Select(v => v.VendorKey).ToList();
@@ -66,6 +79,8 @@ public class ProveedorDocumentos
             //}
 
             PortalProveedoresEntities db = new PortalProveedoresEntities();
+
+
             List<Documents> list = db.Documents.Where(predicate).ToList();
             List<ProveedorDocumentoDTO> documentos = new List<ProveedorDocumentoDTO>();
             foreach (Documents doc in list)
@@ -75,9 +90,20 @@ public class ProveedorDocumentos
                     StatusDocs status = null;
                     if (doc.Status != null)
                         status = db.StatusDocs.Where(s => s.Status == doc.Status).FirstOrDefault();
+                    //status = db.StatusDocs.Where(s => 4 == doc.Status).FirstOrDefault();
 
-                    documentos.Add(new ProveedorDocumentoDTO(doc.DocID, doc.Vendors.VendorID, doc.Vendors.VendName, company.CompanyID,
-                        doc.DocDescription, doc.CreateDate.ToShortDateString(), doc.UpdateDate.Value.ToShortDateString(), status != null ? status.Status.ToString() : "0", status != null ? status.Descripcion : "No definido", doc.Users.UserID));
+                    documentos.Add(new ProveedorDocumentoDTO(
+                        doc.DocID,
+                        doc.Vendors != null ? doc.Vendors.VendorID : "",
+                        doc.Vendors != null ? doc.Vendors.VendName : "",
+                        company.CompanyID,
+                        doc.DocDescription,
+                        doc.CreateDate != null ? doc.CreateDate.Date.ToString("dd/MM/yyyy") : "",
+                        doc.UpdateDate != null ? doc.UpdateDate.Value.ToString("dd/MM/yyyy") : "",
+                        status != null ? status.Status.ToString() : "0",
+                        status != null ? status.Descripcion : "No definido",
+                        doc.Users != null ? doc.Users.UserID : "",
+                        doc.UpdateDate != null ? doc.UpdateDate.Value : DateTime.MinValue));
                 }
                 catch
                 { }

@@ -15,6 +15,8 @@ namespace Proveedores_Model
     
     public partial class PortalProveedoresEntities : DbContext
     {
+        internal object tapAPILogValidacion;
+
         public PortalProveedoresEntities()
             : base("name=PortalProveedoresEntities")
         {

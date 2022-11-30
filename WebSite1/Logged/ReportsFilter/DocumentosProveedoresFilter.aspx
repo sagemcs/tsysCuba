@@ -6,7 +6,11 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" />--%>
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
@@ -32,29 +36,11 @@
             <div class="col-md-12">
           
                 <div class="row">
-                    <div class="col-md-2">
-                    
-                        <div class="form-group">
-                            
-                        <asp:TextBox ID="inputID" MaxLength="5"  placeholder="ID" runat="server" CssClass="form-control filter" ToolTip="ID"></asp:TextBox>   
-                         
-                        </div>
-                    </div>
-                   <div class="col-md-3">
-                    
-                        <div class="form-group">
-                            
-                        <asp:TextBox ID="inputNombre" MaxLength="12"  placeholder="Nombre" runat="server" CssClass="form-control filter" ToolTip="Nombre"></asp:TextBox>   
-                         
-                        </div>
-                    </div>
                    
-                   <div class="col-md-3">
+                   <div class="col-md-4">
                     
-                        <div class="form-group">
-                     
-                        <asp:TextBox ID="inputSocial" MaxLength="50"  placeholder="Razón Social" runat="server" CssClass="form-control filter" ToolTip="Razón social"></asp:TextBox>   
-                         
+                        <div class="form-group">                     
+                        <asp:TextBox ID="inputSocial" MaxLength="50"  placeholder="Razón Social" runat="server" CssClass="form-control filter" AutoComplete = "off" AutoCompleteType="Disabled" ToolTip="Razón social"></asp:TextBox>   
                         </div>
                     </div>
                    
@@ -66,16 +52,29 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
           
                         </div>
                     </div>
 
+                   <div class="col-md-1" style="visibility:hidden">
+                        <div class="form-group">                            
+                        <asp:TextBox ID="inputID" MaxLength="5"  placeholder="ID" runat="server" CssClass="form-control filter" ToolTip="ID"></asp:TextBox>   
+                        </div>
+                    </div>
+
+                   <div class="col-md-1" style="visibility:hidden">
+                        <div class="form-group">                            
+                        <asp:TextBox ID="inputNombre" MaxLength="12"  placeholder="Nombre" runat="server" CssClass="form-control filter" ToolTip="Nombre"></asp:TextBox>   
+                        </div>
+                    </div>
+
+                    <a href="../../Css/">../../Css/</a>
                 </div>
           
             </div>
@@ -87,12 +86,11 @@
                 <table id="list" class="datatable table table-bordered table-striped" width="100%">
                     <thead>
                     <tr>             
-                        <th></th>
-                     
-                        <th>Razón social</th>
-                       
-                        <th>Fecha</th>
+                        <th></th>                     
+                        <th>Razón social</th>                       
+                        <th>Fecha de Aprobación</th>
                         <th>Descripción</th>
+                        <th>Estado</th>
                     </tr>
                     </thead>
                     <tbody>

@@ -1,4 +1,11 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ABRIL, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//PANTALLA DE REDIRECCIONAMIENTO DE ERRORES
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,6 +16,11 @@ public partial class Logged_Error : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+        Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+        Page.Response.Cache.SetNoStore();
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
         bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
         if (!isAuth)
         {
@@ -28,7 +40,7 @@ public partial class Logged_Error : System.Web.UI.Page
         if (Request.QueryString.HasKeys())
         {
             try {
-                ErrorLabel.Text = "Lo sentimos. " + Request["error"] + ". Le recomendamos ponerse en contacto con los desarrolladores del sistema.";
+                ErrorLabel.Text = "Existe un problema de comunicación, favor de intentarlo más tarde.";
             }
             catch {
                 Response.Redirect("~/Logged/Error");

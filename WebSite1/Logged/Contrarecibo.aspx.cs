@@ -1,4 +1,11 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//PANTALLA DE CONTRARECIBO
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,8 +17,7 @@ using System.Web.Script.Services;
 using System.Web.Services;
 
 using Proveedores_Model;
-
-
+using System.Globalization;
 
 public partial class Logged_Contrarecibo : System.Web.UI.Page
 {
@@ -22,6 +28,11 @@ public partial class Logged_Contrarecibo : System.Web.UI.Page
         //return;
         try
         {
+            Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+            Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+            Page.Response.Cache.SetNoStore();
+            Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
             bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
             if (!isAuth)
             {
@@ -48,6 +59,8 @@ public partial class Logged_Contrarecibo : System.Web.UI.Page
                 }
             }
 
+
+
             Page.Title = "Generar contrarecibo";
 
             List<ProveedorDTO> list_dto = Proveedores.ObtenerProveedores();
@@ -72,5 +85,47 @@ public partial class Logged_Contrarecibo : System.Web.UI.Page
             Response.Redirect("~/Logged/Error?error=Hubo un error mientras se intentaba cargar la interfaz de creación de contrarecibos");
         }
     }
-    
+
+    protected void Page_PreInit(object sender, EventArgs e)
+    {
+        try
+        {
+            Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+            Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+            Page.Response.Cache.SetNoStore();
+            Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
+            bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
+
+            if (!isAuth)
+            {
+                HttpContext.Current.Session.RemoveAll();
+                Context.GetOwinContext().Authentication.SignOut();
+                Response.Redirect("~/Account/Login.aspx");
+            }
+
+            if (HttpContext.Current.Session["RolUser"].ToString() == "Proveedor")
+            {
+                Global.Docs();
+                if ((HttpContext.Current.Session["Docs"].ToString() == "0"))
+                {
+                    //Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+                }
+            }
+        }
+        catch
+        {
+            HttpContext.Current.Session.RemoveAll();
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
+
+    }
+    string eventName = String.Empty;
+    protected override void OnPreInit(EventArgs e)
+    {
+        base.OnPreInit(e);
+        eventName = "OnPreInit";
+    }
+
 }

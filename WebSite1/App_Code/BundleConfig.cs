@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : ADRIAN QUIALA
+
+//REFERENCIAS UTILIZADAS
 using System.Web.Optimization;
-using System.Web.UI;
 
 namespace WebSite1
 {

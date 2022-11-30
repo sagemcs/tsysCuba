@@ -4,8 +4,14 @@
             format: 'dd/mm/yyyy'
         });
     }
-
+    $('#error_inputTotal').css('display', 'none');
     $('#Text_Sec').css('display', 'none');
+    $('.cargar').click(function () {
+        blockUI({
+            boxed: true,
+            message: 'Espere un momento'
+        });
+    });
 });
 
 window.datatableLang = {

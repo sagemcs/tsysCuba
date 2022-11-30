@@ -3,7 +3,8 @@
 <%@ Register Src="~/Account/OpenAuthProviders.ascx" TagPrefix="uc" TagName="OpenAuthProviders" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
-    <h2><%: Title %>.</h2>
+    Version 16-Octubre-2019 By Luis Angel Garcia P
+    <br />
     <script src ="../../Css/sweetalert.min.js" type="text/javascript"></script>
         <script>
         function alertme(titulo,mesaje,Tipo) {
@@ -25,6 +26,8 @@
     </div>
     <br />
     <br />
+    <br />
+        <br />
     <br />
     <div class="row">
         <div class="col-md-12">
@@ -75,6 +78,7 @@
                     <label class="col-form-label col-lg-5 col-sm-3 col-xs-1"></label>
                     <div class="form-group col-lg-6 col-sm-8 col-xs-10">
                         <h3>Administración de Usuario</h3>
+                        <br />
                     </div>
                     </div>
 

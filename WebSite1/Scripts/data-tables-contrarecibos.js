@@ -1,9 +1,11 @@
-
-
+//PORTAL DE PROVEDORES T|SYS|
+//12 MARZO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     hide_combo_proveedores(ContrarecibosWebService.get_path());
-    var url_list = ContrarecibosWebService.get_path() + "/listar";
+    var url_list = ContrarecibosWebService.get_path() + "/listarC";
     
     table = $('#list').DataTable({
         language: window.datatableLang,
@@ -15,13 +17,14 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
-                //data.VendID = $('#MainContent_comboProveedores').val();
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.Folio = $('#MainContent_inputFolio').val();
                 data.VendID = $('#MainContent_comboProveedores').val();
                 data.AliasDBA = $('#MainContent_inputRFC').val();
                 data.Total = $('#MainContent_inputTotal').val();
                 data.RcptDate = $('#MainContent_inputFechaRecepcion').val();
+                data.RcptPago = $('#MainContent_inputPago').val();
                 data.sin_solicitud = false;
             }
         },
@@ -40,8 +43,8 @@ $(document).ready(function () {
             { "data": "Condiciones" , 'className': "centrar-data text_align_left"},
             { "data": "Fecha_Recepcion", 'className': "centrar-data"},
             { "data": "Fecha_Programada_Pago", 'className': "centrar-data" },
+            { "data": "Total", 'className': "centrar-data text_align_right" },
             { "data": "actions", 'className': "centrar-data", "orderable": false }
-
         ],
 
         "columnDefs": [ {
@@ -54,7 +57,7 @@ $(document).ready(function () {
             "data": null,
             "render": function (data, type, row) {
                 var render = "";
-                render += '<a class="btn btn-xs btn-danger" title="Exportar reporte" data-tootle="tooltip" data-id="' + row.Id + '" href="/Logged/Reports/Contrarecibo?id=' + row.Id + '" target="_blank"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>';
+                render += '<a class="btn btn-xs btn-success" title="Exportar reporte" data-tootle="tooltip" data-id="' + row.Id + '" href="/Logged/Reports/Contrarecibo?id=' + row.Id + '" target="_blank"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>';
                 //render += '<a class="btn btn-xs btn-danger" title="Imprimir reporte" data-tootle="tooltip" data-id="' + row.Id + '" href="/Logged/Reports/Contrarecibo?id=' + row.Id + '&print=true" target="_blank"><span class="glyphicon glyphicon-print" aria-hidden="true"></span></a>';
                 return render;
             }
@@ -91,6 +94,7 @@ $(document).ready(function () {
         $('#MainContent_inputRFC').val('');
         $('#MainContent_inputTotal').val('');
         $('#MainContent_inputFechaRecepcion').val('');
+        $('#MainContent_inputPago').val('');
         table.ajax.reload(  );
     });
     
@@ -120,7 +124,8 @@ redirectToReport(); return false;
         var provId = $('#MainContent_comboProveedores').val();
         var rfc = $('#MainContent_inputRFC').val();
         var total = $('#MainContent_inputTotal').val();
-        var fecha_r = $('#MainContent_inputFechaRecepcion').val();
+        var fecha = $('#MainContent_inputFechaRecepcion').val();
+        var fechaPago = $('#MainContent_inputPago').val();
 
         var url_report = "/Logged/Reports/Contrarecibos";
        
@@ -128,7 +133,8 @@ redirectToReport(); return false;
         url_report += "&provId=" + provId;
         url_report += "&total=" + total;
         url_report += "&rfc=" + rfc;
-        url_report += "&fecha_r=" + fecha_r;
+        url_report += "&fechaPago=" + fechaPago;
+        url_report += "&fecha=" + fecha;
         window.open(url_report, '_blank');
     }
 } );

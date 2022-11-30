@@ -6,7 +6,12 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" />--%>
+        <link href ="../../Css/tables.css" rel="stylesheet" type ="text/css" />
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
@@ -29,82 +34,88 @@
         <div class="col-lg-12 col-sm-5 col-12" id="M1">
             <h3>Solicitudes de cheques</h3>
         </div>
+
         <div class="row" >
             <div class="col-md-12">
           
                 <div class="row">
+
                     <div class="col-md-2">
-                    
                         <div class="form-group">
-                            
-                        <asp:TextBox ID="inputSerie" MaxLength="25" placeholder="Serie" runat="server" CssClass="form-control filter"  ToolTip="Serie"></asp:TextBox>   
-                         
+                            <label>Folio de Solicitud</label>
+                                <asp:TextBox ID="inputSerie" MaxLength="25" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter"  ToolTip="Serie">
+                                </asp:TextBox>   
                             </div>
                     </div>
-                   <div class="col-md-2">
-                    
+
+                    <div class="col-md-2">
                         <div class="form-group">
-                            
+                            <label>Proveedor</label>
                             <asp:DropDownList ID="comboProveedores" runat="server" CssClass="form-control select2 filter">
                             </asp:DropDownList>
                            
                         </div>
                     </div>
                    
-                   <div class="col-md-2">
-                    
+                    <div class="col-md-2">
                         <div class="form-group">
+                            <label>Solicitante</label>
                             <asp:DropDownList ID="comboSolicitantes" runat="server" CssClass="form-control select2 filter">
                             </asp:DropDownList>
-                           
                         </div>
-                    </div>
+                     </div>
                     
-                   <div class="col-md-2">
-                    
+                    <div class="col-md-2">
                         <div class="form-group">
-                            
-                        <asp:TextBox ID="inputTotal"  placeholder="Total" runat="server" CssClass="form-control filter"  ToolTip="Total"></asp:TextBox>   
+                        <label>Total</label>  
+                        <asp:TextBox ID="inputTotal" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter"  ToolTip="Total"></asp:TextBox>   
                         <span id="error_inputTotal" class="no-valid-message">Dato no válido</span>
                         </div>
                     </div>
+
                     <div class="col-md-2">
                         <div class="form-group">
-                            
-                              <asp:TextBox ID="inputFecha"  placeholder="Fecha" runat="server" ToolTip="Fecha" CssClass="form-control datepicker filter"></asp:TextBox>
-                        
+                            <label>Fecha de Solicitud</label>                         
+                           <asp:TextBox type="date" ID="inputFecha" AutoComplete = "off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" CssClass="form-control filter"  runat="server" ></asp:TextBox>
                         </div>
                     </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Fecha Programada Pago</label>  
+                            <asp:TextBox type="date" ID="inputPago" min="1980-01-01" max="2050-12-31" CssClass="form-control filter" runat="server" ></asp:TextBox>
+                        </div>
+                    </div>
+
                     <div class="col-md-2">
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <br />
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
-                            </a>
-          
+                            </a>          
                         </div>
                     </div>
 
                 </div>
           
             </div>
-
-
         </div>
+
         <div class="row">
             <div class="col-md-12">
                 <table id="list" class="datatable table table-bordered table-striped" width="100%">
                     <thead>
                     <tr>        
                         <th></th>
-                        <th>Serie</th>
+                        <th>Folio Solicitud</th>
                         <th>Proveedor</th>
                         <th>Solicitante</th>
                         <th>Total</th>
-                        <th>Fecha</th>
-                        <th>Fecha programada</th>
+                        <th>Fecha de Solicitud</th>
+                        <th>Fecha Programada Pago</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -114,6 +125,7 @@
                 </table>
             </div>
         </div>
+
         <div class="row" style="margin-top: 15px;">
             <div class="col-md-12">
                 <div class="pull-right">
@@ -123,6 +135,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
 </asp:Content>

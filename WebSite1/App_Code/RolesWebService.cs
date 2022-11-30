@@ -1,4 +1,11 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+
+using Proveedores_Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -6,7 +13,6 @@ using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
-using Proveedores_Model;
 
 /// <summary>
 /// Summary description for RolesWebService
@@ -27,7 +33,7 @@ public class RolesWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(UseHttpGet = true)]
-    public void listar(string RoleID, string Description, int start, int length)
+    public void listar(string order_col, string order_dir, string RoleID, string Description, int start, int length)
     {
         try
         {
@@ -46,7 +52,19 @@ public class RolesWebService : System.Web.Services.WebService
                 if (list_dto != null)
                 {
                     int total = list_dto.Count();
-                    list_dto = list_dto.Skip(start).Take(length).ToList();
+
+                    if (order_col == "1")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Descripcion).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Descripcion).ToList();
+                    else if (order_col == "2")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Date).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Date).ToList();
+
+                    list_dto = length == -1 ? list_dto.Skip(start).ToList() : list_dto.Skip(start).Take(length).ToList();
                     int cantidad = list_dto.Count();
 
                     var result = new

@@ -4,7 +4,7 @@ th {
 }
 
 input.filter, select.filter {
-    font-size: 10px;
+    font-size: 14px;
     height: 30px;
     padding: 5px 10px;
     /*font-size: 12px;*/
@@ -14,7 +14,7 @@ input.filter, select.filter {
 
 a.buscar, a.limpiar {
     padding: 5px 10px;
-    font-size: 12px;
+    font-size: 10px;
     line-height: 1.5;
     border-radius: 3px;
 }
@@ -31,7 +31,7 @@ a.buscar, a.limpiar {
 }
 
 table {
-    font-size: 13px;
+    font-size: 10px;
 }
 
 td, .centrar-data {
@@ -76,7 +76,7 @@ UI Loading
     padding: 10px;
     margin: 0 auto;
     color: #000 !important;
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 400;
     text-align: center;
     vertical-align: middle;
@@ -105,7 +105,7 @@ UI Loading
     padding: 7px;
     text-align: center;
     color: #333;
-    font-size: 13px;
+    font-size: 10px;
     border: 1px solid #ddd;
     background-color: #eee;
     vertical-align: middle;

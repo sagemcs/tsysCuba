@@ -8,6 +8,10 @@
 <%@ Register assembly="CrystalDecisions.Web, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" namespace="CrystalDecisions.Web" tagprefix="CR" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="CustomStyles" Runat="Server">
+    <!--Version 31-Mayo-2019 By Luis Angel-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
     <link href ="../../Css/reports.css" rel="stylesheet" type ="text/css" />
     <link rel="stylesheet" href="../../Css/bootstrap.min.css" />
     <link rel="stylesheet" href="../../Css/bootstrap-theme.min.css" />
@@ -16,8 +20,8 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" Runat="Server">
-    <br/><br/><br/><br/><div>
-        <input id="btn_print" class="btn btn-primary" type="button" value="Imprimir" onclick="Print()" style="position: relative; left: 45%;"  /> 
+    <br/> <br/> <br/> <br /> <br/><div>
+        <input id="btn_print" class="btn btn-primary" type="button" value="Imprimir" style="position: relative; left: 45%;"  /> 
         </div><br/>
         <div id = "dvReport"  style="position: relative; left: 10%;" > 
             <CR:CrystalReportViewer ID="Reporte_Solicitudes_Cheque" runat="server" AutoDataBind="true" BestFitPage="False" DisplayStatusbar="False" HasCrystalLogo="False" HasDrilldownTabs="False" HasToggleGroupTreeButton="False" HasToggleParameterPanelButton="False" ToolPanelView="None" ClientIDMode="Inherit" PrintMode="pdf" HasPrintButton="True" />

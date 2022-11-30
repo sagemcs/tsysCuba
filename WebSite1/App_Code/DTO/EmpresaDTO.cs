@@ -1,9 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
 using Proveedores_Model;
 using SAGE_Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 /// <summary>
 /// Summary description for EmpresaDTO
 /// </summary>
@@ -13,18 +18,20 @@ public class EmpresaDTO
     public string Nombre { get; set; }
     public string RFC { get; set; }
     public string Fecha { get; set; }
+    public DateTime Date { get; set; }
     public string Actualizacion { get; set; }
     public string Estado { get; set; }
 
     public EmpresaDTO()
     { }
 
-    public EmpresaDTO(string ID, string Nombre, string RFC, string Fecha, string Actualización, string Estado)
+    public EmpresaDTO(string ID, string Nombre, string RFC, string Fecha, string Actualización, string Estado, DateTime Dat)
     {
         this.ID = ID;
         this.Nombre = Nombre;
         this.RFC = RFC;
         this.Fecha = Fecha;
+        this.Date = Dat == null ? DateTime.MinValue : Convert.ToDateTime(Dat);
         this.Actualizacion = Actualización;
         this.Estado = Estado;
     }
@@ -63,7 +70,14 @@ public class Empresas
             {
                 tsmCompany tsmCompany = db_sage.tsmCompany.Where(c => c.CompanyID == company.CompanyID).FirstOrDefault();
                 StatusUsers status = db.StatusUsers.Where(s => s.Status == company.Status).FirstOrDefault();
-                empresas.Add(new EmpresaDTO(company.CompanyID, company.CompanyName, tsmCompany != null ? tsmCompany.FedID : string.Empty, company.CreateDate != null ? company.CreateDate.ToShortDateString() : string.Empty, company.UpdateDate != null ? company.UpdateDate.Value.ToShortDateString() : string.Empty, status != null ? status.Descripcion : "No definido"));
+                empresas.Add(new EmpresaDTO(
+                    company.CompanyID,
+                    company.CompanyName,
+                    tsmCompany != null ? tsmCompany.FedID : string.Empty,
+                    company.CreateDate != null ? company.CreateDate.Date.ToString("dd/MM/yyyy") : string.Empty,
+                    company.UpdateDate != null ? company.UpdateDate.Value.ToString("dd/MM/yyyy") : string.Empty,
+                    status != null ? status.Descripcion : "No definido",
+                    company.CreateDate != null ? company.CreateDate : DateTime.MinValue));
             }
             return empresas;
         }

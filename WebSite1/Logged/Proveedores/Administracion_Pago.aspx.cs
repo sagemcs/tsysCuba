@@ -1,4 +1,11 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//PANTALLA PARA PROVEEDOR DE CONSULTA DE PAGOS CARGADOS AL PORTAL
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Data;
@@ -18,6 +25,11 @@ public partial class Logged_Administrar : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+        Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+        Page.Response.Cache.SetNoStore();
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
         if (!IsPostBack)
         {
             if (HttpContext.Current.Session["IDCompany"] == null)
@@ -30,10 +42,17 @@ public partial class Logged_Administrar : System.Web.UI.Page
                 if (HttpContext.Current.Session["RolUser"].ToString() == "Proveedor")
                 {
                     Global.Docs();
-                    if ((HttpContext.Current.Session["Docs"].ToString() == "0"))
+                    if ((HttpContext.Current.Session["Docs"].ToString() == "1"))
                     {
-                        Page.MasterPageFile = "MenuP.master";
-                        Response.Redirect("~/Account/Default.aspx");
+                        //Page.MasterPageFile = "MenuP.master";
+                        Global.RevDocs();
+                        if ((HttpContext.Current.Session["Docs"].ToString() == "1"))
+                        {
+                            //Page.MasterPageFile = "MenuP.master";
+                            Response.Redirect("~/Logged/Proveedores/Default.aspx",false);
+
+                        }
+                        //Response.Redirect("~/Account/Default.aspx");
                     }
                     else
                     {
@@ -66,14 +85,56 @@ public partial class Logged_Administrar : System.Web.UI.Page
                 Response.Redirect("~/Account/Login.aspx");
             }
 
-            Global.Docs();
-            if ((HttpContext.Current.Session["Docs"].ToString() == "0"))
-            {
-                //Page.MasterPageFile = "MenuP.master";
-                Response.Redirect("~/Logged/Proveedores/Default.aspx");
+            //Global.Docs();
+            //if ((HttpContext.Current.Session["Docs"].ToString() == "1"))
+            //{
+            //    //Page.MasterPageFile = "MenuP.master";
+            //    //Response.Redirect("~/Logged/Proveedores/Default.aspx",false);
 
+            //}
+            //else if ((HttpContext.Current.Session["Status"].ToString() == "Activo"))
+            //{
+            //    Page.MasterPageFile = "MenuPreP.master";
+            //}
+            Global.Docs();
+            int Dias = Convert.ToInt16(HttpContext.Current.Session["Docs"].ToString());
+            if (Dias == 0)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
             }
-            else if ((HttpContext.Current.Session["Status"].ToString() == "Activo"))
+            else if (Dias < 0)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias == 30)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias == 25)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias == 26)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias == 27)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias == 28)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias == 22)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias <= 10 && Dias > 0)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias > 10)
             {
                 Page.MasterPageFile = "MenuPreP.master";
             }
@@ -452,6 +513,35 @@ public partial class Logged_Administrar : System.Web.UI.Page
         }
 
     }
+    protected int ObtenerVK(string razon, string company)
+    {
+        int VK = 0;
+        try
+        {
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+            string sql;
+            string Cuenta;
+            sqlConnection1.Open();
+
+            sql = @"Select VendorKey as Cuenta from Vendors a inner join Company b on a.CompanyID = b.CompanyID Where b.CompanyName Like '%" + company + "%' And a.VendName Like '%" + razon + "%'";
+
+            using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
+            {
+                sqlQuery.CommandType = CommandType.Text;
+                sqlQuery.CommandText = sql;
+                Cuenta = sqlQuery.ExecuteScalar().ToString();
+            }
+            VK = Convert.ToInt16(Cuenta);
+            sqlConnection1.Close();
+
+        }
+        catch (Exception ex)
+        {
+            VK = 0;
+        }
+        return VK;
+    }
 
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
@@ -461,10 +551,12 @@ public partial class Logged_Administrar : System.Web.UI.Page
             MemoryStream memoryStream = new MemoryStream();
 
             int index = Convert.ToInt32(e.CommandArgument);
-            String archivo;
-            
+            string Pago, archivo, Folio, Cte;
             GridViewRow row = GridView1.Rows[index];
-            archivo = HttpUtility.HtmlDecode(row.Cells[4].Text);
+            int vkey = ObtenerVK(HttpUtility.HtmlDecode(row.Cells[6].Text), HttpUtility.HtmlDecode(row.Cells[7].Text));
+            Folio = HttpUtility.HtmlDecode(row.Cells[3].Text);
+            Pago = HttpUtility.HtmlDecode(row.Cells[5].Text);
+            Cte = HttpUtility.HtmlDecode(row.Cells[7].Text);
 
 
             if (e.CommandName == "Documento_2")
@@ -472,15 +564,31 @@ public partial class Logged_Administrar : System.Web.UI.Page
                 string tipo = ".pdf";
                 if (e.CommandName == "Documento_2")
                 {
-                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[4].Text, "FileBinary",tipo);
+                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[4].Text, "FileBinary", tipo, vkey);
                 }
 
-                Response.ContentType = "text/plain";
-                archivo = archivo + tipo;
-                Response.AppendHeader("Content-Disposition", "attachment; filename=" + archivo);
-                Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
-                Response.BinaryWrite(memoryStream.ToArray());
-                Response.End();
+                if (memoryStream == null || memoryStream.Length == 0)
+                {
+                    string titulo, Msj, tipo2;
+                    tipo2 = "error";
+                    Msj = "Se genero error al intentar descargar el archivo, comunícate con el área de sistemas para ofrecerte una Solución";
+                    titulo = "Notificaciones T|SYS|";
+                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo2 + "');", true);
+                    return;
+                }
+                else
+                {
+                    archivo = Cte + "- Pago Folio " + Pago + " - Factura " + Folio;
+                    archivo = archivo + tipo;
+                    HttpContext.Current.Response.ContentType = "application/pdf";
+                    HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + archivo + "\"");
+                    HttpContext.Current.Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
+                    HttpContext.Current.Response.BinaryWrite(memoryStream.ToArray());
+                    HttpContext.Current.Response.End();
+                }
+
+
+
             }
 
             if (e.CommandName == "Documento_3")
@@ -488,14 +596,28 @@ public partial class Logged_Administrar : System.Web.UI.Page
                 string tipo = ".xml";
                 if (e.CommandName == "Documento_3")
                 {
-                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[4].Text, "FileBinary",tipo);
+                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[4].Text, "FileBinary", tipo, vkey);
                 }
-                archivo = archivo + tipo;
-                Response.ContentType = "text/plain";
-                Response.AppendHeader("Content-Disposition", "attachment; filename=" + archivo);
-                Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
-                Response.BinaryWrite(memoryStream.ToArray());
-                Response.End();
+
+                if (memoryStream == null || memoryStream.Length == 0)
+                {
+                    string titulo, Msj, tipo2;
+                    tipo2 = "error";
+                    Msj = "Se genero error al intentar descargar el archivo, comunícate con el área de sistemas para ofrecerte una Solución";
+                    titulo = "Notificaciones T|SYS|";
+                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo2 + "');", true);
+                    return;
+                }
+                else
+                {
+                    archivo = Cte + "- Pago Folio " + Pago + " - Factura " + Folio;
+                    archivo = archivo + tipo;
+                    HttpContext.Current.Response.ContentType = "text/xml";
+                    HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + archivo + "\"");
+                    HttpContext.Current.Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
+                    HttpContext.Current.Response.BinaryWrite(memoryStream.ToArray());
+                    HttpContext.Current.Response.End();
+                }
             }
 
         }
@@ -509,7 +631,7 @@ public partial class Logged_Administrar : System.Web.UI.Page
         }
     }
 
-    private MemoryStream databaseFileRead(string consulta, string InvoiceKey, string columna,string Tipo)
+    private MemoryStream databaseFileRead(string consulta, string InvoiceKey, string columna,string Tipo,int Vkey)
     {
         try
         {
@@ -521,15 +643,16 @@ public partial class Logged_Administrar : System.Web.UI.Page
             sqlConnection1.Open();
 
             if (consulta == "InvoiceKey")
-                sql = @"SELECT " + columna + " From PaymentFile a INNER JOIN Payment b ON a.PaymentKey = b.PaymentKey Where b.Folio = @varID And a.FileType = @Type ";
+                sql = @"SELECT " + columna + " From PaymentFile a INNER JOIN Payment b ON a.PaymentKey = b.PaymentKey Where b.Folio = @varID And a.FileType = @Type  AND b.VendorKey = @VKey";
             else
-                sql = @"SELECT " + columna + " From PaymentFile a INNER JOIN Payment b ON a.PaymentKey = b.PaymentKey Where b.Folio = @varID And a.FileType = @Type ";
+                sql = @"SELECT " + columna + " From PaymentFile a INNER JOIN Payment b ON a.PaymentKey = b.PaymentKey Where b.Folio = @varID And a.FileType = @Type  AND b.VendorKey = @VKey";
 
 
             using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
             {
                 sqlQuery.Parameters.AddWithValue("@varID", InvoiceKey);
                 sqlQuery.Parameters.AddWithValue("@Type", Tipo);
+                sqlQuery.Parameters.AddWithValue("@VKey", Vkey);
                 using (var sqlQueryResult = sqlQuery.ExecuteReader())
                     if (sqlQueryResult != null)
                     {

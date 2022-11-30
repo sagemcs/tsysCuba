@@ -1,3 +1,7 @@
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 var facturas_seleccionas = {};
 $(document).ready(function () {
@@ -40,7 +44,6 @@ $(document).ready(function () {
     }   
     table = $('#list').DataTable({
         language: window.datatableLang,
-        //"deferLoading":false,
         "ajax": {
             "url": url_list,
             "type": "POST",
@@ -49,11 +52,13 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.VendID = $('#MainContent_comboProveedores').val();
                 data.Folio = '';
                 data.Serie = '';
                 data.Fecha = $('#MainContent_inputFecha').val();
+                data.FechaAP = $('#MainContent_inputAproba').val();
                 data.Total = '';
                 data.UUID = '';
                 data.Status = '';
@@ -62,7 +67,7 @@ $(document).ready(function () {
         searching: false,
         'aLengthMenu':[[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]],
         // 'aLengthMenu':[[2, 5, 10, 100, -1],[2, 5, 10, 100, "All"]],
-        // "bStateSave": true,
+        // "bStateSave": true, right
         "processing": true,
         "serverSide": true,
         "stateSave": true,
@@ -77,14 +82,15 @@ $(document).ready(function () {
             { "data": "Compania" , 'className': "centrar-data text_align_left"},
             { "data": "Folio" , 'className': "centrar-data text_align_left"},
             { "data": "Serie", 'className': "centrar-data" },
-            { "data": "Fecha" , 'className': "centrar-data"},
-            { "data": "Proveedor" , 'className': "centrar-data"},
-            { "data": "Subtotal", 'className': "centrar-data" },
-            { "data": "Retenciones", 'className': "centrar-data" },
-            { "data": "Traslados", 'className': "centrar-data" },
-            { "data": "Total", 'className': "centrar-data" },
-            { "data": "Notas", 'className': "centrar-data details-control" },
-            { "data": "Importe", 'className': "centrar-data" },
+            { "data": "Fecha_Recepcion", 'className': "centrar-data" },
+            { "data": "Fecha_Aprobacion", 'className': "centrar-data" },
+            { "data": "Proveedor_Nombre", 'className': "centrar-data" },
+            { "data": "Subtotal", 'className': "centrar-data text_align_right" },
+            { "data": "Retenciones", 'className': "centrar-data text_align_right" },
+            { "data": "Traslados", 'className': "centrar-data text_align_right" },
+            { "data": "Total", 'className': "centrar-data text_align_right" },
+            { "data": "Notas", 'className': "centrar-data details-control", "orderable": false },
+            { "data": "Importe", 'className': "cetrar-data text_align_right", "orderable": false },
         ],
 
         "columnDefs": [ {
@@ -123,7 +129,7 @@ $(document).ready(function () {
                     render += '<a class="btn btn-xs btn-primary" title="Ver notas" data-tootle="tooltip" data-uuid="' + row.UUID + '" data-notas="' + encode_notas + '" onclick="mostrarNotas(this);">' + valorNota+'</a>';
 
                 } else {
-                    render += '<a class="btn btn-xs btn-danger" title="Ver notas" data-tootle="tooltip" data-uuid="' + row.UUID + '" data-notas="' + encode_notas + '" onclick="mostrarNotas(this);">' + valorNota +'</a>';
+                    render += '<a class="btn btn-xs btn-primary" title="Ver notas" data-tootle="tooltip" data-uuid="' + row.UUID + '" data-notas="' + encode_notas + '" onclick="mostrarNotas(this);">' + valorNota + '</a>';
 
                 }
                 
@@ -137,6 +143,7 @@ $(document).ready(function () {
                     //if (!row.Notas) {
                     //    return "-";
                     //}
+                    //data.columns(7).hide;
                     var Notas = row.Notas;
 
                     //if (Notas.length == 0) {
@@ -152,21 +159,27 @@ $(document).ready(function () {
                             valorNota -= parseFloat(nota.Total);
                         }
                     });
-                    var v = parseFloat(row.Total) + valorNota;
-                    return v.toFixed(2);
 
+                    var str2 = row.Total.substr(0, 1);
+                    var text = row.Total;
+                    var str3 = text.replace('$', '');
+                    var str4 = str3.replace(',', '');
+                    var str5 = parseFloat(str3).toFixed(2)
+                    //var str6 = str2.concat(str5);
+                    return row.Total;
                 }
-            } ],
+            }
+        ],
         'select': {
             selector:'td:not(:last-child)',
             'style': 'multi'
         },
         'order': [[1, 'asc']]
     });
+
     //-----detail -test---
     // Array to track the ids of the details displayed rows
     var detailRows = [];
-
     $('#list tbody').on('click', 'tr td.details-control', function () {
         var tr = $(this).closest('tr');
         var row = table.row(tr);
@@ -214,29 +227,40 @@ $(document).ready(function () {
     });
     $('.limpiar').click(function (e) {
         e.preventDefault();
-
+        $('#MainContent_inputFecha').val(''); 
+        $('#MainContent_inputAproba').val('');
+        $('#MainContent_inputRFC').val('');
         $("#MainContent_comboProveedores").val($("#MainContent_comboProveedores option:first").val()).change();
-        $('#MainContent_inputFecha').val('');
         table.ajax.reload(  );
     });
 
+
     function getSelected() {
-        var rows_selected = table.column(0).checkboxes.selected();
+        //var rows_selected = table.column(0).checkboxes.selected();
         var ids = [];
-        $.each(rows_selected, function (index, id, a) {
-            ids.push(id);
+        $.each(facturas_seleccionas, function (prop, data) {
+            ids.push(prop);
         });
+
         return ids;
     }
 
     function getSelectedFechas() {
-        var rows_selected = table.column(0).checkboxes.selected();   
+        //var rows_selected = table.column(0).checkboxes.selected();
         var fechas = [];
-        $.each(rows_selected, function (index, id) {
-            var fecha = $("." + id).data('fecha');
-            fechas.push(fecha);
+        $.each(facturas_seleccionas, function (prop, data) {
+            fechas.push(data.Fecha_Recepcion);
         });
         return fechas;
+    }
+
+    function getSelectedMonedas() {
+        //var rows_selected = table.column(0).checkboxes.selected();
+        var monedas = [];
+        $.each(facturas_seleccionas, function (prop, data) {
+            monedas.push(data.Moneda);
+        });
+        return monedas;
     }
 
     function verificarFacturasFechas() {
@@ -251,7 +275,20 @@ $(document).ready(function () {
         return result;
     }
 
+    function verificarFacturasMonedas() {
+        var monedas = getSelectedMonedas();
+        var result = true;
+        var moneda0 = monedas[0];
+        monedas.forEach(function (moneda) {
+            if (moneda != moneda0) {
+                result = false; return;
+            }
+        });
+        return result;
+    }
+
     $('form').submit(function () {
+
         var ids = getSelected();
         if (ids.length == 0) {
             showToastError("Seleccione las facturas para generar el contrarecibo.");
@@ -259,6 +296,10 @@ $(document).ready(function () {
         }
         if (verificarFacturasFechas() == false) {
             showToastError("Las facturas seleccionadas deben ser de la misma fecha.");
+            return false;
+        }
+        if (verificarFacturasMonedas() == false) {
+            showToastError("Las facturas seleccionadas deben ser de la misma moneda.");
             return false;
         }
         showToastConfirmation("Desea crear el contrarecibo?", "", function () {
@@ -325,6 +366,8 @@ $(document).ready(function () {
 
     function calcularImporteTotal() {
         var importeTotal = 0;
+        var uno = 0;
+        var dos = 0;
         $.each(facturas_seleccionas, function (key, data) {
             var valorNota = 0;
             data.Notas.forEach(function (nota) {
@@ -335,14 +378,41 @@ $(document).ready(function () {
                     valorNota -= parseFloat(nota.Total);
                 }
             });
-            importeTotal += parseFloat(data.Total) + valorNota;
+
+            var cu = data.Total;
+            var cin = cu.replace('$', '').replace(',', '');
+            var seis = parseFloat(cin);
+
+            //uno= parseFloat(data.Total.replace('$', ''))
+            //dos = parseFloat(uno.toString().replace(',', ''));
+            //importeTotal += dos + valorNota;
+            importeTotal += seis + valorNota;
+            tres = parseFloat(importeTotal).toFixed(2);
         });
         return importeTotal.toFixed(2);
     }
 
+    function formatNumber(num) {
+        if (!num || num == 'NaN') return '-';
+        if (num == 'Infinity') return '&#x221e;';
+        num = num.toString().replace(/\$|\,/g, '');
+        if (isNaN(num))
+            num = "0";
+        sign = (num == (num = Math.abs(num)));
+        num = Math.floor(num * 100 + 0.50000000001);
+        cents = num % 100;
+        num = Math.floor(num / 100).toString();
+        if (cents < 10)
+            cents = "0" + cents;
+        for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3) ; i++)
+            num = num.substring(0, num.length - (4 * i + 3)) + ',' + num.substring(num.length - (4 * i + 3));
+        return (((sign) ? '' : '-') + num + '.' + cents);
+    }
+
     function actualizarImporte() {
         var importe = calcularImporteTotal();
-        $('#importe-total').html(importe);
+        var Total = formatNumber(importe);
+        $('#importe-total').html(Total);
     }
 
     

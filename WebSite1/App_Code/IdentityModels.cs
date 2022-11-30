@@ -1,9 +1,16 @@
-﻿using Microsoft.AspNet.Identity;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//Version: 1.1
+//Modificado por: Luis Angel Garcia           Fecha: 17/Enero/2019
+//      Actualizacion: Modificar la validacion de usuarios para permitir caracteres especiales
+
+//REFERENCIAS UTILIZADAS
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
-using System.Web;
 using System;
-using WebSite1;
+using System.Web;
 
 namespace WebSite1
 {
@@ -26,6 +33,7 @@ namespace WebSite1
         public UserManager()
             : base(new UserStore<ApplicationUser>(new ApplicationDbContext()))
         {
+            UserValidator = new UserValidator<ApplicationUser>(this) { AllowOnlyAlphanumericUserNames = false };
         }
     }
 }

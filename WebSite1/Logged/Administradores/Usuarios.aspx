@@ -1,40 +1,18 @@
 ﻿<%@ Page Language="C#" Title="Aprobar Usuarios" AutoEventWireup="true" MasterPageFile="~/Site.Master" CodeFile="Usuarios.aspx.cs" Inherits="Pagos" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+    Version 25-Julio-2019 By Luis Angel Garcia P
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+<meta http-equiv="Pragma" content="no-cache" />
     <script src ="../../Css/sweetalert.min.js" type="text/javascript"></script>
     <link href ="../../Css/HojaProv.css" rel="stylesheet" type ="text/css" />
-
-    <script type="text/javascript">
-        $(function () {
-
-            // We can attach the `fileselect` event to all file inputs on the page
-            $(document).on('change', ':file', function () {
-                var input = $(this),
-                    numFiles = input.get(0).files ? input.get(0).files.length : 1,
-                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-                input.trigger('fileselect', [numFiles, label]);
-            });
-
-            // We can watch for our custom `fileselect` event like this
-            $(document).ready(function () {
-                $(':file').on('fileselect', function (event, numFiles, label) {
-
-                    var input = $(this).parents('.input-group').find(':text'),
-                        log = numFiles > 1 ? numFiles + ' files selected' : label;
-
-                    if (input.length) {
-                        input.val(log);
-                    } else {
-                        if (log) alert(log);
-                    }
-
-                });
-            });
-        })
-    </script>
+    <script src ="../../Scripts/jquery.blockui.min.js" type="text/javascript"></script>
+    <script src ="../../Scripts/custom.js" type="text/javascript"></script>
 
     <script>
-        function alertme(titulo,mesaje,Tipo) {
+        function alertme(titulo, mesaje, Tipo) {
             swal(titulo, mesaje, Tipo)
+             unblockUI();
         }
     </script>
 
@@ -58,7 +36,7 @@
        <div class="tab-pane container active" id="home">
         <br />
 
-           <asp:Panel runat="server" ID="DatosV" Width="90%" Height=" 300px">
+       <asp:Panel runat="server" ID="DatosV" Width="90%" Height=" 300px">
                <div class ="col-xs-12">
                    <font size="5" color="#A4A4A4">No Se Encontraron Resultados</font>
                </div>
@@ -73,7 +51,6 @@
 
           <Triggers>
               <asp:AsyncPostBackTrigger controlid="Button1" eventname="Click" />
-<%--              <asp:AsyncPostBackTrigger controlid="Button2" eventname="Click" />--%>
             </Triggers>
           
           <ContentTemplate>
@@ -123,8 +100,8 @@
                 </ItemTemplate>
                 <edititemtemplate>
                     <%--Botones de grabar y cancelar la edición de registro...--%>
-                    <asp:Button ID="btnUpdate" runat="server" Text="Aceptar" CssClass="btn btn-success" CommandName="Update" />
-                    <asp:Button ID="btnCancel" runat="server" Text="Negar" CssClass="btn btn-danger" CommandName="Cancel" />
+                    <asp:Button ID="btnUpdate" runat="server" Text="Aceptar" CssClass="btn btn-tsys" CommandName="Update" />
+                    <asp:Button ID="btnCancel" runat="server" Text="Rechazar" CssClass="btn btn-success" CommandName="Cancel" />
                 </edititemtemplate>
 
             <HeaderStyle Width="90px"></HeaderStyle>
@@ -167,20 +144,32 @@
     <SortedDescendingCellStyle BackColor="#E9EBEF" />
     <SortedDescendingHeaderStyle BackColor="#4870BE" />
     </asp:GridView> 
-       </ContentTemplate>
-      </asp:UpdatePanel>
+
+    </ContentTemplate>
+    </asp:UpdatePanel>    
        <br />
+         <asp:UpdatePanel runat="server" id="UpdatePanel3" updatemode="Conditional">
+          <Triggers>
+              <asp:AsyncPostBackTrigger controlid="Button1" eventname="Click" />
+            </Triggers>
+          
+          <ContentTemplate>
+
        <div class="row">
             <div class="col-xs-11 col-sm-11 col-md-11">
                 <div class="form-group row">
                     <label class="col-form-label col-sm-11"></label>
                     <div class="col-sm-11">
-                        <asp:Button Text="Guardar" ID="Button1" runat="server" CssClass="btn btn-primary" title="Guardar Datos" OnClick="btn_Enviar" />
+                      <asp:Button Text="Guardar" ID="Button1" runat="server" CssClass="btn btn-primary cargar" title="Guardar Datos" OnClick="btn_Enviar" />
                     </div>
                 </div>
             </div>
         </div>
-       </div>     
+
+      </ContentTemplate>
+      </asp:UpdatePanel>
+
+       </div>  
 
         <!-- Registro Ususarios Tsys -->
       <div class="tab-pane container fade" id="menu1">
@@ -198,9 +187,9 @@
           </asp:Panel>
        <asp:UpdatePanel runat="server" id="UpdatePanel1" updatemode="Conditional">
 
-<%--          <Triggers>
+          <Triggers>
               <asp:AsyncPostBackTrigger controlid="Button2" eventname="Click" />
-            </Triggers>--%>
+            </Triggers>
           
           <ContentTemplate>
        
@@ -231,8 +220,8 @@
                 </ItemTemplate>
                 <edititemtemplate>
                     <%--Botones de grabar y cancelar la edición de registro...--%>
-                    <asp:Button ID="btnUpdate" runat="server" Text="Aceptar" CssClass="btn btn-success" CommandName="Update" />
-                    <asp:Button ID="btnCancel" runat="server" Text="Negar" CssClass="btn btn-danger" CommandName="Cancel" />
+                    <asp:Button ID="btnUpdate" runat="server" Text="Aceptar" CssClass="btn btn-tsys" CommandName="Update" />
+                    <asp:Button ID="btnCancel" runat="server" Text="Rechazar" CssClass="btn btn-success" CommandName="Cancel" />
                 </edititemtemplate>
 
             <HeaderStyle Width="90px"></HeaderStyle>
@@ -270,10 +259,20 @@
     <SortedDescendingCellStyle BackColor="#E9EBEF" />
     <SortedDescendingHeaderStyle BackColor="#4870BE" />
     </asp:GridView> 
-       </ContentTemplate>
+      </ContentTemplate>
       </asp:UpdatePanel>
         <br />
-        <div class="row">
+      
+
+
+       <asp:UpdatePanel runat="server" id="UpdatePanel2" updatemode="Conditional">
+          <Triggers>
+              <asp:AsyncPostBackTrigger controlid="Button2" eventname="Click" />
+            </Triggers>
+          
+          <ContentTemplate>
+
+                <div class="row">
             <div class="col-xs-11 col-sm-11 col-md-11">
                 <div class="form-group row">
                     <label class="col-form-label col-sm-11"></label>
@@ -284,7 +283,14 @@
             </div>
       </div>
 
+
+      </ContentTemplate>
+      </asp:UpdatePanel>
+
+
        </div>
+
+
       </div>
 
 </asp:Content>

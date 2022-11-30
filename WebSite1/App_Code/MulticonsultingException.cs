@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Web;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : ADRIAN QUIALA
+
+//REFERENCIAS UTILIZADAS
+using System;
 
 /// <summary>
 /// Summary description for MulticonsultingException
@@ -19,5 +21,5 @@ public class MulticonsultingException : Exception
 
     public MulticonsultingException(string message, Exception innerException) : base(message, innerException)
     {
-    }    
+    }
 }

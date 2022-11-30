@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Net.Mail;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : ADRIAN QUIALA
+
+//REFERENCIAS UTILIZADAS
+
+using System;
 using System.IO;
 using System.Net;
+using System.Net.Mail;
 
 public static class ConfiguracionCorreoElectronico
 {
     public static string server_address { get { return "smtp.gmail.com"; } }
-    public static int server_port { get { return Convert.ToInt16("587"); }}
+    public static int server_port { get { return Convert.ToInt16("587"); } }
     public static string user { get { return "lgarcia@multiconsulting.com"; } }
     public static string password { get { return "Resistance8"; } }
     public static bool enable_ssl { get { return true; } }
@@ -40,7 +44,7 @@ public class CorreoElectronico
             message.Priority = MailPriority.Normal;
             message.IsBodyHtml = is_text_html;
 
-            if(attachment_data != null && !string.IsNullOrWhiteSpace(attachment_name))
+            if (attachment_data != null && !string.IsNullOrWhiteSpace(attachment_name))
             {
                 Attachment attachment_file = new Attachment(attachment_data, attachment_name);
                 message.Attachments.Add(attachment_file);
@@ -55,6 +59,6 @@ public class CorreoElectronico
             return false;
         }
     }
-    
+
     #endregion
 }

@@ -1,8 +1,9 @@
 ﻿<%@ Page title="Subir Documentos" Language="C#" AutoEventWireup="true"  MasterPageFile="MenuPreP.master" CodeFile="Carga_Doc.aspx.cs" Inherits="Carga_Doc" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
-
+    Version 16-Octubre-2019 By Luis Angel Garcia P
     <script src ="../../Css/sweetalert.min.js" type="text/javascript"></script>
-    
+    <script src ="../../Scripts/jquery.blockui.min.js" type="text/javascript"></script>
+    <script src ="../../Scripts/custom.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(function () {
             // We can attach the `fileselect` event to all file inputs on the page
@@ -34,6 +35,7 @@
     <script>
         function alertme(titulo,mesaje,Tipo) {
             swal(titulo, mesaje, Tipo)
+            unblockUI();
         }
     </script>
 
@@ -45,14 +47,15 @@
 
     <script>
         function Alerta(Doc) {
-         alert(Doc)
+            alert(Doc);
+            unblockUI();
         }
     </script>
 
     <div class="Titulo">
 
     <div class="col-lg-12 col-sm-12 col-12" id="M1">
-        <h3>Carga de Documentos Pre-Registro</h3>
+        <h3>Carga de Documentos</h3>
     </div>
 
 
@@ -138,7 +141,7 @@
              <div class="row">
                  <label class="col-form-label col-lg-11 col-sm-11 col-xs-1"></label>
                  <div class="col-xs-3 col-md-1 col-lg-1">
-                     <asp:Button Text="Enviar" runat="server" ID="btnEnv" OnClick="Nuevos" CssClass="btn btn-success" title="Enviar Documentos" />
+                    <asp:Button Text="Enviar" runat="server" ID="btnEnv" OnClick="Nuevos" CssClass="btn btn-tsys cargar" title="Enviar Documentos" />
                  </div>
              </div>
 <%--    </ContentTemplate>
@@ -188,6 +191,18 @@
                 <h3>Error!</h3>
                 El Documento Contrato y/o Carta de Prestación, excede el Tamaño Permitido 15 Mb
             </div>
+            <div class="alert alert-block alert-danger" id="B11" style="display: none">
+                <h3>Error!</h3>
+                El Documento Carta de No Adeudo, excede el Tamaño Permitido 15 Mb
+            </div>
+            <div class="alert alert-block alert-danger" id="B12" style="display: none">
+                <h3>Error!</h3>
+                El Documento Terminos y Condiciones, excede el Tamaño Permitido 15 Mb
+            </div>
+            <div class="alert alert-block alert-danger" id="B9" style="display: none">
+                <h3>Error!</h3>
+                <asp:Label ID="Label4" runat="server" ></asp:Label>
+            </div>
             </div>
 
             <div class="row">
@@ -206,7 +221,7 @@
              </div>
 
             <div class="col-lg-6 col-sm-6 col-xs-10">
-            <h4>Registro Federal del Contribuyente.</h4>
+            <h4>Constancia de Situacion Fiscal.</h4>
             <div class="input-group col-lg-10 col-sm-10 col-xs-10">
                 <label class="input-group-btn">
                     <span class="btn btn-primary">
@@ -284,16 +299,39 @@
                  <small class="form-text text-muted">Archivo Max 15 Mb.</small>
              </div>
 
+            <div class="col-lg-6 col-sm-6 col-xs-10" id="CTerminos">
+            <h4>Terminos Y Condiciones</h4>
+            <div class="input-group col-lg-10 col-sm-10 col-xs-10">
+                <label class="input-group-btn">
+                    <span class="btn btn-primary">
+                        Seleccionar&hellip; <asp:FileUpload type="file" ID="FileUpload8" runat=server style="display: none;" accept="application/pdf" />
+                    </span>
+                </label>
+                <asp:TextBox type="text" runat="server" class="form-control" id="TextBox2" readonly="true" />
+            </div>
+                 <small class="form-text text-muted">Archivo Max 15 Mb.</small>
+             </div>
+
+            <div class="col-lg-6 col-sm-6 col-xs-10" id="CNoAdeudo">
+            <h4>Carta de No Adeudo</h4>
+            <div class="input-group col-lg-10 col-sm-10 col-xs-10">
+                <label class="input-group-btn">
+                    <span class="btn btn-primary">
+                        Seleccionar&hellip; <asp:FileUpload type="file" ID="FileUpload9" runat=server style="display: none;" accept="application/pdf" />
+                    </span>
+                </label>
+                <asp:TextBox type="text" runat="server" class="form-control" id="TextBox1" readonly="true" />
+            </div>
+                 <small class="form-text text-muted">Archivo Max 15 Mb.</small>
+             </div>
+
+
             </div>
 
-
-
-
-
-                <div class="row">
+           <div class="row">
                     <label class="col-form-label col-lg-10 col-sm-10 col-xs-6"></label>
                     <div class="col-xs-7 col-md-7">
-                        <asp:Button Text="Cargar" runat="server" ID="btnEnviar" AutoPostBack="False" CssClass="btn btn-success" title="Cargar Documentos" OnClick="Btn_Buscar" />
+                        <asp:Button Text="Cargar" runat="server" ID="btnEnviar" AutoPostBack="False" CssClass="btn btn-tsys cargar" title="Cargar Documentos" OnClick="Btn_Buscar" />
                     </div>
                 </div>
 

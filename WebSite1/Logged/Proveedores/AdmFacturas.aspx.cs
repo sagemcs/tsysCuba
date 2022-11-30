@@ -1,4 +1,12 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//PANTALLA PARA PROVEEDOR DE CONSULTA DE FACTURAS CARGADAS AL PORTAL
+
+//REFERENCIAS UTILIZADAS
+
+using System;
 using System.IO;
 using uCFDsLib.v33;
 using System.Xml.Serialization;
@@ -176,6 +184,11 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
     {
         try
         {
+            Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+            Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+            Page.Response.Cache.SetNoStore();
+            Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
             bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
 
             if (!isAuth)
@@ -186,15 +199,93 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
             }
 
             Global.Docs();
-            if ((HttpContext.Current.Session["Docs"].ToString() == "0"))
+            int Dias = Convert.ToInt16(HttpContext.Current.Session["Docs"].ToString());
+            if (Dias == 0)
             {
-                Page.MasterPageFile = "MenuP.master";
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
             }
-            else if ((HttpContext.Current.Session["Status"].ToString() == "Activo"))
+            else if (Dias < 0)
             {
-                if (HttpContext.Current.Session["UpDoc"].ToString() == "1") { Page.MasterPageFile = "MenuP.master"; }
-                else { Page.MasterPageFile = "MenuPreP.master"; }
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
             }
+            else if (Dias == 30)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias == 25)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias == 26)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias == 27)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias == 28)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias == 22)
+            {
+                Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            }
+            else if (Dias <= 10 && Dias > 0)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+            else if (Dias > 10)
+            {
+                Page.MasterPageFile = "MenuPreP.master";
+            }
+
+            //if (Dias == 0)
+            //{
+            //    Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            //}
+            //else if (Dias < 0)
+            //{
+            //    Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            //}
+            //else if (Dias == 24)
+            //{
+            //    Page.MasterPageFile = "MenuPreP.master";
+            //}
+            //else if (Dias == 26)
+            //{
+            //    Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            //}
+            //else if (Dias == 28)
+            //{
+            //    Page.MasterPageFile = "MenuPreP.master";
+            //}
+            //else if (Dias == 22)
+            //{
+            //    Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+            //}
+            //else if (Dias <= 10 && Dias > 0)
+            //{
+            //    Page.MasterPageFile = "MenuPreP.master";
+            //}
+            //else if (Dias > 10)
+            //{
+            //    Page.MasterPageFile = "MenuPreP.master";
+            //}
+            //if ((HttpContext.Current.Session["Docs"].ToString() == "1"))
+            //{
+            //    //Page.MasterPageFile = "MenuP.master";
+            //    Global.RevDocs();
+            //    if ((HttpContext.Current.Session["Docs"].ToString() == "1"))
+            //    {
+            //        //Page.MasterPageFile = "MenuP.master";
+            //        Response.Redirect("~/Logged/Proveedores/Default.aspx", false);
+
+            //    }
+            //    //Response.Redirect("~/Logged/Proveedores/Default.aspx",false);
+            //}
+
         }
         catch
         {
@@ -226,7 +317,7 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
 
             sqlConnection1.Open();
 
-            sSQL = @"SELECT VendID FROM tapVendor WHERE VendKey = @varID and CompanyID=@CompanyID";
+            sSQL = @"SELECT VendName FROM tapVendor WHERE VendKey = @varID and CompanyID=@CompanyID";
 
 
             string VendorId = "";
@@ -356,6 +447,20 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
 
     }
 
+    protected void Limpiar_Click1(object sender, EventArgs e)
+    {
+        //IdProveedor.Text = "";
+        //RFC.Text = "";
+        //UUID.Text = "";
+        NoOC.Text = "";
+        Folio.Text = "";
+        dpEstatus.SelectedValue = "1";
+        chkFechas.Checked = false;
+        txtdtp.Text = "";
+        txtdtp2.Text = "";
+        BindGrid();
+    }
+
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
         try
@@ -376,23 +481,25 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                 {
                     memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary1");
                     archivo += ".xml";
+                    HttpContext.Current.Response.ContentType = "text/xml";
                 }
                 if (e.CommandName == "Documento_2")
                 {
                     memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary2");
                     archivo += ".pdf";
+                    HttpContext.Current.Response.ContentType = "application/pdf";
                 }
                 if (e.CommandName == "Documento_3")
                 {
                     memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary3");
                     archivo += ".pdf";
+                    HttpContext.Current.Response.ContentType = "application/pdf";
                 }
 
-                Response.ContentType = "text/plain";
-                Response.AppendHeader("Content-Disposition", "attachment; filename=" + archivo);
-                Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
-                Response.BinaryWrite(memoryStream.ToArray());
-                Response.End();
+                HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + archivo + "\"");
+                HttpContext.Current.Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
+                HttpContext.Current.Response.BinaryWrite(memoryStream.ToArray());
+                HttpContext.Current.Response.End();
 
             }
             else if (e.CommandName == "Aprobar")
@@ -420,7 +527,6 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
 
             SqlConnection sqlConnection1 = new SqlConnection();
             sqlConnection1 = SqlConnectionDB("PortalConnection");
-
             sqlConnection1.Open();
 
             using (var sqlQuery = new SqlCommand("", sqlConnection1))

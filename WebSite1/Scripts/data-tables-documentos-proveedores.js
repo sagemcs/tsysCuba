@@ -1,5 +1,7 @@
-
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     var url_list = DocumentosProveedoresWebService.get_path() + "/listar";
@@ -13,8 +15,8 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
-                //data.VendID = $('#MainContent_comboProveedores').val();
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.DocID = $('#MainContent_inputID').val();
                 data.VendID = $('#MainContent_inputNombre').val();  
                 data.VendName = $('#MainContent_inputSocial').val();
@@ -30,11 +32,10 @@ $(document).ready(function () {
         "stateSave": true,
         "columns": [
             { "data": "ID_Documento" , 'className': "centrar-data", "orderable": false},
-          //  { "data": "Nombre", 'className': "centrar-data text_align_left" },
             { "data": "Social" , 'className': "centrar-data"},
-           // { "data": "RFC", 'className': "centrar-data" }, 
-            { "data": "Fecha", 'className': "centrar-data" },
-            { "data": "Descripcion" , 'className': "centrar-data"}
+            { "data": "Actualizacion", 'className': "centrar-data" },
+            { "data": "Descripcion", 'className': "centrar-data" },
+            { "data": "Estado", 'className': "centrar-data" }
         ],
 
         "columnDefs": [ {

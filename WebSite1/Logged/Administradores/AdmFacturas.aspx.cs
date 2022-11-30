@@ -1,18 +1,20 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 - JUNIO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//PANTALLA ADMINISTRACION DE FACTURAS CARGADAS POR PROVEEDORES
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.IO;
-using uCFDsLib.v33;
-using System.Xml.Serialization;
 using System.Data.SqlClient;
 using System.Data;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Web.UI.WebControls;
-using System.Xml;
-using ConsultaSAT;
 using System.Web;
 using System.Web.UI;
-using System.Net.Mime;
-using System.Net.Mail;
+using System.Diagnostics;
 
 public partial class Logged_AdmFacturas : System.Web.UI.Page
 {
@@ -66,14 +68,13 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
         }
     }
 
-
-    private void LogError(int LogKey, int UpdateUserKey, String proceso, String mensaje, String CompanyID)
+    //Rutina Manejar Errores
+    public static void LogError(int LogKey, int UpdateUserKey, String proceso, String mensaje, String CompanyID)
     {
         try
         {
 
-            int vkey, val1;
-            vkey = 0;
+            int val1;
             val1 = 0;
 
             SqlConnection sqlConnection1 = new SqlConnection();
@@ -115,16 +116,29 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
             }
 
 
-
         }
         catch (Exception ex)
         {
             string err;
             err = ex.Message;
-            Label4.Text = err;
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL);", true);
+            HttpContext.Current.Session["Error"] = err;
+            string Msj = string.Empty;
+            StackTrace st = new StackTrace(ex, true);
+            StackFrame frame = st.GetFrame(st.FrameCount - 1);
+            int LogKey2, Userk;
+            string Company = string.Empty;
+            if (HttpContext.Current.Session["UserKey"] == null) { Msj = "Variable UserKey null"; Userk = 0; } else { Userk = Convert.ToUInt16(HttpContext.Current.Session["UserKey"]); }
+            if (HttpContext.Current.Session["IDCompany"] == null) { Msj = Msj + "," + "Variable IDCompany null"; Company = "MGS"; } else { Company = Convert.ToString(HttpContext.Current.Session["IDCompany"]); }
+            if (HttpContext.Current.Session["LogKey"] == null) { Msj = Msj + "," + "Variable LogKey null"; LogKey2 = 0; } else { LogKey2 = Convert.ToUInt16(HttpContext.Current.Session["LogKey"]); }
+            Msj = Msj + ex.Message;
+            string nombreMetodo = frame.GetMethod().Name.ToString();
+            int linea = frame.GetFileLineNumber();
+            Msj = Msj + " || Metodo : AdmFacturas.aspx.cs_" + nombreMetodo + " Linea " + Convert.ToString(linea);
+            LogError(LogKey2, Userk, "AdmFacturas.aspx.cs_" + nombreMetodo, Msj, Company);
+
         }
     }
+
     //Rutina de Conexión
     public static SqlConnection SqlConnectionDB(string cnx)
     {
@@ -141,6 +155,20 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
         }
         catch (Exception ex)
         {
+            string Msj = string.Empty;
+            StackTrace st = new StackTrace(ex, true);
+            StackFrame frame = st.GetFrame(st.FrameCount - 1);
+            int LogKey, Userk, VendK;
+            string Company = string.Empty;
+            if (HttpContext.Current.Session["UserKey"] == null) { Msj = "Variable UserKey null"; Userk = 0; } else { Userk = Convert.ToUInt16(HttpContext.Current.Session["UserKey"]); }
+            if (HttpContext.Current.Session["IDCompany"] == null) { Msj = Msj + "," + "Variable IDCompany null"; Company = "MGS"; } else { Company = Convert.ToString(HttpContext.Current.Session["IDCompany"]); }
+            if (HttpContext.Current.Session["VendKey"] == null) { Msj = Msj + "," + "Variable VendKey null"; VendK = 0; } else { VendK = Convert.ToUInt16(HttpContext.Current.Session["VendKey"]); }
+            if (HttpContext.Current.Session["LogKey"] == null) { Msj = Msj + "," + "Variable LogKey null"; LogKey = 0; } else { LogKey = Convert.ToUInt16(HttpContext.Current.Session["LogKey"]); }
+            Msj = Msj + ex.Message;
+            string nombreMetodo = frame.GetMethod().Name.ToString();
+            int linea = frame.GetFileLineNumber();
+            Msj = Msj + " || Metodo : AdmFacturas.aspx.cs_" + nombreMetodo + " Linea " + Convert.ToString(linea);
+            LogError(LogKey, Userk, " AdmFacturas.aspx.cs_" + nombreMetodo, Msj, Company);
             return null;
         }
     }
@@ -149,35 +177,77 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+        Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+        Page.Response.Cache.SetNoStore();
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
         try
         {
-            if (HttpContext.Current.Session["IDCompany"] == null)
-            {
-                Context.GetOwinContext().Authentication.SignOut();
-                Response.Redirect("~/Account/Login.aspx");
-            }
-            else
-            {
-                if (HttpContext.Current.Session["RolUser"].ToString() != "Proveedor")
+
+                if (HttpContext.Current.Session["IDCompany"] == null)
                 {
-                    pVendKey = 0;
-                    pLogKey = 1;
-                    pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
-                    pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
-                    DatosV.Visible = false;
-                }
-                else
-                {
-                    HttpContext.Current.Session.RemoveAll();
                     Context.GetOwinContext().Authentication.SignOut();
                     Response.Redirect("~/Account/Login.aspx");
                 }
-            }
+                else
+                {
+                    if (HttpContext.Current.Session["RolUser"].ToString() != "Proveedor")
+                    {
+                       pVendKey = 0;
+                       pLogKey = Convert.ToInt32(Session["LogKey"]);
+                       pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+                       pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+                       DatosV.Visible = false;
+                       ActualizarFacturas();
+
+                    if (HttpContext.Current.Session["Evento"] != null)
+                    {
+                        if (IsPostBackEventControlRegistered)
+                        {
+                            HttpContext.Current.Session["Evento"] = null;
+                        }
+                        else
+                        {
+                            if (HttpContext.Current.Session["Evento"].ToString() == "Java")
+                            {
+                                int Cont = 0;
+                                if (HttpContext.Current.Session["Prv"] != null) { IdProveedor.Text = HttpContext.Current.Session["Prv"].ToString(); Cont = Cont + 1; }
+                                if (HttpContext.Current.Session["Fol"] != null) { Folio.Text = HttpContext.Current.Session["Fol"].ToString(); Cont = Cont + 1; }
+                                if (HttpContext.Current.Session["NOC"] != null) { NoOC.Text = HttpContext.Current.Session["NOC"].ToString(); Cont = Cont + 1; }
+                                if (HttpContext.Current.Session["Sts"].ToString() != null) { dpEstatus.SelectedIndex = Convert.ToInt32(HttpContext.Current.Session["Sts"].ToString()) - 1; Cont = Cont + 1; }
+                                if (HttpContext.Current.Session["Chk"].ToString() == "true")
+                                {
+                                    chkFechas.Checked = true;
+                                    if (HttpContext.Current.Session["Chk"].ToString() != null) { chkFechas.Checked = Convert.ToBoolean(HttpContext.Current.Session["Chk"].ToString()); Cont = Cont + 1; }
+                                    if (HttpContext.Current.Session["Fe1"] != null) { txtdtp.Text = HttpContext.Current.Session["Fe1"].ToString(); Cont = Cont + 1; }
+                                    if (HttpContext.Current.Session["Fe2"] != null) { txtdtp2.Text = HttpContext.Current.Session["Fe2"].ToString(); Cont = Cont + 1; }
+                                }
+                                else
+                                {
+                                    chkFechas.Checked = false;
+                                }
+                                HttpContext.Current.Session["Evento"] = null;
+                                if (Cont >0)
+                                {
+                                    BindGrid();
+                                }                                
+                            }
+                        }
+                    }
+
+                }
+                    else
+                    {
+                       HttpContext.Current.Session.RemoveAll();
+                       Context.GetOwinContext().Authentication.SignOut();
+                       Response.Redirect("~/Account/Login.aspx");
+                    }
+                }
         }
         catch (Exception ex)
         {
-            LogError(pLogKey, pUserKey, "Carga-Factura:BindGridView", ex.Message, pCompanyID);
-
+            //RutinaError(ex);
         }
     }
 
@@ -194,22 +264,28 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                 Response.Redirect("~/Account/Login.aspx");
             }
 
-
-            if (HttpContext.Current.Session["RolUser"] != null) { 
-
-            if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Consultas")
+            if (HttpContext.Current.Session["RolUser"] != null)
             {
-                Page.MasterPageFile = "MasterPageContb.master";
-            }
 
-            if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Validador")
-            {
-                Page.MasterPageFile = "SiteVal.master";
+                if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Consultas")
+                {
+                    Page.MasterPageFile = "MasterPageContb.master";
+                }
+
+                if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Validador")
+                {
+                    Page.MasterPageFile = "SiteVal.master";
+                }
+
+                if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Empleado")
+                {
+                    Page.MasterPageFile = "~/Logged/Administradores/SiteEmpleado.master";
+                }
             }
         }
-    }
         catch (Exception ex)
         {
+            //RutinaError(ex);
             HttpContext.Current.Session.RemoveAll();
             Context.GetOwinContext().Authentication.SignOut();
             Response.Redirect("~/Account/Login.aspx");
@@ -265,11 +341,30 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
 
         catch (Exception ex)
         {
-            LogError(pLogKey, pUserKey, "Carga-Factura:BindGridView", ex.Message, pCompanyID);
+            RutinaError(ex);
             return "XXXX";
         }
 
     }
+
+    //protected void gvProducts_RowDataBound(object sender, GridViewRowEventArgs e)
+    //{
+    //    if (e.Row.RowType != DataControlRowType.DataRow)
+    //        return;
+
+    //    //se recupera la entidad que genera la row
+    //    //Product prod = e.Row.DataItem as Product;
+    //    string valor = e.Row.Cells[1].Text.ToString();
+
+    //    //se verifica si el producto esta discontinuo
+    //    //para quitar el boton de edicion
+    //    if (valor == "Extranjero")
+    //    {
+    //        ImageButton img = e.Row.FindControl("imgEdit") as ImageButton;
+    //        e.Row.Cells[7].Controls.Remove(img);
+    //    }
+
+    //}
 
     protected void BindGridInvoices(string VendId, string RFC, string Folio, string UUID, string NodeOC, int estatus, int opcion, DateTime FechaInicial, DateTime FechaFinal, string CompanyID)
     {
@@ -285,9 +380,6 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
             {
                 sSQL = "spSelectInvoice";
 
-                Cmd.CommandType = CommandType.StoredProcedure;
-                Cmd.CommandText = sSQL;
-
                 List<SqlParameter> parsT = new List<SqlParameter>();
                 parsT.Add(new SqlParameter("@VendId", VendId));
                 parsT.Add(new SqlParameter("@RFC", RFC));
@@ -299,6 +391,16 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                 parsT.Add(new SqlParameter("@FechaInicial", FechaInicial));
                 parsT.Add(new SqlParameter("@FechaFinal", FechaFinal));
                 parsT.Add(new SqlParameter("@CompanyID", CompanyID));
+
+                if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Empleado") 
+                {
+                    string user = HttpContext.Current.Session["UserKey"].ToString();
+                    sSQL = "spSelectInvoiceEmple";
+                    parsT.Add(new SqlParameter("@userkey", user));
+                }
+
+                Cmd.CommandType = CommandType.StoredProcedure;
+                Cmd.CommandText = sSQL;
 
                 System.Data.SqlClient.SqlParameter[] sqlParameter = parsT.ToArray();
                 foreach (System.Data.SqlClient.SqlParameter par in sqlParameter)
@@ -314,16 +416,24 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                 gvFacturas.DataBind();
 
 
-                if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Consultas")
+                if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Consultas" || dpEstatus.SelectedItem.ToString() != "Pendiente")
                 {
-                    gvFacturas.Columns[8].Visible = false;
-                    gvFacturas.Columns[9].Visible = false;
+                    gvFacturas.Columns[10].Visible = false;
+                    gvFacturas.Columns[11].Visible = false;
                 }
                 else
                 {
-                    gvFacturas.Columns[8].Visible = true;
-                    gvFacturas.Columns[9].Visible = true;
+                    gvFacturas.Columns[10].Visible = true;
+                    gvFacturas.Columns[11].Visible = true;
                 }
+
+                if (HttpContext.Current.Session["RolUser"].ToString() == "T|SYS| - Empleado" || dpEstatus.SelectedItem.ToString() != "Pendiente")
+                {
+                    gvFacturas.Columns[10].Visible = false;
+                    gvFacturas.Columns[11].Visible = false;
+                }
+
+                //gvFacturas.Columns[0].Visible = false;
 
                 if (Table.Rows.Count == 0) { DatosV.Visible = true; }
 
@@ -331,7 +441,8 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al ejecutar procedimiento almacenado, Error: " + ex.ToString());
+                RutinaError(ex);
+                //throw new Exception("Error al ejecutar procedimiento almacenado, Error: " + ex.ToString());
             }
             finally
             {
@@ -341,8 +452,20 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                 }
             }
         }
+    }
 
-
+    protected void Limpiar_Click1(object sender, EventArgs e)
+    {
+        IdProveedor.Text = "";
+        //RFC.Text = "";
+        //UUID.Text = "";
+        NoOC.Text = "";
+        Folio.Text = "";
+        dpEstatus.SelectedValue = "1";
+        chkFechas.Checked = false;
+        txtdtp.Text = "";
+        txtdtp2.Text = "";
+        BindGrid();
     }
 
     protected void Buscar_Click1(object sender, EventArgs e)
@@ -360,7 +483,7 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
             if (chkFechas.Checked)
             {
                 fechaini = DateTime.Parse(txtdtp.Text);
-                fechafin = DateTime.Parse(txtdtp.Text);
+                fechafin = DateTime.Parse(txtdtp2.Text);
             }
             else
             {
@@ -368,11 +491,12 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                 fechafin = DateTime.Parse("2000-01-01");
             }
 
-            BindGridInvoices(VendorID(Convert.ToString(pVendKey), pCompanyID), RFC.Text, Folio.Text, UUID.Text, NoOC.Text, Convert.ToInt32(dpEstatus.SelectedItem.Value), chkFechas.Checked ? 1 : 0, fechaini, fechafin, pCompanyID);
+            BindGridInvoices(IdProveedor.Text, "", Folio.Text, "", NoOC.Text, Convert.ToInt32(dpEstatus.SelectedItem.Value), chkFechas.Checked ? 1 : 0, fechaini, fechafin, pCompanyID);
+
         }
         catch (Exception ex)
         {
-            LogError(pLogKey, pUserKey, "Carga-Factura:BindGridView", ex.Message, pCompanyID);
+            RutinaError(ex);
         }
 
     }
@@ -381,58 +505,208 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
     {
         try
         {
-
             MemoryStream memoryStream = new MemoryStream();
-
             int index = Convert.ToInt32(e.CommandArgument);
             String archivo;
 
             GridViewRow row = gvFacturas.Rows[index];
             archivo = HttpUtility.HtmlDecode(row.Cells[1].Text);
-
+            string folio = HttpUtility.HtmlDecode(row.Cells[0].Text);
+            string llave = HttpUtility.HtmlDecode(row.Cells[3].Text);
 
             if (e.CommandName == "Documento_1" | e.CommandName == "Documento_2" | e.CommandName == "Documento_3")
             {
                 if (e.CommandName == "Documento_1")
                 {
-                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary1");
+                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary1"); // XML
+                    archivo += " Factura - " + HttpUtility.HtmlDecode(row.Cells[3].Text);
                     archivo += ".xml";
+                    HttpContext.Current.Response.ContentType = "text/xml";
                 }
                 if (e.CommandName == "Documento_2")
                 {
-                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary2");
+                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary2"); // PDF
+                    archivo += " Factura - " + HttpUtility.HtmlDecode(row.Cells[3].Text);
                     archivo += ".pdf";
+                    HttpContext.Current.Response.ContentType = "application/pdf";
                 }
                 if (e.CommandName == "Documento_3")
                 {
-                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary3");
+                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[0].Text, "FileBinary3"); //PDF
+                    archivo += " Factura - " + HttpUtility.HtmlDecode(row.Cells[3].Text) + " Anexo - " + HttpUtility.HtmlDecode(row.Cells[2].Text);
                     archivo += ".pdf";
+                    HttpContext.Current.Response.ContentType = "application/pdf";
                 }
 
-                Response.ContentType = "text/plain";
-                Response.AppendHeader("Content-Disposition", "attachment; filename=" + archivo);
-                Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
-                Response.BinaryWrite(memoryStream.ToArray());
-                Response.End();
+
+                HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + archivo + "\"");
+                HttpContext.Current.Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
+                HttpContext.Current.Response.BinaryWrite(memoryStream.ToArray());
+                HttpContext.Current.Response.ContentType = Page.ContentType;
+                HttpContext.Current.Response.End();
+
 
             }
             else if (e.CommandName == "Aprobar")
             {
-               
-               InsertSage(row.Cells[0].Text, row.Cells[1].Text);
+                InsertSage(row.Cells[0].Text, row.Cells[1].Text);
             }
             else if (e.CommandName == "Cancelar")
             {
-                StatusFactura(row.Cells[0].Text, "3");
-                BindGrid();
+                int Fila = row.RowIndex + 1;
+                Rechaza(llave, folio, Fila);
+                //int Vrs = Convert.ToInt32(folio);
+                //if ((CancelarD(Vrs, 0, 1, 1) == 0))
+                //{
+                //    int Fila = row.RowIndex + 1;
+                //    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "Pregunta('" + folio + "','" + llave + "','" + Fila + "');", true);
+                //    BindGrid();
+                //}
+                //HttpContext.Current.Response.AddHeader("REFRESH", "2;URL=AdmFacturas");
+                //Thread.Sleep(5000);
+                //Response.Redirect("miUrl");
             }
 
 
         }
         catch (Exception ex)
         {
-            LogError(pLogKey, pUserKey, "Carga-Factura:GridView1_RowCommand", ex.Message, pCompanyID);
+            //RutinaError(ex);
+            //LogError(pLogKey, pUserKey, "Carga-Factura:GridView1_RowCommand", ex.Message, pCompanyID);
         }
+    }
+
+    protected void Rechaza(string InvoiceKey,string Folios,int Fila)
+    {
+        try
+        {
+                SqlCommand sqlSelectCommand1 = new SqlCommand();
+                SqlDataAdapter sqlDataAdapter1 = new SqlDataAdapter();
+                SqlConnection sqlConnection1 = new SqlConnection();
+                sqlConnection1 = SqlConnectionDB("PortalConnection");
+
+                string sSQL;
+                sqlConnection1.Open();
+                sSQL = @"SELECT Folio,NodeOc,UUID,VendorKey,Trantype FROM Invoice WHERE InvoiceKey = @varID";
+
+                string Folio = "";
+                string NodeOc = "";
+                string UUID = "";
+                string VendorKey = "";
+                string Trantype = "";
+
+                using (var sqlQuery = new SqlCommand(sSQL, sqlConnection1))
+                {
+                    sqlQuery.Parameters.AddWithValue("@varID", Folios);
+                    using (var sqlQueryResult = sqlQuery.ExecuteReader())
+                        if (sqlQueryResult != null)
+                        {
+                            while (sqlQueryResult.Read())
+                            {
+                                Folio = Convert.ToString(sqlQueryResult.GetValue(0));
+                                NodeOc = Convert.ToString(sqlQueryResult.GetValue(1));
+                                UUID = Convert.ToString(sqlQueryResult.GetValue(2));
+                                VendorKey = Convert.ToString(sqlQueryResult.GetValue(3));
+                                Trantype = Convert.ToString(sqlQueryResult.GetValue(4));
+                            }
+                        }
+                }
+
+                sqlConnection1.Close();
+
+                ///Consulta Sage
+                sqlConnection1 = SqlConnectionDB("ConnectionString");
+                sqlConnection1.Open();
+                int Conteo = 0;
+
+                sSQL = "Select Count(*) from tapVoucherCEx WHERE iTranNo =" + "'" + Folio + "' And iVendKey = " + VendorKey;
+                sqlConnection1 = SqlConnectionDB("ConnectionString");
+                sqlConnection1.Open();
+                using (SqlCommand Cmd = new SqlCommand(sSQL, sqlConnection1))
+                {
+                    try
+                    {
+                        Cmd.CommandType = CommandType.Text;
+                        Cmd.CommandText = sSQL;
+                        Conteo = Convert.ToInt32(Cmd.ExecuteScalar());
+                    }
+                    catch (Exception ex)
+                    {
+                        RutinaError(ex);
+                        lblMsj.Text = ex.Message;
+                        ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
+                        return;
+                    }
+                }
+
+                sqlConnection1.Close();
+                if (Conteo == 0)
+                {
+                    int Vrs = Convert.ToInt32(Folios);
+                    if ((CancelarD(Vrs, 0, 1, 1) == 0))
+                    {
+                        ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "Pregunta('" + Folios + "','" + InvoiceKey + "','" + Fila + "');", true);
+                        BindGrid();
+                    }
+                }
+                else
+                {
+                    Label4.Text = "La Factura ya se encuentra Procesada en SAGE";
+                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL);", true);
+                }
+        }
+        catch(Exception ex)
+        {
+            RutinaError(ex);
+            lblMsj.Text = ex.Message;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
+        }
+    }
+
+    protected int CancelarD(int FacKey, int Not, int Op,int Tipo)
+    {
+        int val1 = -1;
+        try
+        {
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+            sqlConnection1.Open();
+            string sSQL;
+            string Rest = string.Empty;
+
+            sSQL = "Notificaciones_Fc";
+            List<SqlParameter> parsT = new List<SqlParameter>();
+            parsT.Add(new SqlParameter("@Invc", FacKey));
+            parsT.Add(new SqlParameter("@Not", Not));
+            parsT.Add(new SqlParameter("@Opcion", Op));
+            parsT.Add(new SqlParameter("@Tipo", Tipo));
+
+            using (System.Data.SqlClient.SqlCommand Cmd = new System.Data.SqlClient.SqlCommand(sSQL, sqlConnection1))
+            {
+
+                Cmd.CommandType = CommandType.StoredProcedure;
+                Cmd.CommandText = sSQL;
+
+                foreach (System.Data.SqlClient.SqlParameter par in parsT)
+                {
+                    Cmd.Parameters.AddWithValue(par.ParameterName, par.Value);
+                }
+                System.Data.SqlClient.SqlDataReader rdr = null;
+                rdr = Cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    Rest = rdr["Resultado"].ToString(); // 0 ok
+                }
+                sqlConnection1.Close();
+                val1 = Convert.ToInt32(Rest);
+
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new MulticonsultingException(ex.Message);
+        }
+        return val1;
     }
 
     private bool StatusFactura(String InvoiceKey, String Status)
@@ -460,7 +734,8 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            LogError(pLogKey, pUserKey, "Carga-Factura:Page_Load", ex.Message, pCompanyID);
+            RutinaError(ex);
+            //LogError(pLogKey, pUserKey, "Carga-Factura:Page_Load", ex.Message, pCompanyID);
             return false;
         }
     }
@@ -476,11 +751,7 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
 
             sqlConnection1.Open();
 
-            if (consulta == "InvoiceKey")
-                sql = @"SELECT " + columna + " FROM InvoiceFile WHERE InvoiceKey = @varID";
-            else
-                sql = @"SELECT " + columna + " FROM InvoiceFile WHERE InvcFileKey = @varID";
-
+            sql = @"SELECT " + columna + " FROM InvoiceFile WHERE InvoiceKey = @varID";
 
             using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
             {
@@ -491,9 +762,7 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                         sqlQueryResult.Read();
                         var blob = new Byte[(sqlQueryResult.GetBytes(0, 0, null, 0, int.MaxValue))];
                         sqlQueryResult.GetBytes(0, 0, blob, 0, blob.Length);
-                        //using (var fs = new MemoryStream(memoryStream, FileMode.Create, FileAccess.Write)) {
                         memoryStream.Write(blob, 0, blob.Length);
-                        //}
                     }
             }
 
@@ -504,8 +773,7 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
         }
         catch (Exception ex)
         {
-            string err;
-            err = ex.Message;
+            RutinaError(ex);
 
             return null;
         }
@@ -515,6 +783,13 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
     {
         try
         {
+
+            if (!ValidaArt(InvoiceKey))
+            {
+                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
+                return;
+            }
+
             SqlCommand sqlSelectCommand1 = new SqlCommand();
             SqlDataAdapter sqlDataAdapter1 = new SqlDataAdapter();
             SqlConnection sqlConnection1 = new SqlConnection();
@@ -552,7 +827,6 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                             UUID = Convert.ToString(sqlQueryResult.GetValue(2));
                             VendorKey = Convert.ToString(sqlQueryResult.GetValue(3));
                             Trantype = Convert.ToString(sqlQueryResult.GetValue(4));
-
                         }
                     }
             }
@@ -570,37 +844,39 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
             }
 
             ///Consulta Sage
-
-            sqlConnection1 = SqlConnectionDB("ConnectionString");
-            sqlConnection1.Open();
-
-            sSQL = "Select Count(*) from tapLoadFilesAP WHERE UUID =" + "'" + UUID.ToString() + "'";
             int Conteo = 0;
 
-            using (System.Data.SqlClient.SqlCommand Cmd = new System.Data.SqlClient.SqlCommand(sSQL, sqlConnection1))
+            if (UUID == "")
             {
-                try
-                {
-                    Cmd.CommandType = CommandType.Text;
-                    Cmd.CommandText = sSQL;
-
-                    Conteo = Convert.ToInt32(Cmd.ExecuteScalar());
-
-                }
-                catch (Exception ex)
-                {
-                    string err;
-                    err = ex.Message;
-                    return;
-                }
+                Conteo = 0;
             }
+            else 
+            { 
+                sqlConnection1 = SqlConnectionDB("ConnectionString");
+                sqlConnection1.Open();
+                sSQL = "Select Count(*) from tapLoadFilesAP WHERE UUID =" + "'" + UUID.ToString() + "'";
+                using (System.Data.SqlClient.SqlCommand Cmd = new System.Data.SqlClient.SqlCommand(sSQL, sqlConnection1))
+                {
+                    try
+                    {
+                        Cmd.CommandType = CommandType.Text;
+                        Cmd.CommandText = sSQL;
 
-            sqlConnection1.Close();
+                        Conteo = Convert.ToInt32(Cmd.ExecuteScalar());
 
+                    }
+                    catch (Exception ex)
+                    {
+                        RutinaError(ex);
+                        return;
+                    }
+                }
+                sqlConnection1.Close();
+            }
 
             if (Conteo == 0)
             {
-                sSQL = "Select Count(*) from tapVoucherCEx WHERE iTranNo =" + "'" + Folio + "'";
+                sSQL = "Select Count(*) from tapVoucherCEx WHERE iTranNo =" + "'" + Folio + "' And iVendKey = " + VendorKey;
 
                 sqlConnection1 = SqlConnectionDB("ConnectionString");
                 sqlConnection1.Open();
@@ -616,6 +892,7 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                     }
                     catch (Exception ex)
                     {
+                        RutinaError(ex);
                         lblMsj.Text = ex.Message;
                         ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
                         return;
@@ -687,16 +964,12 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
                                 return;
                             }
-                            else
-                            {
-                                lblMsj1.Text = "Carga Exitosa";
-                                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL2);", true);
-                            }
 
                             sqlConnection1.Close();
                         }
                         catch (Exception ex)
                         {
+                            RutinaError(ex);
                             lblMsj.Text = ex.Message;
                             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
                             return;
@@ -742,26 +1015,32 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
 
                             if (val3 == -1)
                             {
-                                lblMsj.Text = ("Error al cargar a Sage");
+                                string Msj = TraerMsj(val1,val2,pCompanyID);
+                                if (Msj == "Error al obtener mensaje de Validación")
+                                {
+                                    Msj = "Error al cargar a Sage";
+                                }
+                                //Traer errores de la tabla 
+                                lblMsj.Text = Msj;
                                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
                                 return;
                             }
                             else
                             {
-                                lblMsj1.Text = "Carga Exitosa";
-                                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL2);", true);
+                                //lblMsj1.Text = "Carga Exitosa";
+                                //ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL2);", true);
                             }
 
                             sqlConnection1.Close();
                         }
                         catch (Exception ex)
                         {
+                            RutinaError(ex);
                             lblMsj.Text = ex.Message;
                             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
                             return;
                         }
                     }
-
 
                     sSQL = "sppaVoucherAPI";
                     parsT = new List<SqlParameter>();
@@ -819,6 +1098,7 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
                         }
                         catch (Exception ex)
                         {
+                            RutinaError(ex);
                             lblMsj.Text = ex.Message;
                             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
 
@@ -839,23 +1119,218 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
         }
         catch (Exception ex)
         {
+            RutinaError(ex);
             lblMsj.Text = ex.Message;
             LogError(pLogKey, pUserKey, "Carga-Factura:GridView1_RowCommand", ex.Message, pCompanyID);
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL1);", true);
         }
     }
 
-    protected void Alerts(object sender, EventArgs e)
+    private bool ValidaArt(string invoicKey)
     {
+        bool Resultado = true;
+        try
+        {
+            string Estado=string.Empty;
 
-        lblMsj1.Text = "Carga Exitosa";
-        lblMsj.Text = "Carga Exitosa";
-        ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(AL2);", true);
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+            sqlConnection1.Open();
+            string ItemKey = "Select Codigo From InvoiceLines Where InvoiceKey = " + invoicKey;
+            using (SqlCommand Cmd = new SqlCommand(ItemKey, sqlConnection1))
+            {
 
+                Cmd.CommandType = CommandType.Text;
+                Cmd.CommandText = ItemKey;
+                SqlDataReader rdr = null;
+                rdr = Cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    string IKey = rdr["Codigo"].ToString(); 
+
+                    string Ssql = "Select Status From TimItem Where ItemID = '" + IKey + "' AND CompanyID = '" + iCompanyID + "'";
+
+                    SqlConnection sqlConnection2 = new SqlConnection();
+                    sqlConnection2 = SqlConnectionDB("ConnectionString");
+                    sqlConnection2.Open();
+                    using (SqlCommand Cmdd = new SqlCommand(Ssql, sqlConnection2))
+                    {
+                        Cmdd.CommandType = CommandType.Text;
+                        Cmdd.CommandText = Ssql;
+                        Estado = Cmdd.ExecuteScalar().ToString();
+                    }
+                    sqlConnection2.Close();
+
+                    if (Estado == "2")
+                    {
+                        Resultado = false;
+                        lblMsj.Text = "El articulo  " + IKey + "  se encuentra con estatus Inactivo , la carga no puede continuar, verificalo en SAGE.";
+                        return Resultado;
+                    }
+
+                    if (Estado == "4")
+                    {
+                        Resultado = false;
+                        lblMsj.Text = "El articulo  " + IKey + "  se encuentra con estatus Borrado , la carga no puede continuar, verificalo en SAGE.";
+                        return Resultado;
+                    }
+
+                    Estado = string.Empty;
+                }
+                sqlConnection1.Close();
+            } 
+
+        }
+        catch (Exception ex)
+        {
+            Resultado = false;
+            string error = ex.Message;
+            lblMsj.Text = "Se produjo un error al realizar la validación de los articulos.";
+        }
+        return Resultado;
+    }
+
+    protected string TraerMsj(int Lote,int vkey,string Company)
+    {
+        string Conteo=string .Empty;
+
+        try
+        {
+            SqlCommand sqlSelectCommand1 = new SqlCommand();
+            SqlDataAdapter sqlDataAdapter1 = new SqlDataAdapter();
+            SqlConnection sqlConnection1 = new SqlConnection();
+            string sSQL = "Select top 1 ErrorValidacion from tapAPILogValidacion WHERE iLote =" + "'" + Lote + "' And vKey = '" + vkey + "' And CompanyID = '" + Company + "'";
+
+            sqlConnection1 = SqlConnectionDB("ConnectionString");
+            sqlConnection1.Open();
+
+            using (System.Data.SqlClient.SqlCommand Cmd = new System.Data.SqlClient.SqlCommand(sSQL, sqlConnection1))
+            {
+                try
+                {
+                    Cmd.CommandType = CommandType.Text;
+                    Cmd.CommandText = sSQL;
+                    Conteo = Convert.ToString(Cmd.ExecuteScalar());
+
+                }
+                catch (Exception ex)
+                {
+                    RutinaError(ex);
+                    lblMsj.Text = ex.Message;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            string msj = ex.Message;
+            Conteo = "Error al obtener mensaje de Validación";
+        }
+
+        return Conteo;
     }
 
     protected void dpEstatus_SelectedIndexChanged(object sender, EventArgs e)
     {
+        //ActualizarFacturas();
+        if (dpEstatus.SelectedValue == "7")
+        {   
+            RevisaPagos();
+        }
+
         BindGrid();
     }
+
+    protected void RevisaPagos()
+    {
+        string IDCom = HttpContext.Current.Session["IDCompany"].ToString();
+        int Logkey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
+        int Uskey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+
+        try
+        {
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+            {
+                SqlCommand cmd = new SqlCommand("spRevPago", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Opcion", Value = 6 });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@VendKey", Value = 0 });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@IDC", Value = IDCom });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Fol", Value = 0 });
+
+                if (conn.State == ConnectionState.Open) { conn.Close(); }
+
+                conn.Open();
+                SqlDataReader rdr = cmd.ExecuteReader();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            LogError(Logkey, Uskey, "Actualización Estado Factura a Pagada", ex.Message, IDCom);
+        }
+    }
+
+    protected void RutinaError(Exception ex)
+    {
+        string Msj = string.Empty;
+        StackTrace st = new StackTrace(ex, true);
+        StackFrame frame = st.GetFrame(st.FrameCount - 1);
+        int LogKey, Userk;
+        string Company = string.Empty;
+        if (HttpContext.Current.Session["UserKey"] == null) { Msj = "Variable UserKey null"; Userk = 0; } else { Userk = Convert.ToUInt16(HttpContext.Current.Session["UserKey"]); }
+        if (HttpContext.Current.Session["IDCompany"] == null) { Msj = Msj + "," + "Variable IDCompany null"; Company = "MGS"; } else { Company = Convert.ToString(HttpContext.Current.Session["IDCompany"]); }
+        if (HttpContext.Current.Session["LogKey"] == null) { Msj = Msj + "," + "Variable LogKey null"; LogKey = 0; } else { LogKey = Convert.ToUInt16(HttpContext.Current.Session["LogKey"]); }
+        Msj = Msj + ex.Message;
+        string nombreMetodo = frame.GetMethod().Name.ToString();
+        int linea = frame.GetFileLineNumber();
+        Msj = Msj + " || Metodo : AdmFacturas.aspx.cs_" + nombreMetodo + " Linea " + Convert.ToString(linea);
+        LogError(LogKey, Userk, " AdmFacturas.aspx.cs_" + nombreMetodo, Msj, Company);
+        lblMsj.Text = ex.Message;
+    }
+
+    protected void ActualizarFacturas()
+    {
+        try
+        {
+            if (HttpContext.Current.Session["IDCompany"] != null)
+            {
+                int val1;
+                val1 = 0;
+                SqlConnection sqlConnection1 = new SqlConnection();
+                sqlConnection1 = SqlConnectionDB("PortalConnection");
+                sqlConnection1.Open();
+                string pCompanyID = HttpContext.Current.Session["IDCompany"].ToString();
+                string sSQL;
+
+                sSQL = "spUpdateInvoice";
+                List<SqlParameter> parsT = new List<SqlParameter>();
+                parsT.Add(new SqlParameter("@Company", pCompanyID));
+
+                using (System.Data.SqlClient.SqlCommand Cmd = new System.Data.SqlClient.SqlCommand(sSQL, sqlConnection1))
+                {
+                    Cmd.CommandType = CommandType.StoredProcedure;
+                    Cmd.CommandText = sSQL;
+                    foreach (System.Data.SqlClient.SqlParameter par in parsT)
+                    {
+                        Cmd.Parameters.AddWithValue(par.ParameterName, par.Value);
+                    }
+                    System.Data.SqlClient.SqlDataReader rdr = null;
+                    rdr = Cmd.ExecuteReader();
+                    while (rdr.Read())
+                    {
+                        val1 = rdr.GetInt32(0); // 0 ok
+                    }
+                    sqlConnection1.Close();
+
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            RutinaError(ex);
+        }
+    }
+
 }
+
+

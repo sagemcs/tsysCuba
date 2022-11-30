@@ -1,4 +1,11 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : ADRIAN QUIALA
+//PANTALLA DE CONFIGURACION PARA REPORTE DE CARGA DE FACTURAS
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,6 +18,10 @@ public partial class Logged_ReportsFilter_CargaFacturasFilter : System.Web.UI.Pa
     {
         Page.Title = "Carga de Facturas";
 
+        Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
+        Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
+        Page.Response.Cache.SetNoStore();
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
         bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
         if (!isAuth)
         {
@@ -52,11 +63,16 @@ public partial class Logged_ReportsFilter_CargaFacturasFilter : System.Web.UI.Pa
                 comboProveedores.DataBind();
             }
             else
+            {
                 return;
-            List<EstadoDocumentoDTO> list_dto_estados = EstadosDocumento.Obtener();
+            }
+                
+
+
+            List<EstadoArticulossDTO> list_dto_estados = EstadosArticuloss.Obtener();
             if (list_dto_estados != null && list_dto_estados.Count != 0)
             {
-                EstadoDocumentoDTO vacio = new EstadoDocumentoDTO();
+                EstadoArticulossDTO vacio = new EstadoArticulossDTO();
                 vacio.Id = "0";
                 vacio.Descripcion = "[-Seleccione estado-]";
                 list_dto_estados.Insert(0, vacio);

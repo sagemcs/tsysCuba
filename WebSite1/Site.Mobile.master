@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
-    <meta name="viewport" content="width=device-width" />
+<%--<meta name="viewport" content="width=device-width" />--%>
     <title></title>
     <asp:ContentPlaceHolder runat="server" ID="HeadContent" />
 </head>
@@ -14,6 +14,7 @@
     <div>
         <h1>Mobile Master Page</h1>
         <asp:ContentPlaceHolder runat="server" ID="FeaturedContent" />
+<%--        <asp:ContentPlaceHolder ID="Head" runat="server"></asp:ContentPlaceHolder>--%>
         <section class="content-wrapper main-content clear-fix">
             <asp:ContentPlaceHolder runat="server" ID="MainContent" />
         </section>

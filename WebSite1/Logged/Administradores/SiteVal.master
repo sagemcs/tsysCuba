@@ -1,32 +1,26 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="SiteVal.master.cs" Inherits="SiteMaster" %>
 
 <!DOCTYPE html>
-
 <html lang="en">
 <head runat="server">
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> - T|SYS|®</title>
+<%--    <meta name="viewport" content="width=device-width, initial-scale=1.0" />--%>
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <title><%: Page.Title %>- T|SYS|®</title>
 
     
     <link rel="stylesheet" href="~/Css/bootstrap.min.css">
-
+    <!--Version 08-Abril-2019 By Luis Angel-->
     <!-- Optional theme -->
 <link rel="stylesheet" href="~/Css/bootstrap-theme.min.css">
 <link href ="~/Css/HojaProv.css" rel="stylesheet" type ="text/css" />
-<!-- Latest compiled and minified JavaScript -->
-<%--<script src="~/Css/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>--%>
-<%--    <link href="~/Content/Site.css" rel="stylesheet" type ="text/css" />--%>
-
-<%--    <link href ="Content/bootstrap.css" rel ="stylesheet" type ="text/css" />   --%> 
-<%--        <asp:PlaceHolder runat="server">
-        <%: Scripts.Render("~/bundles/modernizr") %>
-    </asp:PlaceHolder>--%>
-<%--<webopt:bundlereference runat="server" path="~/Content/css" />--%>
 
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link href="~/Scripts/dataTable-1.10.16/datatables.css" rel="stylesheet" />
     <link href="~/Css/sweetalert.css" rel="stylesheet" />
+    <link href="~/Css/tables.css" rel="stylesheet" />
     <asp:ContentPlaceHolder ID="CustomStyles" runat="server"></asp:ContentPlaceHolder>
 </head>
 <body>
@@ -38,11 +32,12 @@
         </div>
     </div>
     <form runat="server">
+        <asp:TextBox ID="Text_Sec" runat="server"></asp:TextBox>
         <asp:ScriptManager runat="server">
             <Scripts>
                 <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
                 <%--Framework Scripts--%>
-            <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="MsAjaxBundle" />
                 <asp:ScriptReference Name="jquery" />
                 <asp:ScriptReference Name="bootstrap" />
                 <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
@@ -53,20 +48,16 @@
                 <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
                 <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
                 <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
-                <asp:ScriptReference Name="WebFormsBundle" />
-                <asp:ScriptReference  Path="~/Css/sweetalert.min.js" />
-                <asp:ScriptReference  Path="~/Scripts/jquery.blockui.min.js" />
-                <%--Site Scripts--%>
-
-                    <%--
-                <asp:ScriptReference Name="datatables.min.js" Path="~/Scripts/dataTable-1.10.16/datatables.min.js" />
-                <asp:ScriptReference Name="datatables.checkboxes.min.js" Assembly="System.Web" Path="~/Scripts/dataTable-1.10.16/datatables.checkboxes.min.js" />
-                <asp:ScriptReference Name="data-tables-facturas.js" Assembly="System.Web" Path="~/Scripts/data-tables-facturas.js" />
-            
-               --%>  
-
+                <asp:ScriptReference Name="WebFormsBundle" />       
+                <asp:ScriptReference Path="~/Css/sweetalert.min.js" />
+                <asp:ScriptReference Path="~/Scripts/jquery.blockui.min.js" />
+                <asp:ScriptReference Path="~/Scripts/crypto-js.js" />
+                <asp:ScriptReference Path="~/Scripts/sha256.js" />
+                <asp:ScriptReference Path="~/Scripts/custom.js" />
+                <asp:ScriptReference Path="~/Scripts/notificaciones.js" />
             </Scripts>
                  <Services>
+                <asp:ServiceReference Path="~/Servicios/NotificacionesWebService.asmx" />  
                 <asp:ServiceReference Path="~/Servicios/AccesosWebService.asmx" />
                 <asp:ServiceReference Path="~/Servicios/ChequeSolicitudesWebService.asmx" />
                 <asp:ServiceReference Path="~/Servicios/ContrarecibosWebService.asmx" />
@@ -96,14 +87,13 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a runat="server" href="~/Logged/Administradores/Default">
-                    <img src="/Img/Lgtys.png" style="border:0px solid black;">
+                    <img src="/Img/Lgtys.png" style="border:0px solid black;" id="Lm">
                     </a>
                 </div>
                 <div class="navbar-collapse collapse" >
                     <ul class="nav navbar-nav">
-                        <li><a runat="server" href="~/Logged/Administradores/About">Acerca</a></li>
-                        <li><a runat ="server" href="~/Logged/Administradores/Contact">Contacto</a></li>
-                        
+                        <li id="LetraT"><a runat="server" href="~/About">Acerca</a></li>
+                        <li id="LetraT2"><a runat ="server" href="~/Contact">Contacto</a></li>                       
                     </ul>
                     <asp:LoginView runat="server" ViewStateMode="Enabled">
                         <AnonymousTemplate>
@@ -114,18 +104,86 @@
                         <LoggedInTemplate>
                             <ul class="nav navbar-nav navbar-right">
                                 <li><a runat="server" href="~/Account/Manage" title="Usuario"><%: Context.User.Identity.GetUserName()  %></a></li>
+                                
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Administrar<span class="caret"></span></a>
-                                <ul class="dropdown-menu" role="menu">
+                                <ul class="dropdown-menu" role="menu">  
+
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/EditPreRegistro" title="Editar Usuarios">Editar Usuarios</a>
+                                </li>
                                 <li>
                                     <a runat="server" href="~/Logged/Administradores/AdmFacturas" title="Adminsitrar Facturas">Administrar Facturas</a>
                                 </li>
                                 <li>
                                     <a runat="server" href="~/Logged/Administradores/Administracion_Pago" title="Adminsitrar Facturas">Administrar Pagos</a>
                                 </li>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/Lector" title="Codigo de Barras">Codigo de Barras</a>
+                                </li>
+                                    <% 
+                                if(HasRightsForSpecifiedMenu("Reembolso")==true){ %>
+                                <li >
+                                    <a runat="server" href="~/Logged/Administradores/ReembolsoEmpleados" title="Reembolso de Gastos">Subir Reembolso de Gastos</a>
+                                </li>
+                                <% } %>
+
+                                <% 
+                                if(HasRightsForSpecifiedMenu("Anticipo")==true){ %>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/AnticipoEmpleados" title="Anticipo de Gastos">Subir Anticipo de Gastos</a>
+                                </li>
+                                <% } %>                                 
+
+                                <% 
+                                if(HasRightsForSpecifiedMenu("Tarjeta")==true){ %>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/TarjetaEmpleado" title="Tarjeta Corporativa">Subir Gasto Tarjeta Corporativa</a>
+                                </li>
+                                <% } %>
+
+                                <% 
+                                if(HasRightsForSpecifiedMenu("GMedicos")==true){ %>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/GastosMedicosMenoresEmpleados" title="Gastos Médicos Menores">Subir Gastos Médicos Menores</a>
+                                </li>
+                                <% } %>      
                                 </ul>
                                 </li>
 
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Validar<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">  
+
+                                 <% 
+                                if(HasRightsForSpecifiedMenu("Reembolso")==true){ %>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/ValidadorReembolsos" title="Adminsitrar Facturas">Validar Reembolsos</a>
+                                </li>
+                                <% } %>
+
+                                <% 
+                                if(HasRightsForSpecifiedMenu("Anticipo")==true){ %>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/ValidadorAnticipos" title="Adminsitrar Facturas">Validar Anticipos</a>
+                                </li>
+                                <% } %>
+
+                                <% 
+                                if(HasRightsForSpecifiedMenu("GMedicos")==true){ %>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/ValidadorGastosMedicosMenores" title="Adminsitrar Facturas">Validar Gastos Medicos Menores</a>
+                                </li>
+                                <% } %>
+
+                                <% 
+                                if(HasRightsForSpecifiedMenu("Tarjeta")==true){ %>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/ValidadorTarjetas" title="Adminsitrar Facturas">Validar Tarjetas Coorporativas</a>
+                                </li>
+                                <% } %>
+                                </ul>
+                                </li>                                
 
                                  <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
@@ -136,9 +194,6 @@
                                         </li>
                                          <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/SolicitudCheque">Generar solicitud de cheque</a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/ReportsFilter/AccesosFilter">Accesos</a>
                                         </li>
                                        
                                         <li role="presentation">
@@ -151,17 +206,11 @@
                                             <a runat="server" class="" href="~/Logged/ReportsFilter/FacturasFilter">Facturas</a>
                                         </li>
                                         <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/ReportsFilter/FacturasEstadoFilter">Estado de Facturas</a>
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/FacturasEstadoAll">Estado de Facturas</a>
                                         </li>
                                         <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/ReportsFilter/PagosFilter">Pagos</a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/ReportsFilter/RolesFilter">Roles</a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/ReportsFilter/UsuariosFilter">Usuarios</a>
-                                        </li>  
+                                        </li> 
                                         <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/ReportsFilter/ProveedoresFilter">Proveedores</a>
                                         </li>

@@ -21,4 +21,8 @@ form > div > div {
     margin-top: 30px;
 }
 
+div[onselectstart="return false"], iframe {
+    display: none;
+}
+
 

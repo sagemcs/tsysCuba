@@ -1,4 +1,10 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -13,7 +19,7 @@ using System.Web.Services;
 [WebService(Namespace = "http://tempuri.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
- [System.Web.Script.Services.ScriptService]
+[System.Web.Script.Services.ScriptService]
 public class ErroresWebService : System.Web.Services.WebService
 {
 
@@ -26,7 +32,7 @@ public class ErroresWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(UseHttpGet = true)]
-    public void listar( int start, int length)
+    public void listar(string order_col, string order_dir, string Fecha, int start, int length)
     {
         try
         {
@@ -36,7 +42,9 @@ public class ErroresWebService : System.Web.Services.WebService
             {
                 List<ErrorDTO> list_dto = new List<ErrorDTO>();
 
-                list_dto = Errores.ObtenerErrores();
+                Fecha = Tools.ObtenerFechaEnFormatoNew(Fecha);
+
+                list_dto = Errores.FiltroErrores(Fecha);
 
                 var js = new JavaScriptSerializer();
                 Context.Response.Clear();
@@ -45,7 +53,19 @@ public class ErroresWebService : System.Web.Services.WebService
                 if (list_dto != null)
                 {
                     int total = list_dto.Count();
-                    list_dto = list_dto.Skip(start).Take(length).ToList();
+
+                    if (order_col == "1")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Date).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Date).ToList();
+                    else if (order_col == "2")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Comentario).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Comentario).ToList();
+
+                    list_dto = length == -1 ? list_dto.Skip(start).ToList() : list_dto.Skip(start).Take(length).ToList();
                     int cantidad = list_dto.Count();
 
                     var result = new

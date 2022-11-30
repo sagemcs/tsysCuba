@@ -1,43 +1,61 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
+using SAGE_Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using SAGE_Model;
-using Proveedores_Model;
 
 /// <summary>
 /// Summary description for CargaFacturaDTO
 /// </summary>
 public class CargaFacturaDTO
 {
-    
+
     public string Factura { get; set; }
     public string Proveedor { get; set; }
     public string RFC { get; set; }
     public string Orden { get; set; }
     public string Subtotal { get; set; }
+    public double Subtotal_in_Docuble { get; set; }
     public string Impuestos { get; set; }
+    public double Impuestos_in_Docuble { get; set; }
     public string Total { get; set; }
+    public double Total_in_Docuble { get; set; }
     public string Estado { get; set; }
     public string Retenciones { get; set; }
+    public double Retenciones_in_Docuble { get; set; }
     public string Traslados { get; set; }
+    public double Traslados_in_Docuble { get; set; }
+    public string Moneda { get; set; }
+    public int IdEstado { get; set; }
 
     public CargaFacturaDTO()
     {
-        
+
     }
 
-    public CargaFacturaDTO(string Factura, string Proveedor, string RFC, string Orden, string Subtotal, string Impuestos, string Total, string Status)
+    public CargaFacturaDTO(string Moneda, string Factura, string Proveedor, string RFC, string Orden, string Subtotal, string Impuestos, string Total, string Status, int IdEstado)
     {
         this.Factura = Factura;
         this.Proveedor = Proveedor;
         this.RFC = RFC;
         this.Orden = Orden;
         this.Subtotal = Subtotal;
+        this.Subtotal_in_Docuble = Convert.ToDouble(Subtotal);
         this.Impuestos = Impuestos;
+        this.Impuestos_in_Docuble = Convert.ToDouble(Impuestos);
         this.Total = Total;
+        this.Total_in_Docuble = Convert.ToDouble(Total);
         this.Estado = Status;
         this.Traslados = this.Retenciones = "0";
+        this.Traslados_in_Docuble = Convert.ToDouble(Traslados);
+        this.Moneda = Moneda;
+        this.IdEstado = IdEstado;
     }
 }
 
@@ -79,8 +97,18 @@ public class CargaFactura
                 }
 
                 tapLFStatus status = item.status == null ? null : db.tapLFStatus.Where(s => s.Status == item.status).FirstOrDefault();
-                list_dto.Add(new CargaFacturaDTO(item.NumVoucher, vendor != null ? vendor.VendID.ToString() : "", item.RFC, item.POTranID, Math.Round(Convert.ToDecimal(item.Subtotal), 2).ToString(),
-                Math.Round(Convert.ToDecimal(item.Impuestos), 2).ToString(), Math.Round(Convert.ToDecimal(item.Total), 2).ToString(), status != null ? status.Descripcion : "No definido"));
+                list_dto.Add(new CargaFacturaDTO(
+                    item.CurrID.ToString(),
+                    item.NumVoucher,
+                    vendor != null ? vendor.VendName.ToString() : string.Empty,
+                    item.RFC,
+                    item.POTranID,
+                    item.Subtotal != null ? Math.Round(Convert.ToDecimal(item.Subtotal), 2).ToString() : "0",
+                //Math.Round(Convert.ToDecimal(item.Impuestos), 2).ToString(), Math.Round(Convert.ToDecimal(item.Total), 2).ToString(), status != null ? status.Descripcion : "No definido"));
+                    item.Impuestos != null ? Math.Round(Convert.ToDecimal(item.Impuestos), 2).ToString() : "0",
+                    item.Total != null ? Math.Round(Convert.ToDecimal(item.Total), 2).ToString() : "0",
+                    status != null ? status.Descripcion : "No definido",
+                    status.Status));
             }
 
             return list_dto;
@@ -117,9 +145,10 @@ public class CargaFactura
             if (!string.IsNullOrWhiteSpace(POTranID) && POTranID != "null")
                 items = items.Where(a => a.Orden.ToUpper().Contains(POTranID.ToUpper())).ToList();
             if (!string.IsNullOrWhiteSpace(Total) && Total != "null")
-                items = items.Where(a => a.Total == Total).ToList();
-            if (!string.IsNullOrWhiteSpace(Estado) && Estado!= "null")
-                items = items.Where(a => a.Estado == Estado).ToList();
+                //items = items.Where(a => a.Total == Total).ToList();
+                items = items.Where(a => a.Total.ToString().Contains(Total.ToString())).ToList();
+            if (!string.IsNullOrWhiteSpace(Estado) && Estado != "null")
+                items = items.Where(a => a.IdEstado.ToString() == Estado).ToList();
             return items;
         }
         catch (Exception exp)

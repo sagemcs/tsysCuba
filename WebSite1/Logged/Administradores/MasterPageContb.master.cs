@@ -1,4 +1,11 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//10 DE ENERO, 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//MENU PERSONALIZADO PARA USUARIO CONSULTAS T|SYS|
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -43,6 +50,12 @@ public partial class Logged_Administradores_MasterPageContb : System.Web.UI.Mast
             }
             Response.Cookies.Set(responseCookie);
         }
+
+        try
+        {
+            Text_Sec.Text = HttpContext.Current.Session["JWTKey"].ToString();
+        }
+        catch { }
 
         Page.PreLoad += master_Page_PreLoad;
     }

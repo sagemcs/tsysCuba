@@ -25,7 +25,7 @@ min-height:200px;
 	width:100%;
 	height:78%;  
 	position:absolute; 
-    margin-top :40px;
+    margin-top :90px;
     padding:55px 15% 0px 15%;
 	border-radius: 18px;
 	background: rgba(254, 255, 239,.1);
@@ -71,7 +71,7 @@ min-height:200px;
 .Base .Login:checked + .tab,
 .Base .Registro:checked + .tab{
 	color:#223f68;
-	border-color: #adbd25;
+	border-color: #FD6500;
 }
 .Formulario{
 	min-height:345px;
@@ -108,7 +108,7 @@ min-height:200px;
 	font-size:13px;
 }
 .Formulario .Bloque .Btn{
-	background: #adbd25;
+	background: #FD6500;
 }
 .Formulario .Bloque label .icon{
 	width:15px;
@@ -124,7 +124,7 @@ min-height:200px;
 	content:'';
 	width:10px;
 	height:2px;
-	background:#adbd25;
+	background:#FD6500;
 	position:absolute;
 	-webkit-transition:all .2s ease-in-out 0s;
 	transition:all .2s ease-in-out 0s;
@@ -163,7 +163,7 @@ min-height:200px;
 .hr{
 	height:2px;
 	margin:40px 0 20px 0;
-	background:#ADBD25;
+	background:#FD6500;
 }
 .foot-lnk{
 	text-align:center;

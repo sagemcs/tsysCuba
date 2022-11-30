@@ -1,6 +1,8 @@
 ﻿<%@ Page Language="C#" Title="Configuración Correos" AutoEventWireup="true"  MasterPageFile="~/Site.Master" CodeFile="CargaExcel.aspx.cs" Inherits="Logged_Administradores_SettingsEmail" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+    Version 15-Enero-2019 By Luis Angel
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
 <script src ="../../Css/HojaProv.css" type="text/javascript"></script>
 
     <script>

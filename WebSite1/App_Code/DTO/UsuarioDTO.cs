@@ -1,32 +1,40 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using Proveedores_Model;
 
 public class UsuarioDTO
 {
     public string Correo { get; set; }
     public string Nombre { get; set; }
     public string Compania { get; set; }
-    public string Proveedor { get; set; }
-    public string ProveedorId { get; set; }
+    //public string Proveedor { get; set; }
+    //public string ProveedorId { get; set; }
     public string Interno { get; set; }
     public string Creacion { get; set; }
     public string Actualizacion { get; set; }
     public string Estado { get; set; }
-    
+
     public UsuarioDTO()
     {
 
     }
-    public UsuarioDTO(string Correo, string Nombre, string Compania, string Proveedor, string ProveedorId, string Interno, string Creacion, string Actualizacion, string Estado)
+    //public UsuarioDTO(string Correo, string Nombre, string Compania, string Proveedor, string ProveedorId, string Interno, string Creacion, string Actualizacion, string Estado)
+    //{
+    public UsuarioDTO(string Correo, string Nombre, string Compania, string Interno, string Creacion, string Actualizacion, string Estado)
     {
+
         this.Correo = Correo;
         this.Nombre = Nombre;
         this.Compania = Compania;
-        this.Proveedor = Proveedor;
-        this.ProveedorId = ProveedorId;
+        //this.Proveedor = Proveedor;
+        //this.ProveedorId = ProveedorId;
         this.Interno = Interno.ToUpper();
         this.Creacion = Creacion;
         this.Actualizacion = Actualizacion;
@@ -37,7 +45,7 @@ public class UsuarioDTO
 
 public class Usuarios
 {
-    
+
     public Usuarios()
     {
     }
@@ -84,12 +92,21 @@ public class Usuarios
                 StatusUsers status = null;
                 if (user.Status != null)
                     status = db.StatusUsers.Where(s => s.Status == user.Status).FirstOrDefault();
-                usuarios.Add(new UsuarioDTO(user.UserID, user.UserName, user.Company.FirstOrDefault() != null ? user.Company.First().CompanyName : string.Empty, user.Vendors.FirstOrDefault() != null ? user.Vendors.First().VendName : string.Empty, user.Vendors.FirstOrDefault() != null ? user.Vendors.First().VendorID : string.Empty, user.Vendors.FirstOrDefault() != null ? "NO" : "SI", user.CreateDate != null ? user.CreateDate.Value.ToShortDateString() : string.Empty, user.UpdateDate != null ? user.UpdateDate.Value.ToShortDateString() : string.Empty, status != null ? status.Descripcion : "No definido"));
+                //usuarios.Add(new UsuarioDTO(user.UserID, user.UserName, user.Company.FirstOrDefault() != null ? user.Company.First().CompanyName : string.Empty, user.Vendors.FirstOrDefault() != null ? user.Vendors.First().VendName : string.Empty, user.Vendors.FirstOrDefault() != null ? user.Vendors.First().VendorID : string.Empty, user.Vendors.FirstOrDefault() != null ? "NO" : "SI", user.CreateDate != null ? user.CreateDate.Value.ToShortDateString() : string.Empty, user.UpdateDate != null ? user.UpdateDate.Value.ToShortDateString() : string.Empty, status != null ? status.Descripcion : "No definido"));
+                Company com = user.Company.FirstOrDefault();
+                usuarios.Add(new UsuarioDTO(
+                    user.UserID,
+                    user.UserName,
+                    com != null ? com.CompanyName : string.Empty,
+                    user.Vendors.FirstOrDefault() != null ? "NO" : "SI",
+                    user.CreateDate != null ? user.CreateDate.Value.ToShortDateString() : string.Empty,
+                    user.UpdateDate != null ? user.UpdateDate.Value.ToShortDateString() : string.Empty,
+                    status != null ? status.Descripcion : "No definido"));
             }
 
             return usuarios;
         }
-        catch(Exception exp)
+        catch (Exception exp)
         {
             if (directo_en_vista)
                 throw new MulticonsultingException(exp.ToString());
@@ -108,16 +125,20 @@ public class Usuarios
             if (usuarios == null)
                 return null;
 
-            if (!string.IsNullOrWhiteSpace(Nombre) && Nombre != "null")
-                usuarios = usuarios.Where(u => u.Nombre.ToUpper().Contains(Nombre.ToUpper())).ToList();
             if (!string.IsNullOrWhiteSpace(Proveedor) && Proveedor != "null")
-                usuarios = usuarios.Where(u => u.ProveedorId.ToUpper().Contains(Proveedor.ToUpper())).ToList();
-            if (!string.IsNullOrWhiteSpace(Interno) && Interno!= "null")
+                usuarios = usuarios.Where(u => u.Nombre.ToUpper().Contains(Proveedor.ToUpper())).ToList();
+
+            if (!string.IsNullOrWhiteSpace(Nombre) && Nombre != "null")
+                usuarios = usuarios.Where(u => u.Correo.ToUpper().Contains(Nombre.ToUpper())).ToList();
+
+            //if (!string.IsNullOrWhiteSpace(Proveedor) && Proveedor != "null")
+            //    usuarios = usuarios.Where(u => u.ProveedorId.ToUpper().Contains(Proveedor.ToUpper())).ToList();
+            if (!string.IsNullOrWhiteSpace(Interno) && Interno != "null")
             {
                 Interno = Interno.ToUpper();
                 usuarios = usuarios.Where(u => u.Interno == Interno).ToList();
             }
-            if (!string.IsNullOrWhiteSpace(Estado) && Estado!= "null")
+            if (!string.IsNullOrWhiteSpace(Estado) && Estado != "null")
             {
                 Estado = Tools.GetUserStatusDescription(Estado);
                 usuarios = usuarios.Where(p => p.Estado == Estado).ToList();
@@ -131,6 +152,6 @@ public class Usuarios
             return new List<UsuarioDTO>();
         }
     }
-    
+
 }
 

@@ -1,29 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
 using Proveedores_Model;
 using SAGE_Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 /// <summary>
 /// Summary description for ValidacionDTO
 /// </summary>
 public class ValidacionDTO
 {
-   
+
     public string Articulo { get; set; }
     public string Fecha { get; set; }
+    public DateTime Date { get; set; }
     public string Descripcion { get; set; }
     public string Etapa { get; set; }
 
 
     public ValidacionDTO()
     {
-       
+
     }
-    public ValidacionDTO(string Articulo,  string Fecha, string Descripcion, string Etapa)
+    public ValidacionDTO(string Articulo, string Fecha, string Descripcion, string Etapa, DateTime Date)
     {
         this.Articulo = Articulo;
         this.Fecha = Fecha;
+        this.Date = Date == null ? DateTime.MinValue : Convert.ToDateTime(Date);
         this.Descripcion = Descripcion;
         this.Etapa = Etapa;
     }
@@ -55,17 +62,25 @@ public class Validaciones
             PortalProveedoresEntities db = new PortalProveedoresEntities();
             sage500_appEntities db_sage = new sage500_appEntities();
             List<SAGE_Model.tapAPILogValidacion> list = db_sage.tapAPILogValidacion.ToList();
+            //List<tapAPILogValidacion> list = new List<tapAPILogValidacion>();
+
             List<ValidacionDTO> list_dto = new List<ValidacionDTO>();
             foreach (var item in list)
             {
                 SAGE_Model.tapLoadFilesAPDtl a = db_sage.tapLoadFilesAPDtl.Where(b => b.dtlKey == item.dtlKey).FirstOrDefault();
+                //tapLoadFilesAPDtl a = db_sage.tapLoadFilesAPDtl.Where(b => b.dtlKey == item.dtlKey).FirstOrDefault();
                 if (a != null)
-                    list_dto.Add(new ValidacionDTO(a != null ? a.ItemID : "-", item.fechaError != null ? item.fechaError.Value.ToShortDateString() : "", item.ErrorValidacion, item.Proceso));
+                    list_dto.Add(new ValidacionDTO(
+                        a != null ? a.ItemID : "-",
+                        item.fechaError != null ? item.fechaError.Value.Date.ToString("dd/MM/yyyy") : "",
+                        item.ErrorValidacion,
+                        item.Proceso,
+                        item.fechaError == null ? DateTime.MinValue : item.fechaError.Value.Date));
             }
 
             return list_dto;
         }
-        catch(Exception exp)
+        catch (Exception exp)
         {
             if (directo_en_vista)
                 throw new MulticonsultingException(exp.ToString());
@@ -96,5 +111,5 @@ public class Validaciones
             return new List<ValidacionDTO>();
         }
     }
-   
+
 }

@@ -1,8 +1,13 @@
-﻿using Proveedores_Model;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 /// <summary>
 /// Summary description for EstadoUsuarioDTO
@@ -11,7 +16,7 @@ public class EstadoUsuarioDTO : EstadoDTO
 {
     public EstadoUsuarioDTO()
     {
-        
+
     }
 
     public EstadoUsuarioDTO(string Id, string Descripcion) : base(Id, Descripcion)
@@ -42,7 +47,7 @@ public class EstadosUsuario
 
             return list_dto;
         }
-        catch(Exception exp)
+        catch (Exception exp)
         {
             if (directo_en_vista)
                 throw new MulticonsultingException(exp.ToString());

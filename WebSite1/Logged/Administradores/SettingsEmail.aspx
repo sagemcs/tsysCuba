@@ -1,6 +1,10 @@
 ﻿<%@ Page Language="C#" Title="Configuración Correos" AutoEventWireup="true"  MasterPageFile="~/Site.Master" CodeFile="SettingsEmail.aspx.cs" Inherits="Logged_Administradores_SettingsEmail" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+    Version 08-Abril-2019 By Luis Angel Garcia P
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+<meta http-equiv="Pragma" content="no-cache" />
 <link href ="../../Css/HojaProv.css" rel="stylesheet" type ="text/css" />
 
     <script>
@@ -135,13 +139,13 @@
     </asp:UpdatePanel>
 
 
-<%--    <asp:UpdateProgress ID="UpdatePross" runat ="server" AssociatedUpdatePanelID ="">
+    <asp:UpdateProgress ID="UpdatePross" runat ="server" AssociatedUpdatePanelID ="UpdatePanel1">
         <ProgressTemplate>
             <div id="backGround"></div>
             <div id="Update">
             </div>
         </ProgressTemplate>
-    </asp:UpdateProgress>--%>
+    </asp:UpdateProgress>
 
 
 <%--    <asp:Panel runat ="server">
@@ -187,7 +191,7 @@
                 <div class="col-xs-1 col-sm-2 btn-group">
                 <br />
                 <br />
-                    <asp:LinkButton runat="server" type="button" class="btn btn-success" ID="BtnBusc" OnClick="AddU">                                        
+                    <asp:LinkButton runat="server" type="button" Class="btn btn-tsys" ID="BtnBusc" OnClick="AddU">                                        
                       <span aria-hidden="true" class="glyphicon glyphicon-plus"></span>
                     </asp:LinkButton>
                 </div>

@@ -1,8 +1,11 @@
 ﻿<%@ Page Title="Complementos de Pagos" Language="C#" AutoEventWireup="true" MasterPageFile="MenuPreP.Master" CodeFile="Pagos.aspx.cs" Inherits="Pagos" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+    Version 16-Octubre-2019 By Luis Angel Garcia P
     <script src="../../Css/sweetalert.min.js" type="text/javascript"></script>
     <link href="../../Css/HojaProv.css" rel="stylesheet" type="text/css" />
+    <script src ="../../Scripts/jquery.blockui.min.js" type="text/javascript"></script>
+    <script src ="../../Scripts/custom.js" type="text/javascript"></script>
 
     <script type="text/javascript">
         $(function () {
@@ -35,24 +38,28 @@
 
     <script>
         function alertme(titulo, mesaje, Tipo) {
-            swal(titulo, mesaje, Tipo)
+            swal(titulo, mesaje, Tipo);
+            unblockUI();
         }
     </script>
     <script>
         function alerte(campo) {
-            $(campo).show("slow").delay(2000).hide("slow")
+            $(campo).show("slow").delay(2000).hide("slow");
+            unblockUI();
         }
     </script>
 
     <script>
         function alert(campo) {
             $(campo).toggle();
+            unblockUI();
         }
     </script>
 
     <script>
         function alertY(campo) {
             $(campo).style.display = 'none';
+            unblockUI();
         }
     </script>
     <br />
@@ -64,13 +71,10 @@
     <div class="col-lg-11 col-sm-11 col-xs-11">
         <label class="col-form-label col-lg-5 col-sm-3 col-xs-1"></label>
         <div class="form-group col-lg-6 col-sm-8 col-xs-10">
+            <br />
+            <br />
             <h3>Carga Complemento de Pago</h3>
         </div>
-    </div>
-
-    <div id="Barra" class="centrarCaja">
-        <h4 id="Prov" runat="server">Aplicar Movimiento Para: </h4>
-        <asp:DropDownList ID="UsuarioP" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" Width="30%"></asp:DropDownList>
     </div>
 
     <div class="col-lg-12 col-sm-12 col-xs-12">
@@ -87,6 +91,7 @@
                     <label class="input-group-btn">
                         <span class="btn btn-primary">Seleccionar&hellip;
                             <asp:FileUpload type="file" ID="FileUpload2" runat="server" Style="display: none;" accept="application/xml" />
+<%--                            <ajaxToolkit:AsyncFileUpload  type="file" ID="FileUpload4" runat="server" PersistFile="true" Style="display: none;" />--%>
                         </span>
                     </label>
                     <asp:TextBox type="text" runat="server" class="form-control" ID="Cxml" ReadOnly="true" />
@@ -109,30 +114,23 @@
                 <br />
                 <br />
                 <span>
-                    <asp:Button Text="Cargar" runat="server" AutoPostBack="False" ID="Button3" href="#" OnClick="Unnamed1_Click" CssClass="btn btn-danger" />
+                    <asp:Button Text="Cargar" runat="server" AutoPostBack="False" ID="Button3" href="#" OnClick="Unnamed1_Click" CssClass="btn btn-tsys cargar" />
                 </span>
             </div>
 
-            <br />
-            <br />
-            <br />
             <div class="row">
-            <br />
-            <br />
-            <br />
             <div class="col-lg-10 col-sm-10 col-xs-12"></div>
             <br />
             </div>
 
-            <div class="row">
-                <div class="col-lg-10 col-sm-10 col-xs-12">
+                <div class="col-lg-10 col-sm-10 col-xs-10" style="margin-top:30px;">
                     <div class="alert alert-block alert-danger" id="B1" style="display: none">
                         <h3>¡Error!</h3>
                         <asp:Label runat="server" ID="Mensajes"></asp:Label>
                     </div>
                 </div>
 
-             <div class="alert alert-warning"  id="AL"  style="display: none">
+             <div class="alert alert-warning"  id="AL"  style="display:none; margin-top:30px;">
              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -140,8 +138,7 @@
             <asp:Label ID="Label2" runat="server" Text=""></asp:Label>
             </div>
 
-            </div>
-            <br />
+
 
             <asp:Panel ID="Panel2" runat="server" Height="90px" Width="90%">
                 <br />
@@ -241,7 +238,8 @@
                         CtaBeneficiario:
                         <asp:TextBox ID="TextBox6" CssClass="form-control" ReadOnly="true" runat="server" /></label>
                 </div>--%>
-
+            <br />
+            <br />
             </asp:Panel>
             <br />
             <br />
@@ -278,16 +276,22 @@
                 </asp:GridView>
             </div>
 
+
+        <div id="Barra" class="centrarCaja" style="display:none;">
+        <h4 id="Prov" runat="server">Aplicar Movimiento Para: </h4>
+        <asp:DropDownList ID="UsuarioP" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" Width="30%"></asp:DropDownList>
+        </div>
+
 <%--    </asp:Panel>--%>
 <%--            <div id="Acc">
                 <div class="col-xs-1 col-md-1">
-                    <asp:Button Text="Enviar" runat="server" CssClass="btn btn-success" title="Agregar Usuario a la Lista" ID="Button1" />
+                    <asp:Button Text="Enviar" runat="server" CssClass="btn btn-tsys" title="Agregar Usuario a la Lista" ID="Button1" />
                 </div>
             </div>--%>
 
 <%--                        <div id="Acc">
                 <div class="col-xs-1 col-md-1">
-                    <asp:Button Text="Enviar" runat="server" CssClass="btn btn-success" OnClick="BtnEnviar" title="Agregar Usuario a la Lista" ID="Button2" />
+                    <asp:Button Text="Enviar" runat="server" CssClass="btn btn-tsys" OnClick="BtnEnviar" title="Agregar Usuario a la Lista" ID="Button2" />
                 </div>
             </div>--%>
 </asp:Content>

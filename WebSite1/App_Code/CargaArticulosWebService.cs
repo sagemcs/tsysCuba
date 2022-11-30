@@ -1,4 +1,10 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -13,7 +19,7 @@ using System.Web.Services;
 [WebService(Namespace = "http://tempuri.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
- [System.Web.Script.Services.ScriptService]
+[System.Web.Script.Services.ScriptService]
 public class CargaArticulosWebService : System.Web.Services.WebService
 {
 
@@ -26,7 +32,7 @@ public class CargaArticulosWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(UseHttpGet = true)]
-    public void listar(string ItemID, string Qty, string Status, int start, int length)
+    public void listar(string order_col, string order_dir, string ItemID, string Qty, string Status, int start, int length)
     {
         try
         {
@@ -38,6 +44,14 @@ public class CargaArticulosWebService : System.Web.Services.WebService
 
                 list_dto = CargaArticulo.ObtenerCargaArticulos(ItemID, Qty, Status);
 
+                for (int i = 0; i <= list_dto.Count() - 1; i++)
+                {
+                    string Simbol = "$";
+                    list_dto[i].Monto = Simbol + " " + Convert.ToDecimal(list_dto[i].Monto).ToString("#,##0.00");
+                    list_dto[i].Costo = Simbol + " " + Convert.ToDecimal(list_dto[i].Costo).ToString("#,##0.00");
+                }
+
+
                 var js = new JavaScriptSerializer();
                 Context.Response.Clear();
                 Context.Response.ContentType = "application/json";
@@ -45,7 +59,39 @@ public class CargaArticulosWebService : System.Web.Services.WebService
                 if (list_dto != null)
                 {
                     int total = list_dto.Count();
-                    list_dto = list_dto.Skip(start).Take(length).ToList();
+
+                    if (order_col == "1")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Articulo).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Articulo).ToList();
+                    else if (order_col == "2")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Cantidad_inDouble).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Cantidad_inDouble).ToList();
+                    else if (order_col == "3")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Costo_inDouble).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Costo_inDouble).ToList();
+                    else if (order_col == "4")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Monto_inDouble).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Monto_inDouble).ToList();
+                    else if (order_col == "5")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Comentario).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Comentario).ToList();
+                    else if (order_col == "6")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Estado).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Estado).ToList();
+
+                    list_dto = length == -1 ? list_dto.Skip(start).ToList() : list_dto.Skip(start).Take(length).ToList();
                     int cantidad = list_dto.Count();
 
                     var result = new

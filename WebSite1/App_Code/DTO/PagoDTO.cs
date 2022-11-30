@@ -1,37 +1,52 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using Proveedores_Model;
 
 public class PagoDTO
 {
     public string Folio { get; set; }
     public string Serie { get; set; }
     public string Fecha { get; set; }
+    public string FechaR { get; set; }
+    public DateTime Date { get; set; }
+    public DateTime DateR { get; set; }
     public string Proveedor { get; set; }
     public string Subtotal { get; set; }
+    public double Subtotal_In_Double { get; set; }
     public string Total { get; set; }
     public double Total_In_Double { get; set; }
     public string UUID { get; set; }
     public string Usuario { get; set; }
     public string Estado { get; set; }
+    public string Moneda { get; set; }
 
     public PagoDTO()
     { }
 
-    public PagoDTO(string Folio, string Serie, string Fecha, string Proveedor, string Subotal, string Total, string UUID, string Usuario, string Estado)
+    public PagoDTO(string Moneda, string Folio, string Serie, string Fecha, string FechaR, string Proveedor, string Subotal, string Total, string UUID, string Usuario, string Estado, DateTime Date, DateTime DateR)
     {
         this.Folio = Folio;
         this.Serie = Serie;
         this.Fecha = Fecha;
+        this.FechaR = FechaR;
+        this.Date = Date == null ? DateTime.MinValue : Convert.ToDateTime(Date);
+        this.DateR = DateR == null ? DateTime.MinValue : Convert.ToDateTime(DateR);
         this.Proveedor = Proveedor;
         this.Subtotal = Subotal;
+        this.Subtotal_In_Double = Convert.ToDouble(Subtotal);
         this.Total = Total;
         this.Total_In_Double = Convert.ToDouble(Total);
         this.UUID = UUID;
         this.Usuario = Usuario;
         this.Estado = Estado;
+        this.Moneda = Moneda;
     }
 }
 
@@ -72,10 +87,25 @@ public class Pagos
                 Vendors vendor = db.Vendors.Where(v => v.VendorKey == vendor_key).FirstOrDefault();
                 Int32 AprovUserKey = Convert.ToInt32(pago.AprovUserKey);
                 Users user = db.Users.Where(u => u.UserKey == AprovUserKey).FirstOrDefault();
+                Int32 LLavePago = Convert.ToInt32(pago.PaymentKey);
+                PaymentAppl DtllPay = db.PaymentAppl.Where(u => u.PaymentKey == LLavePago).FirstOrDefault();
+                //PaymentAppl DtllPay = db.PaymentAppl.Where(c => c.PaymentKey == pago.PaymentKey).FirstOrDefault();
                 StatusDocs status = null;
-                status = db.StatusDocs.Where(s => s.Status == company.Status).FirstOrDefault();
-                pagos.Add(new PagoDTO(pago.Folio, pago.Serie, pago.PaymentDate != null ? pago.PaymentDate.ToShortDateString() : string.Empty, vendor != null ? vendor.VendorID : string.Empty, pago.Subtotal != null ? Math.Round(Convert.ToDecimal(pago.Subtotal), 2).ToString() : "0",
-                  Math.Round(Convert.ToDecimal(pago.Total), 2).ToString(), pago.UUID, user != null ? user.UserID : string.Empty, status != null ? status.Descripcion : "No definido"));
+                status = db.StatusDocs.Where(s => s.Status == pago.Status).FirstOrDefault();
+                pagos.Add(new PagoDTO(
+                    DtllPay != null ? DtllPay.Moneda : "",
+                    pago.Folio,
+                    pago.Serie,
+                    pago.PaymentDate != null ? pago.PaymentDate.Date.ToString("dd/MM/yyyy") : string.Empty,
+                    pago.CreateDate != null ? pago.CreateDate.Date.ToString("dd/MM/yyyy") : string.Empty,
+                    vendor != null ? vendor.VendName : string.Empty,
+                    pago.Subtotal != null ? Math.Round(Convert.ToDecimal(pago.Subtotal), 2).ToString() : "0",
+                   Math.Round(Convert.ToDecimal(pago.Total), 2).ToString(),
+                   pago.UUID,
+                   user != null ? user.UserID : string.Empty,
+                   status != null ? status.Descripcion : "No definido",
+                   pago.PaymentDate != null ? pago.PaymentDate : DateTime.MinValue,
+                   pago.CreateDate != null ? pago.CreateDate : DateTime.MinValue));
             }
 
             return pagos;
@@ -88,7 +118,7 @@ public class Pagos
         }
     }
 
-    public static List<PagoDTO> ObtenerPagos(string Folio, string Serie, string Fecha, string Proveedor, string Total, string UUID, string Estado, bool directo_en_vista = false)
+    public static List<PagoDTO> ObtenerPagos(string Folio, string Serie, string Fecha, string FechaR, string Proveedor, string Total, string UUID, string Estado, bool directo_en_vista = false)
     {
         try
         {
@@ -105,6 +135,10 @@ public class Pagos
                 pagos = pagos.Where(p => p.Serie.ToUpper().Contains(Serie.ToUpper())).ToList();
             if (!string.IsNullOrWhiteSpace(Fecha) && Fecha != "null")
                 pagos = pagos.Where(p => p.Fecha == Fecha).ToList();
+
+            if (!string.IsNullOrWhiteSpace(FechaR) && FechaR != "null")
+                pagos = pagos.Where(p => p.FechaR == FechaR).ToList();
+
             if (!string.IsNullOrWhiteSpace(Proveedor) && Proveedor != "null")
                 pagos = pagos.Where(p => p.Proveedor.ToUpper().Contains(Proveedor.ToUpper())).ToList();
             if (!string.IsNullOrWhiteSpace(Total) && Total != "null")

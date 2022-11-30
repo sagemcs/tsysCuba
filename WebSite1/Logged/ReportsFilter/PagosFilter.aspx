@@ -6,7 +6,12 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" />--%>
+        <link href ="../../Css/tables.css" rel="stylesheet" type ="text/css" />
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
@@ -33,32 +38,47 @@
             <div class="col-md-12">
           
                 <div class="row">
-                    <div class="col-md-3">
-                    
+                    <div class="col-md-3">                    
                         <div class="form-group">
-                            
-                         <asp:TextBox ID="inputFolio" MaxLength="40"  placeholder="Folio" runat="server" CssClass="form-control filter"  ToolTip="Folio"></asp:TextBox>   
+                         <label for="inputFolio">Folio Complemento de Pago</label>
+                         <asp:TextBox ID="inputFolio" MaxLength="40" AutoComplete = "off" AutoCompleteType="Disabled"  runat="server" CssClass="form-control filter"  ToolTip="Folio"></asp:TextBox>   
                          
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            
-                         <asp:TextBox ID="inputSerie" MaxLength="25"  placeholder="Serie" runat="server" CssClass="form-control filter"  ToolTip="Serie"></asp:TextBox>   
+                           <label for="inputSerie">Serie Complemento de Pago</label> 
+                         <asp:TextBox ID="inputSerie" MaxLength="25" AutoComplete = "off" AutoCompleteType="Disabled"  runat="server" CssClass="form-control filter"  ToolTip="Serie"></asp:TextBox>   
                          
                         </div>
 
                     </div>
 
-                    <div class="col-md-3">
+                   <div class="col-md-3">
                         <div class="form-group">
-                            
-                              <asp:TextBox ID="inputFecha"  placeholder="Fecha" runat="server" ToolTip="Fecha" CssClass="form-control datepicker filter"></asp:TextBox>
-                        
+                        <label for="inputFechaR">Fecha Carga Complemento Pago</label>
+                        <asp:TextBox type="date" ID="inputFechaR" AutoComplete = "off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" CssClass="form-control filter"  runat="server"/>
                         </div>
                     </div>
+
                     <div class="col-md-3">
                         <div class="form-group">
+                        <label>Fecha de Pago</label>
+                        <asp:TextBox type="date" ID="inputFecha" AutoComplete = "off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" CssClass="form-control filter"  runat="server"/>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group"> 
+                         <label>Total</label>                         
+                         <asp:TextBox ID="inputTotal" AutoComplete = "off" AutoCompleteType="Disabled" placeholder="Total" runat="server" CssClass="form-control filter"  ToolTip="Total"></asp:TextBox>   
+                         <span id="error_inputTotal" class="no-valid-message">Dato no válido</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Proveedor</label>  
                             <asp:DropDownList ID="comboProveedores" runat="server" CssClass="form-control select2 filter">
                             </asp:DropDownList>
                            
@@ -66,23 +86,9 @@
 
                     </div>
 
-                </div>
-                <div class="row">
-                    
-                    <div class="col-md-3">
-                        <div class="form-group">                          
-                         <asp:TextBox ID="inputTotal"  placeholder="Total" runat="server" CssClass="form-control filter"  ToolTip="Total"></asp:TextBox>   
-                         <span id="error_inputTotal" class="no-valid-message">Dato no válido</span>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">                            
-                         <asp:TextBox ID="inputUUID" MaxLength="36" placeholder="UUID" runat="server" CssClass="form-control filter"  ToolTip="UUID"></asp:TextBox>   
-                            
-                        </div>
-                    </div>
-                    <div class="col-md-3">
+                  <div class="col-md-3">
                         <div class="form-group">
+                            <label>Estado</label>  
                             <asp:DropDownList ID="comboEstado" runat="server" CssClass="form-control select2 filter">
                             </asp:DropDownList>
                         </div>
@@ -90,10 +96,11 @@
           
                     <div class="col-md-3" >
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <br />
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
           
@@ -101,10 +108,15 @@
                     </div>
 
                 </div>
-          
+                <div class="row">
+                   <div class="col-md-3" style="display:none">
+                        <div class="form-group">                            
+                         <asp:TextBox ID="inputUUID" AutoComplete = "off" AutoCompleteType="Disabled" MaxLength="36" placeholder="UUID" runat="server" CssClass="form-control filter"  ToolTip="UUID"></asp:TextBox>   
+                        </div>
+                    </div>
+
+                </div>
             </div>
-
-
         </div>
         <div class="row">
             <div class="col-md-12">
@@ -112,11 +124,11 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>Folio</th>
-                        <th>Serie</th>
-                        
-                        <th>Fecha</th>
                         <th>Proveedor</th>
+                        <th>Folio Complemento Pago</th>
+                        <th style="width:3%">Serie Complemento Pago</th>
+                        <th>Fecha de Carga Complemento</th>
+                        <th>Fecha de Pago</th>
                         <th>Subtotal</th>
                         <th>Total</th>
                         <th>Estado</th>

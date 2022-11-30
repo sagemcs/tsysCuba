@@ -6,9 +6,15 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" type="text/css" />--%>
+        <link href ="../../Css/tables.css" rel="stylesheet" type ="text/css" />
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+            
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
          <Services>
                 <asp:ServiceReference Path="~/Servicios/CargaArticulosWebService.asmx" /> 
@@ -16,11 +22,11 @@
         <Scripts>
             <asp:ScriptReference  Path="~/Scripts/bootstrap-datepicker/js/bootstrap-datepicker.js" />
             <asp:ScriptReference  Path="~/Scripts/dataTable-1.10.16/datatables.min.js" />
-            <asp:ScriptReference   Path="~/Scripts/dataTable-1.10.16/datatables.checkboxes.min.js" />
-            <asp:ScriptReference   Path="~/Scripts/crypto-js.js" />
-            <asp:ScriptReference   Path="~/Scripts/sha256.js" />
-            <asp:ScriptReference   Path="~/Scripts/custom.js" />
-            <asp:ScriptReference   Path="~/Scripts/data-tables-carga-articulos.js" />
+            <asp:ScriptReference  Path="~/Scripts/dataTable-1.10.16/datatables.checkboxes.min.js" />
+            <asp:ScriptReference  Path="~/Scripts/crypto-js.js" />
+            <asp:ScriptReference  Path="~/Scripts/sha256.js" />
+            <asp:ScriptReference  Path="~/Scripts/custom.js" />
+            <asp:ScriptReference  Path="~/Scripts/data-tables-carga-articulos.js" />
         </Scripts>
     </asp:ScriptManagerProxy>
   
@@ -36,15 +42,15 @@
                     <div class="col-md-2">
                     
                         <div class="form-group">
-                            
-                       <asp:TextBox ID="inputArticulo" MaxLength="30"  placeholder="Artículo" runat="server" CssClass="form-control filter" ToolTip="Artículo"></asp:TextBox>   
+                       <label>Articulo</label>  
+                       <asp:TextBox ID="inputArticulo" MaxLength="30" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter" ToolTip="Artículo"></asp:TextBox>   
                          
                             </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            
-                        <asp:TextBox ID="inputCantidad"  placeholder="Cantidad" runat="server" CssClass="form-control filter" ToolTip="Cantidad" MaxLength="20"></asp:TextBox>   
+                        <label>Cantidad</label> 
+                        <asp:TextBox ID="inputCantidad" AutoComplete = "off" AutoCompleteType="Disabled"  runat="server" CssClass="form-control filter" ToolTip="Cantidad" MaxLength="20"></asp:TextBox>   
                         <span id="error_inputCantidad" class="no-valid-message">Dato no válido</span>
                         </div>
 
@@ -53,16 +59,18 @@
      
                    <div class="col-md-2">
                         <div class="form-group">
+                             <label>Estado</label> 
                             <asp:DropDownList ID="comboEstado" runat="server" CssClass="form-control select2 filter">
                             </asp:DropDownList>
                         </div>
                     </div>
                       <div class="col-md-2" >
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <br />
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
           

@@ -1,9 +1,14 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using Proveedores_Model;
+using SAGE_Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using SAGE_Model;
-using Proveedores_Model;
 
 
 /// <summary>
@@ -17,22 +22,29 @@ public class CargaArticuloDTO
     public string Monto { get; set; }
     public string Comentario { get; set; }
     public string Estado { get; set; }
-
+    public string IDEstado { get; set; }
+    public double Cantidad_inDouble { get; set; }
+    public double Costo_inDouble { get; set; }
+    public double Monto_inDouble { get; set; }
     public CargaArticuloDTO()
     {
-       
+
     }
 
-    public CargaArticuloDTO(string Articulo, string Cantidad, string Costo, string Monto, string Comentario, string Status)
+    public CargaArticuloDTO(string IDEstado, string Articulo, string Cantidad, string Costo, string Monto, string Comentario, string Status)
     {
         this.Articulo = Articulo;
         this.Cantidad = Cantidad;
+        this.Cantidad_inDouble = Convert.ToDouble(Cantidad);
         this.Costo = Costo;
+        this.Costo_inDouble = Convert.ToDouble(Costo);
         this.Monto = Monto;
+        this.Monto_inDouble = Convert.ToDouble(Monto);
         this.Comentario = Comentario;
         this.Estado = Status;
+        this.IDEstado = IDEstado;
     }
-    
+
 }
 
 
@@ -65,9 +77,22 @@ public class CargaArticulo
 
             foreach (var item in list)
             {
+                //tapLFStatus status = item.status == null ? null : db.tapLFStatus.Where(s => s.Status == item.status).FirstOrDefault();
+                //list_dto.Add(new CargaArticuloDTO(item.ItemID, item.Qty != null ? item.Qty.ToString() : "0", item.UnitCost != null ? Math.Round(Convert.ToDecimal(item.UnitCost), 2).ToString() : "0",
+                //item.TranAmt != null ? Math.Round(Convert.ToDecimal(item.TranAmt), 2).ToString() : "0", item.DescError, status != null ? status.Descripcion : "No definido"));
+
                 tapLFStatus status = item.status == null ? null : db.tapLFStatus.Where(s => s.Status == item.status).FirstOrDefault();
-                list_dto.Add(new CargaArticuloDTO(item.ItemID, item.Qty != null ? item.Qty.ToString() : "0", item.UnitCost != null ? Math.Round(Convert.ToDecimal(item.UnitCost), 2).ToString() : "0",
-                item.TranAmt != null ? Math.Round(Convert.ToDecimal(item.TranAmt), 2).ToString() : "0", item.DescError, status != null ? status.Descripcion : "No definido"));
+                list_dto.Add(new CargaArticuloDTO(
+                    item.status.ToString(),
+                    item.ItemID,
+                    item.Qty != null ? Math.Round(Convert.ToDecimal(item.Qty), 4).ToString() : "0",
+                    item.UnitCost != null ? Math.Round(Convert.ToDecimal(item.UnitCost), 2).ToString() : "0",
+                    item.TranAmt != null ? Math.Round(Convert.ToDecimal(item.TranAmt), 2).ToString() : "0",
+                    item.DescError,
+                    status != null ? status.Descripcion : "No definido"));
+
+
+
             }
 
             return list_dto;
@@ -97,9 +122,10 @@ public class CargaArticulo
             if (!string.IsNullOrWhiteSpace(ItemID) && ItemID != "null")
                 items = items.Where(a => a.Articulo.ToUpper().Contains(ItemID.ToUpper())).ToList();
             if (!string.IsNullOrWhiteSpace(Qty) && Qty != "null")
-                items = items.Where(a => a.Cantidad == Qty).ToList();
+                //items = items.Where(a => a.Cantidad == Qty).ToList();
+                items = items.Where(a => a.Cantidad.ToString().Contains(Qty.ToString())).ToList();
             if (!string.IsNullOrWhiteSpace(Status) && Status != "null")
-                items = items.Where(a => a.Estado == Status).ToList();
+                items = items.Where(a => a.IDEstado == Status).ToList();
             return items;
         }
         catch (Exception exp)

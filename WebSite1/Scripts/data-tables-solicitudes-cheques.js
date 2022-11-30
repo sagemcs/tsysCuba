@@ -1,9 +1,13 @@
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     hide_combo_proveedores(ChequeSolicitudesWebService.get_path());
     var url_list = ChequeSolicitudesWebService.get_path() + "/listar";
-   
+    //var Pago = document.getElementById("inputaPago").value;
+    //var Fecha = document.getElementById("inputFecha").value;
     table = $('#list').DataTable({
         language: window.datatableLang,
         "ajax": {
@@ -14,13 +18,14 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns;
-                //data.VendID = $('#MainContent_comboProveedores').val();
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
                 data.Serie = $('#MainContent_inputSerie').val();
                 data.VendID = $('#MainContent_comboProveedores').val();
                 data.UserID = $('#MainContent_comboSolicitantes').val();
                 data.Total = $('#MainContent_inputTotal').val();
                 data.ChkReqDate = $('#MainContent_inputFecha').val();
+                data.PagoDate = $('#MainContent_inputPago').val();
             
             }
         },
@@ -35,8 +40,8 @@ $(document).ready(function () {
             { "data": "Id", 'className': "centrar-data" },
             { "data": "Serie", 'className': "centrar-data text_align_left" },
             { "data": "Proveedor", 'className': "centrar-data text_align_left" },
-            { "data": "Solicitante", 'className': "centrar-data text_align_left" },
-            { "data": "Total" , 'className': "centrar-data "},
+            { "data": "NombreSolicitante", 'className': "centrar-data text_align_left" },
+            { "data": "Total", 'className': "cetrar-data text_align_right" },
             { "data": "Fecha", 'className': "centrar-data" },
             { "data": "Fecha_Programada_Pago", 'className': "centrar-data" },
             { "data": "actions", 'className': "centrar-data", "orderable": false }
@@ -52,7 +57,7 @@ $(document).ready(function () {
             "data": null,
             "render": function (data, type, row) {
                 var render = "";
-                render += '<a class="btn btn-xs btn-danger" title="Exportar reporte" data-tootle="tooltip" data-id="' + row.Id + '" href="/Logged/Reports/SolicitudCheque?id=' + row.Id + '" target="_blank"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>';
+                render += '<a class="btn btn-xs btn-success" title="Exportar reporte" data-tootle="tooltip" data-id="' + row.Id + '" href="/Logged/Reports/SolicitudCheque?id=' + row.Id + '" target="_blank"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>';
 
                 return render;
             }
@@ -87,9 +92,9 @@ $(document).ready(function () {
         $("#MainContent_comboProveedores").val($("#MainContent_comboProveedores option:first").val()).change();
         $("#MainContent_comboSolicitantes").val($("#MainContent_comboSolicitantes option:first").val()).change();
         $('#MainContent_inputSerie').val('');
-
         $('#MainContent_inputTotal').val('');
         $('#MainContent_inputFecha').val('');
+        $('#MainContent_inputPago').val('');
         table.ajax.reload(  );
     });
     
@@ -120,11 +125,13 @@ $(document).ready(function () {
         var userId = $('#MainContent_comboSolicitantes').val();
         var total = $('#MainContent_inputTotal').val();
         var fecha = $('#MainContent_inputFecha').val();
+        var fechaP = $('#MainContent_inputPago').val();
 
         var url_report = "/Logged/Reports/SolicitudesCheque";
 
         url_report += "?serie=" + serie;
         url_report += "&fecha=" + fecha;
+        url_report += "&fechaP=" + fechaP;
         url_report += "&provId=" + provId;
         url_report += "&userId=" + userId;
         url_report += "&total=" + total;

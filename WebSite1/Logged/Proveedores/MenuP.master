@@ -5,7 +5,11 @@
 <html lang="en">
 <head runat="server">
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<%--    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />--%>
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
     <title><%: Page.Title %> - T|SYS|®</title>
 
     
@@ -18,7 +22,7 @@
 </head>
 <body>
     <form runat="server">
-        <asp:ScriptManager runat="server">
+        <asp:ScriptManager runat="server" >
             <Scripts>
                 <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
                 <%--Framework Scripts--%>
@@ -52,14 +56,13 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a runat="server" href="~/Logged/Proveedores/Default">
-                    <img src="/Img/Lgtys.png" style="border:0px solid black;">
+                    <img src="/Img/Lgtys.png" style="border:0px solid black;" id="Lm">
                     </a>
                 </div>
                 <div class="navbar-collapse collapse" >
                     <ul class="nav navbar-nav">
-                        <li><a runat="server" href="~/Logged/Proveedores/About">Acerca</a></li>
-                        <li><a runat ="server" href="~/Logged/Proveedores/Contact">Contacto</a></li>
-                        
+                        <li id="LetraT"><a runat="server" href="~/About">Acerca</a></li>
+                        <li id="LetraT2"><a runat ="server" href="~/Contact">Contacto</a></li>                        
                     </ul>
                     <asp:LoginView runat="server" ViewStateMode="Enabled">
                         <AnonymousTemplate>

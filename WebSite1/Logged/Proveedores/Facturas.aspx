@@ -1,54 +1,140 @@
 ﻿<%@ Page Title="Carga de Facturas" Language="C#" MasterPageFile="MenuPreP.master" AutoEventWireup="true" CodeFile="Facturas.aspx.cs" Inherits="Facturas" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+Version 16-Octubre-2019 By Luis Angel Garcia P
     <script src ="../Css/sweetalert.min.js" type="text/javascript"></script>
+    <script src ="../../Scripts/jquery.blockui.min.js" type="text/javascript"></script>
+    <script src ="../../Scripts/custom.js" type="text/javascript"></script>
+    <style>
+            #Update1{
+            position :fixed;
+            top:40%;
+            bottom :40%;
+            left : 40%;
+            right: 40%;
+            z-index : 1001;
+            overflow : hidden;
+            margin :0;
+            padding :0;
+            background-color : #999;
+            filter :alpha(opacity =50);
+            opacity : 0.80;
+            border: 1px solid gray;
+            border:none;
+            background-image :url("../../Img/aguarde.gif");
+            background-repeat :no-repeat;
+            background-size:cover;
+            background-position:center;
+            border-radius: 15px 15px 15px 15px;
+            -moz-border-radius: 15px 15px 15px 15px;
+            -webkit-border-radius: 15px 15px 15px 15px;}
+        
+            #backGround1{
+            position :fixed;
+            top:0px;
+            bottom : 0px;
+            left : 0px;
+            right: 0px;
+            overflow : hidden;
+            margin :0;
+            padding :0;
+            background-color : #999999;
+            filter :alpha(opacity =80);
+            opacity : 0.80;
+            z-index : 1000;}
+
+            #Testdbd {
+            width:50px;
+            height:50px;
+            background-color:red;}
+        </style>
+
     <script type="text/javascript">
         $(function () {
-
             // We can attach the `fileselect` event to all file inputs on the page
             $(document).on('change', ':file', function () {
-                var input = $(this),
-                    numFiles = input.get(0).files ? input.get(0).files.length : 1,
-                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-                input.trigger('fileselect', [numFiles, label]);
+                var input = $(this);
+                var caja = $(this).parents('.input-group').find(':text'),
+                numFiles = input.get(0).files ? input.get(0).files.length : 1;
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                //input.trigger('fileselect', [numFiles, label]);
+                caja.val(label);
+                //swal('Angel', label, 'success')
             });
 
             // We can watch for our custom `fileselect` event like this
             $(document).ready(function () {
-                $(':file').on('fileselect', function (event, numFiles, label) {
 
-                    var input = $(this).parents('.input-group').find(':text'),
-                        log = numFiles > 1 ? numFiles + ' files selected' : label;
+                var ctrlKeyDown = false;
+                $(document).on("keydown", keydown);
+                $(document).on("keyup", keyup);
 
-                    if (input.length) {
-                        input.val(log);
-                    } else {
-                        if (log) alert(log);
+                function keydown(e) {
+
+                    if ((e.which || e.keyCode) == 116 || ((e.which || e.keyCode) == 82 && ctrlKeyDown)) {
+                        // Pressing F5 or Ctrl+R
+                        //VariableG();
+                        e.preventDefault();
+                        setTimeout("location.href='Facturas'", 10);
+                    } else if ((e.which || e.keyCode) == 17) {
+                        // Pressing  only Ctrl
+                        ctrlKeyDown = true;
                     }
+                };
 
-                });
+                function keyup(e) {
+                    // Key up Ctrl
+                    if ((e.which || e.keyCode) == 17)
+                        ctrlKeyDown = false;
+                };
+                //$(':file').on('fileselect', function (event, numFiles, label) {
+
+                //    var input = $(this).parents('.input-group').find(':text'),
+                //    log = numFiles > 1 ? numFiles + ' files selected' : label;
+                //    if (input.length) {
+                //        input.val(log);
+                //    } else {
+                //        input.val(log);
+                //        //if (log) alert(log);
+                //    }
+
+                //});
+
             });
         })
     </script>
 
     <script>
         function alertme(titulo,mesaje,Tipo) {
-            swal(titulo, mesaje, Tipo)
+            swal(titulo, mesaje, Tipo);
+            unblockUI();
         }
     </script>
 
     <script>
         function alertB(campo) {
             $(campo).toggle();
+            unblockUI();
+        }
+    </script>
+
+    <script >
+        function hideshow() {
+            document.getElementById('UpdatePross').style.display = "none";
+            unblockUI();
         }
     </script>
 
     <script>
         function alert(campo) {
-         $(campo).show("slow").delay(2000).hide("slow")
+            $(campo).show("slow").delay(2000).hide("slow");
+            unblockUI();
         }
     </script>
-   
 
+<%--    <asp:UpdatePanel runat="server" id="UpdatePanel" UpdateMode="Conditional" ChildrenAsTriggers="False" >
+      
+    <contenttemplate>--%>
+   
     <div class="col-lg-12 col-sm-12 col-12" id="M1">
         <h3>Carga de Facturas</h3>
     </div>
@@ -59,7 +145,8 @@
         <div class="input-group col-lg-12 col-sm-12 col-xs-12">
             <label class="input-group-btn">
                 <span class="btn btn-primary">Seleccionar&hellip;
-                    <asp:FileUpload  type="file" ID="FileUpload1" runat="server" Style="display: none;" accept="application/xml"/>
+                    <asp:FileUpload  type="file" ID="FileUpload1" ClientIDMode="Static" runat="server" Style="display: none;" accept="application/xml"/> 
+                    <%--<ajaxToolkit:AsyncFileUpload ID="FileUpload1" runat="server" Style="display: none;" accept="application/xml" PersistFile="true" />--%>
                 </span>
             </label>
             <asp:TextBox type="text" runat="server" class="form-control" ID="Contrato" ReadOnly="true" />
@@ -73,12 +160,13 @@
                 <label class="input-group-btn">
                     <span class="btn btn-primary">Seleccionar&hellip;
                     <asp:FileUpload type="file" ID="FileUpload2" runat="server" Style="display: none;" accept="application/pdf" />
+                   <%-- <ajaxToolkit:AsyncFileUpload ID="FileUpload2" runat="server" Style="display: none;" PersistFile="true" accept="application/pdf" />--%>
                     </span>
                 </label>
                 <asp:TextBox type="text" runat="server" class="form-control" ID="TextBox1" ReadOnly="true" />
             </div>
             <small class="form-text text-muted">Archivo Max 15 Mb.</small>
-        </div>
+   </div>
 
    <div class="col-lg-4 col-sm-8 col-xs-10">
             <h4>PDF Anexo:</h4>
@@ -86,6 +174,7 @@
                 <label class="input-group-btn">
                     <span class="btn btn-primary">Seleccionar&hellip;
                     <asp:FileUpload type="file" ID="FileUpload3" runat="server" Style="display: none;" accept="application/pdf" />
+                    <%--<ajaxToolkit:AsyncFileUpload ID="FileUpload3" runat="server" Style="display: none;" PersistFile="true"  accept="application/pdf" />--%>
                     </span>
                 </label>
                 <asp:TextBox type="text" runat="server" class="form-control" ID="TextBox2" ReadOnly="true" />
@@ -94,15 +183,12 @@
         </div>
     </div>
 
-
     <div>   
     <br />
-
-     <div class="row">
+            <div class="row">
                 <label class="col-form-label col-lg-10 col-sm-10 col-xs-6"></label>
                 <div class="col-xs-7 col-md-7">
-                    <asp:Button ID="btnSage" runat="server" OnClick="btnSage_Click" CssClass="btn btn-success" title="Cargar Documentos" Text="Cargar" />
-                    <%--<asp:Button Text="Cagar" runat="server" ID="btnEnviar" CssClass="btn btn-success" title="Cargar Documentos" OnClick="Btn_Buscar" />--%>
+                    <asp:Button ID="btnSage" runat="server" OnClick="btnSage_Click" Class="btn btn-tsys cargar" title="Cargar Documentos" Text="Cargar" />
                 </div>
             </div>  
     </div>
@@ -113,25 +199,36 @@
     <div class="col-lg-10 col-sm-10 col-xs-12">
         <div class="alert alert-block alert-danger" id="B1" style="display: none">           
             <h3>Error!</h3>
-            Seleccione una Factura en XML para Cargar.
+            Seleccione una Factura en XML para Cargar, vuelva a cargar los archivos.
         </div>
         <div class="alert alert-block alert-danger" id="B2" style="display: none">
             <h3>Error!</h3>
-            Seleccione una Factura en PDF para Cargar.
+            Seleccione una Factura en PDF para Cargar, vuelva a cargar los archivos.
         </div>
         <div class="alert alert-block alert-danger" id="B3" style="display: none">
             <h3>Error!</h3>
-            Seleccione un Anexo en PDF para Cargar.
+            Seleccione un Anexo en PDF para Cargar, vuelva a cargar los archivos.
         </div>
         <div class="alert alert-block alert-danger" id="B4" style="display: none">            
             <h3>Error!</h3>
-            Al cargar los documentos, vuelva a intentarlo.
+            Al intentar cargar los documentos en el servidor vuelva a intentarlo, en caso de persistir el problema comunicate con el área de sistemas.
         </div>
         <div class="alert alert-block alert-success" id="B5" style="display: none">
             <h3>Éxito!</h3>
             Factura Procesada.
         </div>
-
+        <div class="alert alert-block alert-danger" id="B7" style="display: none">
+            <h3>Error!</h3>
+            El Archivo XML Factura no cuenta con formato XML, favor de verificar el archivo e intentar nuevamente.
+        </div>
+        <div class="alert alert-block alert-danger" id="B8" style="display: none">            
+            <h3>Error!</h3>
+            El Archivo PDF FACTURA no cuenta con formato PDF, favor de verificar el archivo e intentar nuevamente.
+        </div>
+        <div class="alert alert-block alert-danger" id="B9" style="display: none">
+            <h3>Éxito!</h3>
+            El Archivo PDF Anexo no cuenta con formato PDF, favor de verificar el archivo e intentar nuevamente.
+        </div>
         <br />
         <div class="alert alert-block alert-danger" id="B6" style="display: none">
             <h4>Error!</h4>
@@ -186,8 +283,6 @@
          <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
     </asp:GridView>
     <br />
-
-
     <asp:GridView ID="gvValidacion" runat="server" 
        CssClass="table table-bordered bs-table"
        AutoGenerateColumns="False"

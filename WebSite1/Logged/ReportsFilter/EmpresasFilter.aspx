@@ -6,7 +6,11 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" />--%>
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
@@ -28,57 +32,47 @@
         <div class="col-lg-12 col-sm-5 col-12" id="M1">
             <h3>Compañias</h3>
         </div>
+
         <div class="row" >
-            <div class="col-md-12">
-          
-                <div class="row">
-                    
+            <div class="col-md-12">          
+                <div class="row">                    
                     <div class="col-md-5">
                         <div class="form-group">
-                            
-                        <asp:TextBox ID="inputNombre" MaxLength="40"  placeholder="Nombre" runat="server" CssClass="form-control filter" ToolTip="NOmbre"></asp:TextBox>   
-                         
+                            <label>Nombre de Empresa</label>   
+                            <asp:TextBox ID="inputNombre" AutoComplete = "off" AutoCompleteType="Disabled" MaxLength="40"  runat="server" CssClass="form-control filter" ToolTip="NOmbre"></asp:TextBox>   
                         </div>
-
                     </div>
 
                     <div class="col-md-5">
                         <div class="form-group">
-                            
-                            <asp:TextBox ID="inputRFC" MaxLength="40" placeholder="RFC" runat="server" CssClass="form-control filter" ToolTip="RFC"></asp:TextBox>   
-                         
+                            <label>R.F.C</label>
+                            <asp:TextBox ID="inputRFC" AutoComplete = "off" AutoCompleteType="Disabled" MaxLength="13" runat="server" CssClass="form-control filter" ToolTip="RFC"></asp:TextBox>   
                         </div>
                     </div>
 
-
-          
                     <div class="col-md-2">
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <a href="#" Class="btn btn-tsys buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
                             <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
-          
                         </div>
                     </div>
-
                 </div>
-          
             </div>
-
-
         </div>
+
         <div class="row">
             <div class="col-md-12">
                 <table id="list" class="datatable table table-bordered table-striped" width="100%">
                     <thead>
                     <tr>
                         <th></th>
-                        <th>Nombre</th>
+                        <th>Nombre de Empresa</th>
                         <th>RFC</th>
-                        <th>Fecha</th>
+                        <th>Fecha de Registro</th>
                         <th>Estado</th>
                     </tr>
                     </thead>

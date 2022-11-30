@@ -1,5 +1,12 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -13,7 +20,7 @@ using System.Web.Services;
 [WebService(Namespace = "http://tempuri.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
- [System.Web.Script.Services.ScriptService]
+[System.Web.Script.Services.ScriptService]
 public class CargaFacturasWebService : System.Web.Services.WebService
 {
 
@@ -26,7 +33,7 @@ public class CargaFacturasWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(UseHttpGet = true)]
-    public void listar(string NumVoucher, string Vendkey, string RFC, string POTranID, string Total, string Status, int start, int length)
+    public void listar(string order_col, string order_dir, string NumVoucher, string Vendkey, string RFC, string POTranID, string Total, string Status, int start, int length)
     {
         try
         {
@@ -38,6 +45,30 @@ public class CargaFacturasWebService : System.Web.Services.WebService
 
                 list_dto = CargaFactura.ObtenerCargaFacturas(NumVoucher, Vendkey, RFC, POTranID, Total, Status);
 
+                for (int i = 0; i <= list_dto.Count() - 1; i++)
+                {
+                    string regin = "";
+                    if (list_dto[i].Moneda == "MXN")
+                    {
+                        regin = "es-MX";
+                    }
+                    else if (list_dto[i].Moneda == "USD")
+                    {
+                        regin = "en-US";
+                    }
+                    else if (list_dto[i].Moneda == "EUR")
+                    {
+                        regin = "fr-FR";
+                    }
+
+                    CultureInfo gbCulture = new CultureInfo(regin);
+                    string Simbol = gbCulture.NumberFormat.CurrencySymbol;
+                    list_dto[i].Subtotal = Simbol + " " + Convert.ToDecimal(list_dto[i].Subtotal).ToString("#,##0.00");
+                    list_dto[i].Total = Simbol + " " + Convert.ToDecimal(list_dto[i].Total).ToString("#,##0.00");
+                    list_dto[i].Impuestos = Simbol + " " + Convert.ToDecimal(list_dto[i].Impuestos).ToString("#,##0.00");
+                }
+
+
                 var js = new JavaScriptSerializer();
                 Context.Response.Clear();
                 Context.Response.ContentType = "application/json";
@@ -45,7 +76,49 @@ public class CargaFacturasWebService : System.Web.Services.WebService
                 if (list_dto != null)
                 {
                     int total = list_dto.Count();
-                    list_dto = list_dto.Skip(start).Take(length).ToList();
+
+                    if (order_col == "1")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Factura).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Factura).ToList();
+                    else if (order_col == "2")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Proveedor).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Proveedor).ToList();
+                    else if (order_col == "3")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.RFC).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.RFC).ToList();
+                    else if (order_col == "4")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Orden).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Orden).ToList();
+                    else if (order_col == "5")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Subtotal_in_Docuble).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Subtotal_in_Docuble).ToList();
+                    else if (order_col == "6")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Impuestos_in_Docuble).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Impuestos_in_Docuble).ToList();
+                    else if (order_col == "7")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Total_in_Docuble).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Total_in_Docuble).ToList();
+                    else if (order_col == "8")
+                        if (order_dir == "desc")
+                            list_dto = list_dto.OrderByDescending(l => l.Estado).ToList();
+                        else
+                            list_dto = list_dto.OrderBy(l => l.Estado).ToList();
+
+                    list_dto = length == -1 ? list_dto.Skip(start).ToList() : list_dto.Skip(start).Take(length).ToList();
                     int cantidad = list_dto.Count();
 
                     var result = new

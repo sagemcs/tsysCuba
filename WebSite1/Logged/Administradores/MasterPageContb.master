@@ -5,7 +5,7 @@
 <html lang="en">
 <head runat="server">
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<%-- Version 12-Marzo-2019   <meta name="viewport" content="width=device-width, initial-scale=1.0" />--%>
     <title><%: Page.Title %> - T|SYS|®</title>
 
     
@@ -29,6 +29,7 @@
         </div>
     </div>
     <form runat="server">
+        <asp:TextBox ID="Text_Sec" runat="server"></asp:TextBox>
         <asp:ScriptManager runat="server">
             <Scripts>
             <asp:ScriptReference Name="MsAjaxBundle" />
@@ -45,7 +46,8 @@
                 <asp:ScriptReference Name="WebFormsBundle" />
                 <asp:ScriptReference  Path="~/Css/sweetalert.min.js" />
                 <asp:ScriptReference  Path="~/Scripts/jquery.blockui.min.js" />
-
+                <asp:ScriptReference   Path="~/Scripts/crypto-js.js" />
+                <asp:ScriptReference   Path="~/Scripts/sha256.js" />
             </Scripts>
                  <Services>
                 <asp:ServiceReference Path="~/Servicios/AccesosWebService.asmx" />
@@ -70,14 +72,13 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a runat="server" href="~/Logged/Administradores/Default">
-                    <img src="/Img/Lgtys.png" style="border:0px solid black;">
+                    <img src="/Img/Lgtys.png" style="border:0px solid black;" id="Lm">
                     </a>
                 </div>
                 <div class="navbar-collapse collapse" >
                     <ul class="nav navbar-nav">
-                        <li><a runat="server" href="~/Logged/Administradores/About">Acerca</a></li>
-                        <li><a runat ="server" href="~/Logged/Administradores/Contact">Contacto</a></li>
-                        
+                        <li id="LetraT"><a runat="server" href="~/About">Acerca</a></li>
+                        <li id="LetraT2"><a runat ="server" href="~/Contact">Contacto</a></li>                        
                     </ul>
                     <asp:LoginView runat="server" ViewStateMode="Enabled">
                         <AnonymousTemplate>
@@ -92,15 +93,15 @@
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Administrar<span class="caret"></span></a>
                                 <ul class="dropdown-menu" role="menu">
                                 <li>
-                                    <a runat="server" href="~/Logged/Administradores/AdmFacturas" title="Adminsitrar Facturas">Consulta de Facturas</a>
+                                    <a runat="server" href="~/Logged/Administradores/AdmFacturas" title="Consulta de Facturas">Consulta de Facturas</a>
                                 </li>
                                 <li>
-                                    <a runat="server" href="~/Logged/Administradores/Administracion_Pago" title="Adminsitrar Facturas">Consulta de Pagos</a>
+                                    <a runat="server" href="~/Logged/Administradores/Administracion_Pago" title="Consulta de Facturas">Consulta de Pagos</a>
                                 </li>
                                 </ul>
                                 </li>
 
-                                 <li class="dropdown">
+<%--                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
                                     <ul class="dropdown-menu" role="menu">
 
@@ -132,7 +133,7 @@
                                             <a runat="server" class="" href="~/Logged/ReportsFilter/CargaArticulosFilter">Carga de Artículos</a>
                                         </li> 
                                     </ul>
-                                </li>
+                                </li>--%>
                                 <li>
                                     <asp:LoginStatus runat="server" LogoutAction="Redirect" LogoutText="Log off" LogoutPageUrl="~/" OnLoggingOut="Unnamed_LoggingOut" />
                                 </li>                            

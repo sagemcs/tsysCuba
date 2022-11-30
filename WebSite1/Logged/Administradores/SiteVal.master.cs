@@ -1,4 +1,11 @@
-﻿using System;
+﻿//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
+//MENU PERSONALIZADO PARA USUARIO VALIDADOR T|SYS|
+
+//REFERENCIAS UTILIZADAS
+using System;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -41,8 +48,92 @@ public partial class SiteMaster : MasterPage
             }
             Response.Cookies.Set(responseCookie);
         }
-
+        try
+        {
+            Text_Sec.Text = HttpContext.Current.Session["JWTKey"].ToString();
+        }
+        catch { }
         Page.PreLoad += master_Page_PreLoad;
+    }
+
+    public bool HasRightsForSpecifiedMenu(string menuItemName)
+    {
+
+        int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+
+        if (menuItemName == "Facturas")
+        {
+            return vermenu(pUserKey, "Facturas");
+        }
+        else if (menuItemName == "Reembolso")
+        {
+            return vermenu(pUserKey, "Reembolso");
+        }
+        else if (menuItemName == "Anticipo")
+        {
+            return vermenu(pUserKey, "Anticipo");
+        }
+        else if (menuItemName == "Tarjeta")
+        {
+            return vermenu(pUserKey, "Tarjeta");
+        }
+        else if (menuItemName == "GMedicos")
+        {
+            return vermenu(pUserKey, "GMedicos");
+        }
+
+        return true;
+    }
+
+    protected bool vermenu(int userkey, string Menu)
+    {
+        try
+        {
+            string sql;
+            string Cuenta;
+
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+
+            sqlConnection1.Open();
+            sql = @"SELECT " + Menu + " FROM PermEmpleados WHERE UserKey = " + userkey + "";
+
+            using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
+            {
+                sqlQuery.CommandType = CommandType.Text;
+                sqlQuery.CommandText = sql;
+                Cuenta = sqlQuery.ExecuteScalar().ToString();
+            }
+
+            sqlConnection1.Close();
+
+            if (Cuenta == "True")
+                return true;
+            else
+                return false;
+        }
+        catch (Exception ex) { }
+        return false;
+    }
+
+    public static SqlConnection SqlConnectionDB(string cnx)
+    {
+        try
+        {
+            SqlConnection SqlConnectionDB = new SqlConnection();
+            ConnectionStringSettings connSettings = ConfigurationManager.ConnectionStrings[cnx];
+            if ((connSettings != null) && (connSettings.ConnectionString != null))
+            {
+                SqlConnectionDB.ConnectionString = ConfigurationManager.ConnectionStrings[cnx].ConnectionString;
+            }
+
+            return SqlConnectionDB;
+        }
+        catch (Exception ex)
+        {
+
+            return null;
+        }
     }
 
     protected void master_Page_PreLoad(object sender, EventArgs e)

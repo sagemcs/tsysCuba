@@ -6,7 +6,11 @@
     }
 </script>
 <asp:Content ID="CustomStyles" ContentPlaceHolderID="CustomStyles" runat="server">
-    <link href="../../Css/reports-filter.css" rel="stylesheet" />
+    <!--Version 08-Abril-2019 By Luis Angel Garcia P-->
+    <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+<%--    <link href="../../Css/reports-filter.css" rel="stylesheet" />--%>
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server">
@@ -32,28 +36,20 @@
             <div class="col-md-12">
           
                 <div class="row">
-                    <div class="col-md-2">
+                   <div class="col-md-3">
                     
                         <div class="form-group">
-                            
-                         <asp:TextBox ID="inputID" MaxLength="12"  placeholder="ID" runat="server" CssClass="form-control filter"  ToolTip="ID"></asp:TextBox>   
-                         
-                        </div>
-                    </div>
-                   <div class="col-md-2">
-                    
-                        <div class="form-group">
-                            
-                         <asp:TextBox ID="inputNombre" MaxLength="256"  placeholder="Nombre" runat="server" CssClass="form-control filter"  ToolTip="Nombre"></asp:TextBox>   
+                          <label>Correo de Proveedor</label>
+                         <asp:TextBox ID="inputNombre" AutoComplete = "off" AutoCompleteType="Disabled" MaxLength="256" runat="server" CssClass="form-control filter"  ToolTip="Correo"></asp:TextBox>   
                          
                         </div>
                     </div>
                    
-                   <div class="col-md-2">
+                   <div class="col-md-3">
                     
                         <div class="form-group">
-                            
-                         <asp:TextBox ID="inputSocial" MaxLength="50" placeholder="Razón Social" runat="server" CssClass="form-control filter"  ToolTip="Razón Social"></asp:TextBox>   
+                          <label>Razón Social</label>  
+                         <asp:TextBox ID="inputSocial" AutoComplete = "off" AutoCompleteType="Disabled" MaxLength="50" runat="server" CssClass="form-control filter"  ToolTip="Razón Social"></asp:TextBox>   
                          
                         </div>
                     </div>
@@ -61,26 +57,37 @@
                    <div class="col-md-2">
                     
                         <div class="form-group">
-                            
-                         <asp:TextBox ID="inputRFC" MaxLength="40" placeholder="RFC" runat="server" CssClass="form-control filter"  ToolTip="RFC"></asp:TextBox>   
+                          <label>R.F.C.</label>  
+                         <asp:TextBox ID="inputRFC" MaxLength="40" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter"  ToolTip="RFC"></asp:TextBox>   
                          
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
+                            <label>Estado</label>
                             <asp:DropDownList ID="comboEstado" runat="server"  CssClass="form-control select2 filter">
                             </asp:DropDownList>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group pull-left">
-                            <a href="#" class="btn btn-success buscar" title="Buscar" data-toggle="tooltip">
+                            <br />
+                            <a href="#" Class="btn btn-primary buscar" title="Buscar" data-toggle="tooltip">
                                Buscar
                             </a>
-                            <a href="#" class="btn btn-primary limpiar" title="Limpiar filtro" data-toggle="tooltip">
+                            <a href="#" class="btn btn-tsys limpiar" title="Limpiar filtro" data-toggle="tooltip">
                                 Limpiar
                             </a>
           
+                        </div>
+                    </div>
+
+                   <div class="col-md-2">
+                    
+                        <div class="form-group" style="visibility:hidden">
+                            
+                         <asp:TextBox ID="inputID" MaxLength="12" AutoComplete = "off" AutoCompleteType="Disabled" runat="server" CssClass="form-control filter"  ToolTip="ID"></asp:TextBox>   
+                         
                         </div>
                     </div>
 
@@ -96,10 +103,10 @@
                     <thead>
                     <tr>            
                         <th></th>
-                        <th>Nombre</th>
-                        <th>Razón social</th>
+                        <th>Correo de Provedor</th>
+                        <th>Razón Social</th>
                         <th>RFC</th>
-                        <th>Fecha</th>
+                        <th>Fecha de Registro</th>
                         <th>Estado</th>
                     </tr>
                     </thead>

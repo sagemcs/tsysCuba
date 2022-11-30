@@ -1,4 +1,7 @@
-
+//PORTAL DE PROVEDORES T|SYS|
+//25 FEBRERO DEL 2019
+//DESARROLLADO POR MULTICONSULTING S.A. DE C.V.
+//ACTUALIZADO POR : LUIS ANGEL GARCIA
 var table;
 $(document).ready(function () {
     hide_combo_proveedores(UsuariosWebService.get_path());
@@ -13,10 +16,10 @@ $(document).ready(function () {
             },
             "draw": 1,
             "data": function (data) {
-                delete data.columns; 
-                //data.VendID = $('#MainContent_comboProveedores').val();
-                data.username = $('#MainContent_inputNombre').val();
-                data.VendName = $('#MainContent_comboProveedores').val();
+                data.order_col = data.order[0]['column'];
+                data.order_dir = data.order[0]['dir'];
+                data.username = $('#MainContent_inputCorreo').val();
+                data.VendName = $('#MainContent_inputNombre').val();
                 data.Interno = $('#MainContent_comboInterno').val();
                 data.Status = $('#MainContent_comboEstado').val();
             }
@@ -32,7 +35,7 @@ $(document).ready(function () {
             { "data": "Correo", 'className': "centrar-data", "orderable": false },
             { "data": "Correo", 'className': "centrar-data" },
             { "data": "Nombre", 'className': "centrar-data text_align_left" },
-            { "data": "Proveedor" , 'className': "centrar-data"},
+            //{ "data": "Proveedor" , 'className': "centrar-data"},
             { "data": "Interno", 'className': "centrar-data" },
             { "data": "Estado" , 'className': "centrar-data"}
         ],
@@ -62,6 +65,7 @@ $(document).ready(function () {
         $("#MainContent_comboInterno").val($("#MainContent_comboInterno option:first").val()).change();
         $("#MainContent_comboEstado").val($("#MainContent_comboEstado option:first").val()).change();
         $('#MainContent_inputNombre').val('');
+        $('#MainContent_inputCorreo').val('');
      
         table.ajax.reload(  );
     });
@@ -88,17 +92,17 @@ redirectToReport(); return false;
     });
 
     function redirectToReport() {
-        var nombre = $('#MainContent_inputNombre').val();
+        var username = $('#MainContent_inputCorreo').val();
+        var VendName = $('#MainContent_inputNombre').val();
         var provId = $('#MainContent_comboProveedores').val();
         var interno = $('#MainContent_comboInterno').val();
         var estado = $('#MainContent_comboEstado').val();
 
         var url_report = "/Logged/Reports/Usuarios";
         
-        url_report += "?nombre=" + nombre;
-        url_report += "&provId=" + provId;
+        url_report += "?VendName=" + VendName;
+        url_report += "&username=" + username;
         url_report += "&interno=" + interno;
-        url_report += "&estado=" + estado;
         url_report += "&estado=" + estado;
         window.open(url_report, '_blank');
     }

@@ -904,7 +904,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, AdvanceId, Isnull(FileNameXml,''), Isnull(FileNamePdf,''), Isnull(FileNamePdfVoucher,''), ExpenseReason FROM Expense where UpdateUserKey = @UpdateUserKey and ExpenseId = @ExpenseId and Status = 1;";
+            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, AdvanceId, ExpenseReason FROM Expense where UpdateUserKey = @UpdateUserKey and ExpenseId = @ExpenseId and Status = 1;";
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
             cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = expense_id;
             cmd.Connection.Open();
@@ -916,11 +916,8 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 expense.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
                 expense.Amount = dataReader.GetDecimal(3);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
-                expense.AdvanceId = dataReader.GetInt32(5);
-                //expense.FileNameXml = dataReader.GetString(6);
-                //expense.FileNamePdf = dataReader.GetString(7);
-                //expense.FileNamePdfVoucher = dataReader.GetString(8);
-                expense.ExpenseReason = dataReader.GetString(9);
+                expense.AdvanceId = dataReader.GetInt32(5);                
+                expense.ExpenseReason = dataReader.GetString(6);
             }
         }
         return expense;

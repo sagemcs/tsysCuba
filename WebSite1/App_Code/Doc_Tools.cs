@@ -962,6 +962,8 @@ public static class Doc_Tools
             { "6", "Política de Gastos de Alimentos" },
             { "7", "El importe máximo para el tipo de gasto Hospedaje es de 200" },
             { "8", "El importe máximo para el tipo de gasto Gastos Exraordinarios es de 2000" },
+            { "B51", "El rol actual no puede validar documentos de este tipo" },
+            { "B52", "Debe especificar el empleado, favor de verificar e intentar nuevamente." },
 
         };
         return dict;

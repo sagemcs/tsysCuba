@@ -305,6 +305,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         drop_empleados.DataValueField = "Id";
         drop_empleados.DataBind();
         drop_empleados.SelectedIndex = -1;
+       
     }
 
     private void BindPackageInfo()    
@@ -331,34 +332,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             }
         }
         return email;
-    }
-   
-    public Dictionary<int, string> Dict_moneda()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pesos" },
-            { 2, "Dolar" },
-            { 3, "Euros" }
-        };
-        return dict;
-    }
-
-    public Dictionary<int, string> Dict_policy()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Politica 1" },
-            { 2, "Politica 2" },
-            { 3, "Politica 3" },
-            { 4, "Politica 4" },
-            { 5, "Politica 5" },
-            { 6, "Politica 6" },
-            { 7, "Politica 7" },
-            { 8, "Politica 8" }
-        };
-        return dict;
-    }
+    }     
 
     private List<ExpenseDTO> ReadFromDb(int user_id, int level)
     {
@@ -381,7 +355,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 expense.DeniedReason = dataReader.GetString(5);
                 expense.PackageId = dataReader.GetInt32(6);
-                expense.ApprovalLevel = dataReader.GetInt32(7);               
+                expense.ApprovalLevel = dataReader.GetInt32(7);   
+                
                 gastos.Add(expense);
                           
             }
@@ -630,6 +605,14 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
 
     protected void drop_empleados_SelectedIndexChanged(object sender, EventArgs e)
     {
+        string rol = HttpContext.Current.Session["RolUser"].ToString();
+        if (rol == "T|SYS| - Recursos Humanos")
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B51").Value;
+            ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            return;
+        }
         int user_id;
         if (drop_empleados.SelectedItem != null)
         {
@@ -637,8 +620,9 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         }
         else
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B20);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B51").Value;
+            ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
@@ -770,11 +754,11 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             int expense_id = int.Parse(e.Row.Cells[0].Text);
             var gasto = gastos.FirstOrDefault(x => x.ExpenseId == expense_id);
 
-            Button btn_aprobar = (Button)e.Row.Cells[7].Controls[1];
-            Button btn_denegar = (Button)e.Row.Cells[8].Controls[1];
-            Button btn_comentar = (Button)e.Row.Cells[10].Controls[1];
-            TextBox tbx_motivo = (TextBox)e.Row.Cells[9].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[11].Controls[1];
+            Button btn_aprobar = (Button)e.Row.Cells[6].Controls[1];
+            Button btn_denegar = (Button)e.Row.Cells[7].Controls[1];
+            Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
+            TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
+            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
             
             if (gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2)
             {
@@ -788,7 +772,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             if (level - gasto.ApprovalLevel == 1)        
             {
                 //partimos con la premisa de que solo vamos a ver anticipos de reembolsos de aprobacion = (nuestro - 1)
-                if (e.Row.Cells[6].Text == "Pendiente")
+                if (e.Row.Cells[5].Text == "Pendiente")
                 {
                     btn_aprobar.Visible = true;
                     btn_denegar.Visible = true;
@@ -797,7 +781,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                     tbx_motivo.ReadOnly = false;
 
                 }
-                if (e.Row.Cells[6].Text == "Aprobado")
+                if (e.Row.Cells[5].Text == "Aprobado")
                 {
                     if (gasto.ApprovalLevel == level)
                     {
@@ -814,14 +798,14 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                         tbx_motivo.ReadOnly = false;
                     }
                 }
-                if (e.Row.Cells[6].Text == "Denegado")
+                if (e.Row.Cells[5].Text == "Denegado")
                 {
                     btn_aprobar.Visible = false;
                     btn_denegar.Visible = false;
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = true;                   
                 }
-                if (e.Row.Cells[6].Text == "Integrado")
+                if (e.Row.Cells[5].Text == "Integrado")
                 {
                     btn_integrar.Visible = false;
                     btn_aprobar.Visible = false;
@@ -839,7 +823,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 btn_integrar.Visible = false;
                 tbx_motivo.ReadOnly = true;
 
-                if (e.Row.Cells[6].Text == "Integrado")
+                if (e.Row.Cells[5].Text == "Integrado")
                 {
                     btn_integrar.Visible = false;
                     btn_aprobar.Visible = false;

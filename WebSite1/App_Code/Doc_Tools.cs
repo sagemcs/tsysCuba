@@ -1039,10 +1039,7 @@ public static class Doc_Tools
         {
             SqlCommand cmd = conn.CreateCommand();
             switch (type)
-            {
-                case DocumentType.Advance:
-                    cmd.CommandText = "Delete from Files where ExpenseType = 1 and ExpenseId = @Id ";
-                    break;
+            {               
                 case DocumentType.Expense:
                     cmd.CommandText = "Delete from Files where ExpenseType = 2 and ExpenseId = @Id ";
                     break;

@@ -983,7 +983,9 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             if (e.Row.Cells[4].Text != "Pendiente")
             {
                 Button btnEdit = (Button)e.Row.Cells[5].Controls[0];
+                Button btnDelete = (Button)e.Row.Cells[6].Controls[0];
                 btnEdit.Visible = false;
+                btnDelete.Visible = false;
             }
         }
     }
@@ -1608,5 +1610,24 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         HttpContext.Current.Session["is_valid"] = false;
         btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
     }
-   
+
+    protected void btnDelete_Command(object sender, CommandEventArgs e)
+    {
+        BindGridView();
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
+        HttpContext.Current.Session["Advance"] = null;
+
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex; //int.Parse(e.CommandArgument.ToString());
+        GridViewRow row = gvGastos.Rows[rowIndex];
+
+        if (e.CommandName == "Delete")
+        {
+            int advance_id = int.Parse(row.Cells[0].Text);
+            Doc_Tools.DeleteExpense(Doc_Tools.DocumentType.Expense, advance_id, pUserKey);
+            BindGridView();
+        }
+    }
+
 }

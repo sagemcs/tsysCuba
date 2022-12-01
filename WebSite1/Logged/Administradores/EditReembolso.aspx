@@ -286,7 +286,7 @@
                     <div class="input-group col-lg-12 col-sm-12 col-xs-12">
                         <label class="input-group-btn">
                             <span class="btn btn-primary">Seleccionar&hellip;
-                                <asp:FileUpload type="file" ID="fu_xml" ClientIDMode="Static" runat="server" Style="display: none;" accept="application/xml" />
+                                <asp:FileUpload type="file" ID="fu_xml" ClientIDMode="Static" runat="server" Style="display: none;" accept="application/xml" AllowMultiple="true" />
                             </span>
                         </label>
                         <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_xml" ReadOnly="true" />
@@ -299,7 +299,7 @@
                     <div class="input-group col-lg-12 col-sm-12 col-xs-12">
                         <label class="input-group-btn">
                             <span class="btn btn-primary">Seleccionar&hellip;
-                            <asp:FileUpload type="file" ID="fu_pdf" runat="server" Style="display: none;" accept="application/pdf" />
+                            <asp:FileUpload type="file" ID="fu_pdf" runat="server" Style="display: none;" accept="application/pdf" AllowMultiple="true" />
                             </span>
                         </label>
                         <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_pdf" ReadOnly="true" />
@@ -313,7 +313,7 @@
                     <div class="input-group col-lg-12 col-sm-12 col-xs-12">
                         <label class="input-group-btn">
                             <span class="btn btn-primary">Seleccionar&hellip;
-                            <asp:FileUpload type="file" ID="fu_voucher" runat="server" Style="display: none;" accept="application/pdf" />
+                            <asp:FileUpload type="file" ID="fu_voucher" runat="server" Style="display: none;" accept="application/pdf" AllowMultiple="true" />
                             </span>
                         </label>
                         <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_voucher" ReadOnly="true" />

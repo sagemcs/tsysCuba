@@ -967,6 +967,49 @@ public static class Doc_Tools
         return dict;
     }
 
+    public static List<string> LoadFilesbyExpense(DocumentType type, ExpenseFilesDTO.FileType fileType, int expense_id)
+    {
+        var file_names = new List<string>();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "select FileName  from Files Where FileType = @FileType and ExpenseId = @ExpenseId and ExpenseType = @ExpenseType";
+            cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = expense_id;
+            cmd.Parameters.Add("@ExpenseType", SqlDbType.Int).Value = type;
+            cmd.Parameters.Add("@FileType", SqlDbType.Int).Value = fileType;
+            cmd.Connection.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                string name = reader.GetString(0);
+                file_names.Add(name);
+            }
+            
+            cmd.Connection.Close();
+        }
+        return file_names;
+    }
+
+    public static bool CheckFileExist(ExpenseFilesDTO file)
+    {
+        var val = string.Empty;
+        int id = 0;
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "select count(*)  from Files Where FileType = @FileType and ExpenseId = @ExpenseId and FileName = @FileName";            
+            cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = file.ExpenseId;
+            cmd.Parameters.Add("@FileName", SqlDbType.NVarChar).Value = file.FileName;
+            cmd.Parameters.Add("@FileType", SqlDbType.Int).Value = file.Type;           
+            cmd.Connection.Open();
+            var inserted = cmd.ExecuteScalar();
+            val = inserted.ToString();
+            id = Convert.ToInt32(val);
+            cmd.Connection.Close();
+        }
+        return id > 0 ? true:false;
+    }
+
     public static int SaveFile(ExpenseFilesDTO file)
     {
         var val = string.Empty;

@@ -410,14 +410,14 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             {
                 gvGastos.DataSource = null;               
                 gvGastos.Visible = false;                             
-                ClearControls();
-                MultiView1.SetActiveView(View_General);
+                ClearControls();                
                 tbx_importe.Text = Math.Round(lista_detalles.Sum(x => x.Amount + x.TaxAmount), 2).ToString("0.00");
                 HttpContext.Current.Session["is_valid"] = false;
                 btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                MultiView1.SetActiveView(View_General);
                 return;
             }
 
@@ -663,11 +663,11 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 }                
                cmd.Connection.Close();
 
-               foreach (ExpenseFilesDTO file in xml_files)
+               foreach (ExpenseFilesDTO file in xml_files.Union(pdf_files).Union(voucher_files))
                {
                    file.ExpenseId = id;
                    int id_file = Doc_Tools.SaveFile(file);                 
-               }
+               }               
             }
 
             return id;
@@ -730,8 +730,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
 
     protected void btnSage_Click(object sender, EventArgs e)
     {
-        Sage();
-        
+        Sage();        
     }
 
     protected void btnFinalizar_Click(object sender, EventArgs e)
@@ -970,6 +969,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         {
             int expense_id = int.Parse(row.Cells[0].Text);
             var expense = LoadExpenseById(expense_id, pUserKey);
+            expense.FileNameXml = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Xml, expense_id);
             HttpContext.Current.Session["Expense"] = expense;
             Response.Redirect("EditReembolso");
         }

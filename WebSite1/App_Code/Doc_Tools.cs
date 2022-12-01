@@ -1095,18 +1095,15 @@ public static class Doc_Tools
         {
             SqlCommand cmd = conn.CreateCommand();
             switch (type)
-            {
-                case DocumentType.Advance:
-                    cmd.CommandText = "Delete from Files where Id = @Id";
-                    break;
+            {               
                 case DocumentType.Expense:
-                    cmd.CommandText = "Delete from Files where Id = @Id";
-                    break;
-                case DocumentType.CorporateCard:
-                    cmd.CommandText = "Delete from Files where Id = @Id";
+                    cmd.CommandText = "Delete from ExpenseDetail where ExpenseId = @Id";
                     break;
                 case DocumentType.MinorMedicalExpense:
-                    cmd.CommandText = "Delete from Files where Id = @Id";
+                    cmd.CommandText = "Delete from MinorMedicalExpenseDetail where MinorMedicalExpenseId = @Id";
+                    break;
+                case DocumentType.CorporateCard:
+                    cmd.CommandText = "Delete from CorporateCardDetail where CorporateCardId = @Id";
                     break;
             }
 
@@ -1114,6 +1111,36 @@ public static class Doc_Tools
             cmd.Connection.Open();
             cmd.ExecuteNonQuery();
             cmd.Connection.Close();
+        }
+    }
+
+    public static void DeleteExpense(DocumentType type,int expense_id, int user_id)
+    {
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            switch (type)
+            {
+                case DocumentType.Advance:
+                    cmd.CommandText = "Delete FROM Advance where UpdateUserKey = @UpdateUserKey and AdvanceId = @AdvanceId;";
+                    break;
+                case DocumentType.Expense:
+                    cmd.CommandText = "Delete FROM Expense where UpdateUserKey = @UpdateUserKey and ExpenseId = @AdvanceId;";
+                    break;
+                case DocumentType.CorporateCard:
+                    cmd.CommandText = "Delete FROM CorporateCard where UpdateUserKey = @UpdateUserKey and CorporateCardId = @AdvanceId;";
+                    break;
+                case DocumentType.MinorMedicalExpense:
+                    cmd.CommandText = "Delete FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey and MinorMedicalExpenseId = @AdvanceId;";
+                    break;               
+            }           
+            cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
+            cmd.Parameters.Add("@AdvanceId", SqlDbType.Int).Value = expense_id;
+            cmd.Connection.Open();
+            cmd.ExecuteNonQuery();
+
+            DeleteDetailOnFail(type, expense_id);
+            
         }
     }
 

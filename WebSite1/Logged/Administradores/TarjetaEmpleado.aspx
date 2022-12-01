@@ -442,6 +442,11 @@
                     <asp:CommandField ShowSelectButton="True" ControlStyle-CssClass="btn-success" ButtonType="Button" SelectText="Editar" ShowCancelButton="False">
                         <ControlStyle CssClass="btn-success"></ControlStyle>
                     </asp:CommandField>
+                    <asp:TemplateField >
+                   <ItemTemplate>
+                      <asp:Button ID="btnDelete" runat="server" CssClass="btn-warning" CommandName="Delete" Text="Eliminar"  OnCommand="btnDelete_Command"></asp:Button>
+                   </ItemTemplate>
+                 </asp:TemplateField>  
                 </Columns>
                 <EditRowStyle BackColor="#999999" />
                 <FooterStyle BackColor="#5D7B9D" ForeColor="White" Font-Bold="True" />

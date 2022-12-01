@@ -608,19 +608,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         }
         return advance;
     }
-
-    private void DeleteAdvance(int advance_id, int user_id)
-    {      
-        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-        {
-            SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "Delete FROM Advance where UpdateUserKey = @UpdateUserKey and AdvanceId = @AdvanceId;";
-            cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
-            cmd.Parameters.Add("@AdvanceId", SqlDbType.Int).Value = advance_id;
-            cmd.Connection.Open();
-            cmd.ExecuteNonQuery();
-        }
-    }
+   
 
     protected void gvAnticipos_RowCommand(object sender, GridViewCommandEventArgs e)
     {
@@ -860,7 +848,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         if (e.CommandName == "Delete")
         {
             int advance_id = int.Parse(row.Cells[0].Text);
-            DeleteAdvance(advance_id, pUserKey);
+            Doc_Tools.DeleteExpense(Doc_Tools.DocumentType.Advance,advance_id, pUserKey);
             BindGridView();
         }
     }

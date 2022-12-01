@@ -909,9 +909,9 @@ public static class Doc_Tools
             { "B12", "Fecha del anticipo requerida, favor de verificar e intentar nuevamente." },
             { "B11", "No coindice el monto declarado con el total de la factura, favor de verificar e intentar nuevamente." },
             { "B10", "Folio requerido, favor de verificar e intentar nuevamente." },
-            { "B9", "El Archivo PDF Anexo no cuenta con formato PDF, favor de verificar el archivo e intentar nuevamente." },
-            { "B8", "El Archivo PDF FACTURA no cuenta con formato PDF, favor de verificar el archivo e intentar nuevamente." },
-            { "B7", "El Archivo XML Factura no cuenta con formato XML, favor de verificar el archivo e intentar nuevamente." },
+            { "B9", "Uno de los archivos PDF Anexo no cuenta con formato PDF, favor de verificar el archivo e intentar nuevamente." },
+            { "B8", "Uno de los archivos PDF FACTURA no cuenta con formato PDF, favor de verificar el archivo e intentar nuevamente." },
+            { "B7", "Uno de los archivos XML Factura no cuenta con formato XML, favor de verificar el archivo e intentar nuevamente." },
             { "B5", "Factura Procesada." },
             { "B4", "Al intentar cargar los documentos en el servidor vuelva a intentarlo, en caso de persistir el problema comunicate con el área de sistemas." },
             { "B3", "La fecha de llegada debe ser posterior a la fecha de salida, favor de verificar e intentar nuevamente." },
@@ -930,7 +930,7 @@ public static class Doc_Tools
             { "B40", "Debe especificar el articulo, favor de verificar e intentar nuevamente." },
             { "B41", "El importe debe ser superior a cero, favor de verificar e intentar nuevamente." },
             { "B42", "Debe especificar el anticipo, favor de verificar e intentar nuevamente." },
-            { "MB42", "Archivo no admitido, el documento PDF VOUCHER supera el tamaño máximo permitido (15 MB)." },
+            { "MB42", "Uno de los archivos PDF VOUCHER supera el tamaño máximo permitido (15 MB)." },
             { "MB41", "La lista de artículos esta vacía, por favor inserte al menos uno." },
             { "MB40", "No coincide el importe total del gasto con los artículos e impuestos declarados." },
             { "MB39", "Ya existe una tarjeta con ese monto el dia actual." },
@@ -942,10 +942,10 @@ public static class Doc_Tools
             { "MB33", "Seleccione un Anexo en PDF para Cargar." },
             { "MB32", "Seleccione una Factura en PDF para Cargar." },
             { "MB31", "Seleccione una Factura en XML para Cargar." },
-            { "MB30", "Archivo no admitido, el documento XML FACTURA supera el tamaño máximo permitido (15 MB)." },
-            { "MB29", "El Archivo XML Factura no cuenta con formato XML." },
-            { "MB28", "Archivo no admitido, el documento PDF Voucher supera el tamaño máximo permitido (15 MB)." },
-            { "MB27", "Archivo no admitido, el documento PDF FACTURA supera el tamaño máximo permitido (15 MB)." },
+            { "MB30", "Uno de los archivos XML FACTURA supera el tamaño máximo permitido (15 MB)." },
+            { "MB29", "Uno de los archivos XML Factura no cuenta con formato XML." },
+            { "MB28", "Uno de los archivos PDF Voucher supera el tamaño máximo permitido (15 MB)." },
+            { "MB27", "Uno de los archivos PDF FACTURA supera el tamaño máximo permitido (15 MB)." },
             { "MB26", "Tipo de gasto requerido, favor de verificar e intentar nuevamente." },
             { "MB25", "No se admiten gastos con más de 3 meses de anterioridad, favor de verificar e intentar nuevamente." },
             { "MB24", "Fecha del gasto requerida, favor de verificar e intentar nuevamente." },
@@ -966,5 +966,113 @@ public static class Doc_Tools
         };
         return dict;
     }
+
+    public static int SaveFile(ExpenseFilesDTO file)
+    {
+        var val = string.Empty;
+        int id = 0;
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "INSERT INTO Files (ExpenseType,ExpenseId,FileName,FileType,FileBinary) VALUES (@ExpenseType,@ExpenseId,@FileName,@FileType,@FileBinary); SELECT SCOPE_IDENTITY();";
+            cmd.Parameters.Add("@ExpenseType", SqlDbType.Int).Value = file.ExpenseType;
+            cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = file.ExpenseId;
+            cmd.Parameters.Add("@FileName", SqlDbType.NVarChar).Value = file.FileName;
+            cmd.Parameters.Add("@FileType", SqlDbType.Int).Value = file.Type;
+            cmd.Parameters.Add("@FileBinary", SqlDbType.VarBinary, file.FileLength).Value = file.FileBinary;            
+            cmd.Connection.Open();          
+            var inserted = cmd.ExecuteScalar();
+            val = inserted.ToString();
+            id = Convert.ToInt32(val);
+            cmd.Connection.Close();
+        }
+        return id;
+        
+    }
+
+    public static void DeleteFile(DocumentType type ,int id)
+    {
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            switch (type)
+            {
+                case DocumentType.Advance:
+                    cmd.CommandText = "Delete from Files where ExpenseType = 1 ExpenseId = @Id ";
+                    break;
+                case DocumentType.Expense:
+                    cmd.CommandText = "Delete from Files where ExpenseType = 2 ExpenseId = @Id ";
+                    break;
+                case DocumentType.CorporateCard:
+                    cmd.CommandText = "Delete from Files where ExpenseType = 3 ExpenseId = @Id ";
+                    break;
+                case DocumentType.MinorMedicalExpense:
+                    cmd.CommandText = "Delete from Files where ExpenseType = 4 ExpenseId = @Id ";
+                    break;
+            }           
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;          
+            cmd.Connection.Open();
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+    }
+
+    public static void DeleteExpenseOnFail(DocumentType type, int id)
+    {
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            switch (type)
+            {
+                case DocumentType.Advance:
+                    cmd.CommandText = "Delete from Advance where AdvanceId = @Id";
+                    break;
+                case DocumentType.Expense:
+                    cmd.CommandText = "Delete from Expense where ExpenseId = @Id";
+                    break;
+                case DocumentType.CorporateCard:
+                    cmd.CommandText = "Delete from CorporateCard where Id = @Id";
+                    break;
+                case DocumentType.MinorMedicalExpense:
+                    cmd.CommandText = "Delete from MinorMedicalExpense where MinorMedicalExpenseId = @Id";
+                    break;
+            }
+            
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+            cmd.Connection.Open();
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+       
+    }
+
+    public static void DeleteDetailOnFail(DocumentType type, int id)
+    {
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            switch (type)
+            {
+                case DocumentType.Advance:
+                    cmd.CommandText = "Delete from Files where Id = @Id";
+                    break;
+                case DocumentType.Expense:
+                    cmd.CommandText = "Delete from Files where Id = @Id";
+                    break;
+                case DocumentType.CorporateCard:
+                    cmd.CommandText = "Delete from Files where Id = @Id";
+                    break;
+                case DocumentType.MinorMedicalExpense:
+                    cmd.CommandText = "Delete from Files where Id = @Id";
+                    break;
+            }
+
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+            cmd.Connection.Open();
+            cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+        }
+    }
+
 
 }

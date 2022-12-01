@@ -17,9 +17,9 @@ using System.Web;
         public string DeniedReason { get; set; }
         public int? PackageId { get; set; }
         public int AdvanceId { get; set; }
-        public string FileNameXml { get; set; }
-        public string FileNamePdf { get; set; }
-        public string FileNamePdfVoucher { get; set; }          
+        public List<string> FileNameXml { get; set; }
+        public List<string> FileNamePdf { get; set; }
+        public List<string> FileNamePdfVoucher { get; set; }          
         public string ExpenseReason { get; set; }
         public bool SageIntegration { get; set; }
 

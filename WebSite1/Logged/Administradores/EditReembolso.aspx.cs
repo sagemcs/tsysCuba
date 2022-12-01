@@ -209,9 +209,9 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                     //tbx_policy.Text = Dict_policy().FirstOrDefault(x => x.Key == STipoGasto.SelectedIndex).Value;
                     //Load_Taxes_By_Expense(expense.ExpenseId, pUserKey, pCompanyID);
                     Load_Articles_By_Expense(expense.ExpenseId, pUserKey, pCompanyID);
-                    tbx_pdf.Text = expense.FileNamePdf;
-                    tbx_xml.Text = expense.FileNameXml;
-                    tbx_voucher.Text = expense.FileNamePdfVoucher;
+                    //tbx_pdf.Text = expense.FileNamePdf;
+                    //tbx_xml.Text = expense.FileNameXml;
+                    //tbx_voucher.Text = expense.FileNamePdfVoucher;
                     tbx_motivo.Text = expense.ExpenseReason;
                 }
             }
@@ -230,10 +230,11 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                 //tbx_currency.Text = expense.Currency;
                 //tbx_fechagasto.Text = expense.Date.ToString("yyyy-MM-dd");
                 //STipoGasto.SelectedValue = Dict_tipos_gastos().FirstOrDefault(x => x.Value == expense.Type).Key.ToString();
-                //tbx_policy.Text = Dict_policy().FirstOrDefault(x => x.Key == STipoGasto.SelectedIndex).Value;                
-                tbx_pdf.Text = expense.FileNamePdf;
-                tbx_xml.Text = expense.FileNameXml;
-                tbx_voucher.Text = expense.FileNamePdfVoucher;
+                //tbx_policy.Text = Dict_policy().FirstOrDefault(x => x.Key == STipoGasto.SelectedIndex).Value;
+                //
+                //tbx_pdf.Text = expense.FileNamePdf;
+                //tbx_xml.Text = expense.FileNameXml;
+                //tbx_voucher.Text = expense.FileNamePdfVoucher;
             }
 
         }

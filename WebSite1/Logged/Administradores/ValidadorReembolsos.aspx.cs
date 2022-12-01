@@ -408,9 +408,9 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 expense.Amount = dataReader.GetDecimal(3);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 expense.AdvanceId = dataReader.GetInt32(5);
-                expense.FileNameXml = dataReader.GetString(6);
-                expense.FileNamePdf = dataReader.GetString(7);
-                expense.FileNamePdfVoucher = dataReader.GetString(8);
+                //expense.FileNameXml = dataReader.GetString(6);
+                //expense.FileNamePdf = dataReader.GetString(7);
+                //expense.FileNamePdfVoucher = dataReader.GetString(8);
                 expense.CompanyId = dataReader.GetString(9);
             }
         }

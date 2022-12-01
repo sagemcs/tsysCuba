@@ -1041,16 +1041,16 @@ public static class Doc_Tools
             switch (type)
             {
                 case DocumentType.Advance:
-                    cmd.CommandText = "Delete from Files where ExpenseType = 1 ExpenseId = @Id ";
+                    cmd.CommandText = "Delete from Files where ExpenseType = 1 and ExpenseId = @Id ";
                     break;
                 case DocumentType.Expense:
-                    cmd.CommandText = "Delete from Files where ExpenseType = 2 ExpenseId = @Id ";
+                    cmd.CommandText = "Delete from Files where ExpenseType = 2 and ExpenseId = @Id ";
                     break;
                 case DocumentType.CorporateCard:
-                    cmd.CommandText = "Delete from Files where ExpenseType = 3 ExpenseId = @Id ";
+                    cmd.CommandText = "Delete from Files where ExpenseType = 3 and ExpenseId = @Id ";
                     break;
                 case DocumentType.MinorMedicalExpense:
-                    cmd.CommandText = "Delete from Files where ExpenseType = 4 ExpenseId = @Id ";
+                    cmd.CommandText = "Delete from Files where ExpenseType = 4 and ExpenseId = @Id ";
                     break;
             }           
             cmd.Parameters.Add("@Id", SqlDbType.Int).Value = id;          

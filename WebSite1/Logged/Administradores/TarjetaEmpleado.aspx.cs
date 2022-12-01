@@ -421,13 +421,14 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
 
             if (carga == -1)
             {
-                gvGastos.DataSource = null;
-                //gvValidacion.DataSource = null;
-                //gvValidacion.Visible = false;
+                gvGastos.DataSource = null;              
                 gvGastos.Visible = false;
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B4);", true);
-                System.Threading.Thread.Sleep(5000);
+                tbx_importe.Text = Math.Round(lista_detalles.Sum(x => x.Amount + x.TaxAmount), 2).ToString("0.00");
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);                
                 ClearControls();
+                MultiView1.SetActiveView(View_General);
                 return;
             }
 
@@ -435,7 +436,9 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             BindGridView();
             ClearControls();
             HttpContext.Current.Session["GridList"] = null;
-            HttpContext.Current.Session["GridTaxes"] = null;         
+            HttpContext.Current.Session["GridTaxes"] = null;
+            HttpContext.Current.Session["is_valid"] = false;
+            btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
             GvItems.DataSource = null;
             GvItems.DataBind();
         }
@@ -458,8 +461,16 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         tbx_importe.Text = string.Empty;      
         STipoGasto.ClearSelection();
         drop_currency.ClearSelection();
+        HttpContext.Current.Session["fu_xml"] = null;
+        HttpContext.Current.Session["fu_pdf"] = null;
+        HttpContext.Current.Session["fu_voucher"] = null;
+        HttpContext.Current.Session["xml_files"] = null;
+        HttpContext.Current.Session["pdf_files"] = null;
+        HttpContext.Current.Session["voucher_files"] = null;
         tbx_pdf.Text = string.Empty;
-        if(fu_xml!=null)
+        tbx_voucher.Text = string.Empty;
+        tbx_xml.Text = string.Empty;
+        if (fu_xml!=null)
         {
             fu_xml.Attributes.Clear();
         }
@@ -470,12 +481,12 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         if(fu_voucher!=null)
         {
             fu_voucher.Attributes.Clear();
-        }       
+        }      
         
-        tbx_voucher.Text = string.Empty;
-        tbx_xml.Text = string.Empty;
+        
         btnSage.Enabled = false;
         tbx_motivo.Text = string.Empty;
+        HttpContext.Current.Session["is_valid"] = false;
     }
 
     /// <summary>

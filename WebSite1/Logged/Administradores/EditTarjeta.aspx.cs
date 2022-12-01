@@ -169,7 +169,6 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             return null;
         }
     }
-
     protected void Page_Load(object sender, EventArgs e)
     {
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
@@ -219,7 +218,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                     var card = (CorporateCardDTO)HttpContext.Current.Session["CorporateCard"];
                     tbx_importe.Text = card.Amount.ToString("0.00");
                     //tbx_policy.Text = Dict_policy().FirstOrDefault(x => x.Key == Dict_tipos_gastos().FirstOrDefault(d => d.Value == card.Type).Key).Value;
-                    drop_currency.SelectedValue = Dict_moneda().FirstOrDefault(x => x.Value == card.Currency).Key.ToString();
+                    drop_currency.SelectedValue = Doc_Tools.Dict_moneda().FirstOrDefault(x => x.Value == card.Currency).Key.ToString();
                     tbx_fechagasto.Text = card.Date.ToString("yyyy-MM-dd");
                    // STipoGasto.SelectedValue = Dict_tipos_gastos().FirstOrDefault(x => x.Value == card.Type).Key.ToString();
                   
@@ -270,7 +269,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT DetailId,CorporateCardId,ItemKey,Qty,UnitCost, STaxCodeKey,TaxAmount FROM CorporateCardDetail where CorporateCardId = @ExpenseId and CreateUser = @CreateUser and CompanyId = @CompanyId;";
+            cmd.CommandText = "SELECT DetailId,CorporateCardId,ItemKey,Qty,UnitCost, STaxCodeKey,TaxAmount, Type FROM CorporateCardDetail where CorporateCardId = @ExpenseId and CreateUser = @CreateUser and CompanyId = @CompanyId;";
             cmd.Parameters.Add("@CreateUser", SqlDbType.Int).Value = user_id;
             cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = expense_id;
             cmd.Parameters.Add("@CompanyId", SqlDbType.VarChar).Value = company_id;
@@ -288,10 +287,10 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                 article.STaxCodeKey = dataReader.GetInt32(5);
                 article.TaxAmount = dataReader.GetDecimal(6);
                 article.STaxCodeID = taxes.FirstOrDefault(x => x.STaxCodeKey == article.STaxCodeKey).STaxCodeID;
-                if (!articles.Any(x => x.ItemKey == article.ItemKey))
-                {
-                    articles.Add(article);
-                }
+                article.Type = dataReader.GetInt32(7);
+                article.TipoGasto = Doc_Tools.Dict_tipos_gastos().FirstOrDefault(x => x.Key == article.Type).Value;
+                articles.Add(article);
+               
             }
         }
         GvItems.DataSource = null;
@@ -331,59 +330,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             { 2, "Compra Extraordinaria" }
         };
         return dict;
-    }
-    public Dictionary<int, string> Dict_status()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pendiente" },
-            { 2, "Aprobado" },
-            { 3, "Cancelado" }
-        };
-        return dict;
-    }
-    public Dictionary<int, string> Dict_policy()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Politica 1" },
-            { 2, "Politica 2" },
-            { 3, "Politica 3" },
-            { 4, "Politica 4" },
-            { 5, "Politica 5" },
-            { 6, "Politica 6" },
-            { 7, "Politica 7" },
-            { 8, "Politica 8" }
-        };
-        return dict;
-    }
-
-    public Dictionary<int, string> Dict_tipos_gastos()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Transporte Aéreo" },
-            { 2, "Transporte Terrestre" },
-            { 3, "Casetas" },
-            { 4, "Gasolina" },
-            { 5, "Estacionamiento" },
-            { 6, "Alimentos" },
-            { 7, "Hospedaje" },
-            { 8, "Gastos extraordinarios" }
-        };
-        return dict;
-    }
-
-    public Dictionary<int, string> Dict_moneda()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pesos" },
-            { 2, "Dolar" },
-            { 3, "Euros" }
-        };
-        return dict;
-    }
+    }       
    
     private bool CompruebaMontoFactura(MemoryStream fs, decimal importe)
     {
@@ -616,11 +563,12 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         var result = WriteToDb(card.CorporateCardId, tipo_moneda, fecha_gasto, importe_gasto, fu_xml, fu_pdf, fu_voucher, pUserKey, pCompanyID, lista_detalles, motivo_gasto);
         if (result == -1)
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B4);", true);
-            System.Threading.Thread.Sleep(5000);
-            MultiView1.SetActiveView(View_General);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);      
             return;
-        }
+        }        
         Response.Redirect("TarjetaEmpleado");
     }
 
@@ -786,16 +734,20 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             if (DateTime.Today.Month != fecha_gasto.Month)
             {
                 tbx_fechagasto.Text = string.Empty;
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B17);", true);
-                System.Threading.Thread.Sleep(5000);
-                return;
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B14").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                MultiView1.SetActiveView(View_General);
+                return;               
             }
         }
         else
         {
             tbx_fechagasto.Text = string.Empty;
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B17);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B14").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
             return;
         }
         HttpContext.Current.Session["fecha_gasto"] = DateTime.Parse(tbx_fechagasto.Text);
@@ -803,30 +755,23 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
     protected void tbx_importegasto_TextChanged(object sender, EventArgs e)
     {
-        foreach (char d in tbx_importegasto.Text.ToArray())
-        {
-            if (!char.IsControl(d) && !char.IsDigit(d) && (d != '.') && (d != ','))
-            {
-                tbx_importegasto.Text = string.Empty;
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B16);", true);
-                System.Threading.Thread.Sleep(5000);
-                return;
-            }
-        }
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
     }
 
     protected void tbx_cantidad_TextChanged(object sender, EventArgs e)
-    {
-        foreach (char d in tbx_cantidad.Text.ToArray())
+    {              
+        if (tbx_cantidad.Text.Any(d=> !char.IsDigit(d) && (d != '.') && (d != ',')))
         {
-            if (!char.IsControl(d) && !char.IsDigit(d) && (d != '.') && (d != ','))
-            {
-                tbx_cantidad.Text = string.Empty;
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B16);", true);
-                System.Threading.Thread.Sleep(5000);
-                return;
-            }
+            tbx_cantidad.Text = string.Empty;
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B39").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+     
         }
+        
     }
 
     protected void btn_new_article_Click(object sender, EventArgs e)

@@ -1140,6 +1140,7 @@ public static class Doc_Tools
             cmd.ExecuteNonQuery();
 
             DeleteDetailOnFail(type, expense_id);
+            DeleteFile(type, expense_id);
             
         }
     }

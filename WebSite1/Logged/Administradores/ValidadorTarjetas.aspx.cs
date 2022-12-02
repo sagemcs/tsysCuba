@@ -187,7 +187,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
                     BindPackageInfo();
                     
-                    upPackage.Visible = level <= 1;
+                    upPackage.Visible = level == 2;
 
                     //BindGridView();
                     if (!IsPostBack)
@@ -367,7 +367,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, FileNameXml ,FileNamePdf ,FileNamePdfVoucher, CompanyId FROM CorporateCard whereCorporateCardId = @CorporateCardId ;";
+            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, FileNameXml ,FileNamePdf ,FileNamePdfVoucher, CompanyId FROM CorporateCard where CorporateCardId = @CorporateCardId ;";
             cmd.Parameters.Add("@CorporateCardId", SqlDbType.Int).Value = expense_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -389,8 +389,8 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
 
     private List<ExpenseDetailDTO> Load_Articles_By_Expense(int expense_id, string company_id)
     {
-        var lista = (List<ItemDTO>)HttpContext.Current.Session["Items"];
-        var taxes = (List<TaxesDTO>)HttpContext.Current.Session["Taxes"];
+        var lista = Doc_Tools.get_items(company_id);
+        var taxes = Doc_Tools.get_taxes(company_id);
         List<ExpenseDetailDTO> articles = new List<ExpenseDetailDTO>();      
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
@@ -437,13 +437,13 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
 
-        if (paquete.PackageId == 0)
+        if (paquete.PackageId == 0 && level_validador == 2)
         {
             tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B34").Value;
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B53").Value;
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
-        }
+        }       
 
         if (e.CommandName == "Select")
         {
@@ -560,7 +560,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                 SqlCommand cmd = conn.CreateCommand();
                 StringBuilder sb = new StringBuilder();
                 sb.Append("UPDATE CorporateCard SET Status = @Status ");
-                if (level == 1)
+                if (level == 2)
                 {
                     sb.Append(", PackageId = @PackageId ");
                     cmd.Parameters.Add("@PackageId", SqlDbType.Int).Value = package_id;
@@ -589,19 +589,18 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
     }
 
     protected void drop_empleados_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        string rol = HttpContext.Current.Session["RolUser"].ToString();
-        if (rol == "T|SYS| - Recursos Humanos" || rol == "T|SYS| - Gerente")
+    {       
+        int user_id = 0;
+        if (drop_empleados.SelectedItem != null)
+        {
+            user_id = int.Parse(drop_empleados.SelectedItem.Value);
+        }
+        else 
         {
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B51").Value;
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
-        }
-        int user_id = 0;
-        if (drop_empleados.SelectedItem != null)
-        {
-            user_id = int.Parse(drop_empleados.SelectedItem.Value);
         }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
         BindGridView(user_id, status_id);
@@ -799,9 +798,9 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             switch (level)
             {
                 case 2:  //CXP
-                    if (level - card.ApprovalLevel == 1 || card.ApprovalLevel == 0)
+                    if (level - card.ApprovalLevel == 0 || card.ApprovalLevel == 0)
                     {
-                        if (e.Row.Cells[6].Text == "Pendiente")
+                        if (e.Row.Cells[5].Text == "Pendiente")
                         {
                             btn_aprobar.Visible = true;
                             btn_denegar.Visible = true;
@@ -809,7 +808,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             tbx_motivo.ReadOnly = false;
 
                         }
-                        if (e.Row.Cells[6].Text == "Aprobado")
+                        if (e.Row.Cells[5].Text == "Aprobado")
                         {
                             if (card.ApprovalLevel == level)
                             {
@@ -827,20 +826,31 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             }
 
                         }
-                        if (e.Row.Cells[6].Text == "Denegado")
+                        if (e.Row.Cells[5].Text == "Denegado")
                         {
                             btn_aprobar.Visible = false;
                             btn_denegar.Visible = false;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
                         }
-                        if (e.Row.Cells[6].Text == "Integrado")
+                        if (e.Row.Cells[5].Text == "Integrado")
                         {
                             btn_aprobar.Visible = false;
                             btn_denegar.Visible = false;
                             btn_comentar.Visible = false;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
+                        }
+                    }
+                    else 
+                    {
+                        if (e.Row.Cells[5].Text == "Aprobado")
+                        {                           
+                            btn_aprobar.Visible = false;
+                            btn_denegar.Visible = false;
+                            btn_comentar.Visible = false;
+                            tbx_motivo.Visible = true;
+                            tbx_motivo.ReadOnly = true;                           
                         }
                     }
                     break;

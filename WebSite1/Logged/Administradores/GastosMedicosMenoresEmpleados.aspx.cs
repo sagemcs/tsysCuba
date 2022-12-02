@@ -741,17 +741,18 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         //validacion texto en importe
         if (tbx_importegasto.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
         {
-            tbx_importegasto.Text = string.Empty;
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B16);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B41").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
         //validacion del importe del articulo
         if (tbx_importegasto.Text == string.Empty || decimal.Parse(tbx_importegasto.Text) == 0)
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B20);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B41").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
@@ -768,16 +769,18 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         //Validacion de la cantidad
         if (tbx_cantidad.Text == string.Empty || int.Parse(tbx_cantidad.Text) == 0)
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B19);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B39").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
         //validaciones
         if (drop_articulos.SelectedValue == "0")
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B18);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B40").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
         }         

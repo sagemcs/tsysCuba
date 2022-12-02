@@ -102,7 +102,7 @@ public partial class SiteMaster : MasterPage
 
     public bool HasRightsForSpecifiedMenu(string menuItemName)
     {
-
+        string rol = HttpContext.Current.Session["RolUser"].ToString();
         int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
 
         if (menuItemName == "Facturas")
@@ -122,7 +122,7 @@ public partial class SiteMaster : MasterPage
             return vermenu(pUserKey, "Tarjeta");
         }
         else if (menuItemName == "GMedicos")
-        {
+        {           
             return vermenu(pUserKey, "GMedicos");
         }
 

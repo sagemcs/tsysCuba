@@ -179,8 +179,8 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 {
                     //string Var = HttpContext.Current.Session["VendKey"].ToString();
                     //string Var2 = HttpContext.Current.Session["RolUser"].ToString();
-                    //string Var3 = HttpContext.Current.Session["IDCompany"].ToString();
-
+                    //string Var3 = HttpContext.Current.Session["IDCompany"].ToString();                  
+                
                     //pVendKey = Convert.ToInt32(HttpContext.Current.Session["VendKey"].ToString());
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
@@ -384,8 +384,8 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
 
     private List<ExpenseDetailDTO> Load_Articles_By_Expense(int expense_id, string company_id)
     {
-        var lista = (List<ItemDTO>)HttpContext.Current.Session["Items"];
-        var taxes = (List<TaxesDTO>)HttpContext.Current.Session["Taxes"];
+        var lista = Doc_Tools.get_items(company_id);
+        var taxes = Doc_Tools.get_taxes(company_id);
         List<ExpenseDetailDTO> articles = new List<ExpenseDetailDTO>();        
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
@@ -447,7 +447,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
             if (paquete.PackageId == 0)
             {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B34").Value;
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B53").Value;
                 ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
@@ -605,19 +605,18 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
     }
 
     protected void drop_empleados_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        string rol = HttpContext.Current.Session["RolUser"].ToString();
-        if (rol == "T|SYS| - Gerente")
-        {
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B51").Value;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            return;
-        }
+    {       
         int user_id = 0;
         if (drop_empleados.SelectedItem != null)
         {
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
+        }
+        else
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B51").Value;
+            ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            return;
         }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
         BindGridView(user_id, status_id);

@@ -58,7 +58,7 @@ public partial class SiteMaster : MasterPage
 
     public bool HasRightsForSpecifiedMenu(string menuItemName)
     {
-
+        string rol = HttpContext.Current.Session["RolUser"].ToString();
         int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
 
         if (menuItemName == "Facturas")
@@ -67,18 +67,34 @@ public partial class SiteMaster : MasterPage
         }
         else if (menuItemName == "Reembolso")
         {
+            if (rol == "T|SYS| - Gerencia de Capital Humano")
+            {
+                return false;
+            }
             return vermenu(pUserKey, "Reembolso");
         }
         else if (menuItemName == "Anticipo")
         {
+            if (rol == "T|SYS| - Gerencia de Capital Humano")
+            {
+                return false;
+            }
             return vermenu(pUserKey, "Anticipo");
         }
         else if (menuItemName == "Tarjeta")
         {
+            if (rol == "T|SYS| - Gerencia de Capital Humano" || rol == "T|SYS| - Gerente")
+            {
+                return false;
+            }
             return vermenu(pUserKey, "Tarjeta");
         }
         else if (menuItemName == "GMedicos")
         {
+            if (rol == "T|SYS| - Gerente")
+            {
+                return false;
+            }
             return vermenu(pUserKey, "GMedicos");
         }
 

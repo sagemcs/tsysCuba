@@ -635,7 +635,6 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         }
     }
           
-
     private List<CorporateCardDTO> ReadFromDb(int user_id)
     {
         List<CorporateCardDTO> gastos = new List<CorporateCardDTO>();
@@ -920,6 +919,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB26").Value;           
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
             return;
         }
 

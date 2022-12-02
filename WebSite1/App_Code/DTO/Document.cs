@@ -33,11 +33,11 @@ public class Document
                 break;
             case DocumentType.CorporateCard:
                 var tarjeta = (CorporateCardDTO)this;
-                date = tarjeta.CreateDate;
+                date = tarjeta.Date;
                 break;
             case DocumentType.MinorMedicalExpense:
                 var medico = (MinorMedicalExpenseDTO)this;
-                date = medico.CreateDate;
+                date = medico.Date;
                 break;           
         }
         return date;

@@ -195,7 +195,7 @@ public static class Doc_Tools
             cmd.Parameters.Add("@iPurchAmt", SqlDbType.Decimal).Value = tap.iPurchAmt != null ? tap.iPurchAmt : (object)DBNull.Value;
             cmd.Parameters.Add("@iTranAmt", SqlDbType.Decimal).Value = tap.iTranAmt != null ? tap.iTranAmt : (object)DBNull.Value;
             cmd.Parameters.Add("@oRetVal", SqlDbType.Int).Value = tap.oRetVal != null ? tap.oRetVal : (object)DBNull.Value;
-
+           
             cmd.Connection.Open();
             try
             {
@@ -213,7 +213,7 @@ public static class Doc_Tools
     }
     public static int Insert_tapVoucherDtlCExGst(tapVoucherDtlCExGst tap)
     {
-
+        //  
         int dtlKey = 0;
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
         {
@@ -355,10 +355,12 @@ public static class Doc_Tools
             iUserID = username,
             iInvcRcptDate = document.GetDate(type),
             iDueDate = document.GetDate(type),
+            iDiscDate = null,
             iDiscAmt = 0,
             iSTaxAmt = type == DocumentType.Advance ? 0 : items.Sum(x => x.TaxAmount),
             iPurchAmt = type == DocumentType.Advance ? document.Amount : items.Sum(x => x.Amount),
             iTranAmt = type == DocumentType.Advance ? document.Amount : items.Sum(x => x.Amount + x.TaxAmount)
+            //iTranDate, iInvcRcptDate, iDueDate, iDiscDate
         };
 
         vkey = Insert_tapVoucherCExGst(tapVoucher);
@@ -964,6 +966,8 @@ public static class Doc_Tools
             { "8", "El importe máximo para el tipo de gasto Gastos Exraordinarios es de 2000" },
             { "B51", "El rol actual no puede validar documentos de este tipo" },
             { "B52", "Debe especificar el empleado, favor de verificar e intentar nuevamente." },
+            { "B53", " Número de Paquete requerido, favor de verificar e intentar nuevamente." },
+
 
         };
         return dict;

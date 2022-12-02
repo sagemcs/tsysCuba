@@ -1006,7 +1006,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT AdvanceId , Folio FROM Advance where UpdateUserKey = @UpdateUserKey and status in (2,4);";
+            cmd.CommandText = "SELECT AdvanceId , Folio FROM Advance where UpdateUserKey = @UpdateUserKey and status in (2,5);";
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;            
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();

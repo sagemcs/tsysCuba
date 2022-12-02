@@ -371,7 +371,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, AdvanceId, Isnull(FileNameXml,''), Isnull(FileNamePdf,''), Isnull(FileNamePdfVoucher,''), CompanyId FROM Expense where ExpenseId = @ExpenseId;";
+            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, AdvanceId, CompanyId FROM Expense where ExpenseId = @ExpenseId;";
             cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = expense_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -382,11 +382,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 expense.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
                 expense.Amount = dataReader.GetDecimal(3);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
-                expense.AdvanceId = dataReader.GetInt32(5);
-                //expense.FileNameXml = dataReader.GetString(6);
-                //expense.FileNamePdf = dataReader.GetString(7);
-                //expense.FileNamePdfVoucher = dataReader.GetString(8);
-                expense.CompanyId = dataReader.GetString(9);
+                expense.AdvanceId = dataReader.GetInt32(5);                
+                expense.CompanyId = dataReader.GetString(6);
             }
         }
         return expense;
@@ -817,10 +814,15 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             }
             else
             {
+                //btn_aprobar.Visible = false;
+                //btn_comentar.Visible = false;
+                //btn_denegar.Visible = false;
+                //btn_integrar.Visible = false;
+                //tbx_motivo.ReadOnly = true;
+
                 btn_aprobar.Visible = false;
                 btn_comentar.Visible = false;
                 btn_denegar.Visible = false;
-                btn_integrar.Visible = false;
                 tbx_motivo.ReadOnly = true;
 
                 if (e.Row.Cells[5].Text == "Integrado")

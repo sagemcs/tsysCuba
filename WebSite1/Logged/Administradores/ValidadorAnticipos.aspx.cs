@@ -569,6 +569,15 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
 
     protected void drop_empleados_SelectedIndexChanged(object sender, EventArgs e)
     {
+        string rol = HttpContext.Current.Session["RolUser"].ToString();
+        if (rol == "T|SYS| - Recursos Humanos")
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B51").Value;
+            ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            return;
+        }
+
         int user_id = 0;
         if (drop_empleados.SelectedItem != null)
         {

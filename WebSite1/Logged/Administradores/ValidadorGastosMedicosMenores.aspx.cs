@@ -336,21 +336,8 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
 
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
-            SqlCommand cmd = conn.CreateCommand();
-            switch (level)
-            {
-                case 1:
-                    cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel , 0) FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey;";
-                    break;
-                case 2:
-                    cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel , 0) FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey and ApprovalLevel in (1, 2) and Status <> 1;";
-                    break;
-                case 3:
-                    cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel , 0) FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey and ApprovalLevel in (2, 3) and Status <> 1;";
-                    break;
-                default:
-                    break;
-            }
+            SqlCommand cmd = conn.CreateCommand();           
+            cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel , 0) FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey;";                             
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();

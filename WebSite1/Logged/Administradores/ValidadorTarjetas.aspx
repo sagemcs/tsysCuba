@@ -252,8 +252,7 @@
          <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
         <Columns>
          <asp:BoundField DataField="CorporateCardId" HeaderText="Id Gasto" ReadOnly="True" SortExpression="CorporateCardId" />
-         <asp:BoundField DataField="PackageId" HeaderText="Paquete" ReadOnly="True" SortExpression="PackageId" />
-         <asp:BoundField DataField="Type" HeaderText="Tipo" ReadOnly="True" SortExpression="Type" />
+         <asp:BoundField DataField="PackageId" HeaderText="Paquete" ReadOnly="True" SortExpression="PackageId" />        
          <asp:BoundField DataField="Date" HeaderText="Fecha" ReadOnly="True" SortExpression="Date" DataFormatString="{0:dd/MM/yyyy}" />
          <asp:BoundField DataField="Currency" HeaderText="Moneda" ReadOnly="True" SortExpression="Currency" />
          <asp:BoundField DataField="Amount" HeaderText="Importe" ReadOnly="True" SortExpression="Amount" DataFormatString="{0:c}"/>

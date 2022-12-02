@@ -781,11 +781,11 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             int card_id = int.Parse(e.Row.Cells[0].Text);
             var card = tarjetas.FirstOrDefault(x => x.CorporateCardId == card_id);
 
-            Button btn_aprobar = (Button)e.Row.Cells[7].Controls[1];
-            Button btn_denegar = (Button)e.Row.Cells[8].Controls[1];
-            TextBox tbx_motivo = (TextBox)e.Row.Cells[9].Controls[1];
-            Button btn_comentar = (Button)e.Row.Cells[10].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[11].Controls[1];
+            Button btn_aprobar = (Button)e.Row.Cells[6].Controls[1];
+            Button btn_denegar = (Button)e.Row.Cells[7].Controls[1];
+            TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
+            Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
+            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
 
             if (card.ApprovalLevel == roles.Max(x => x.Key) && level == 2)
             {
@@ -847,7 +847,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                 case 3: case 4: //Tesoreria//Finanzas
                     if (level - card.ApprovalLevel == 1)
                     {
-                        if (e.Row.Cells[6].Text == "Pendiente")
+                        if (e.Row.Cells[5].Text == "Pendiente")
                         {
                             btn_aprobar.Visible = true;
                             btn_denegar.Visible = true;
@@ -855,7 +855,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             tbx_motivo.ReadOnly = false;
 
                         }
-                        if (e.Row.Cells[6].Text == "Aprobado")
+                        if (e.Row.Cells[5].Text == "Aprobado")
                         {
                             if (card.ApprovalLevel == level)
                             {
@@ -873,14 +873,14 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             }
 
                         }
-                        if (e.Row.Cells[6].Text == "Denegado")
+                        if (e.Row.Cells[5].Text == "Denegado")
                         {
                             btn_aprobar.Visible = false;
                             btn_denegar.Visible = false;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
                         }
-                        if (e.Row.Cells[6].Text == "Integrado")
+                        if (e.Row.Cells[5].Text == "Integrado")
                         {
                             btn_aprobar.Visible = false;
                             btn_denegar.Visible = false;
@@ -896,7 +896,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                         btn_denegar.Visible = false;
                         tbx_motivo.ReadOnly = true;
 
-                        if (e.Row.Cells[6].Text == "Integrado")
+                        if (e.Row.Cells[5].Text == "Integrado")
                         {
                             btn_integrar.Visible = false;
                             btn_aprobar.Visible = false;

@@ -747,17 +747,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             Button btn_denegar = (Button)e.Row.Cells[7].Controls[1];
             Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
             TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
-            
-            if (gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2)
-            {
-                btn_integrar.Enabled = true;
-            }
-            else
-            {
-                btn_integrar.Enabled = false;
-            }
-
+            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];         
+                       
             if (level - gasto.ApprovalLevel == 1)        
             {
                 //partimos con la premisa de que solo vamos a ver anticipos de reembolsos de aprobacion = (nuestro - 1)
@@ -768,7 +759,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                     btn_comentar.Visible = false;
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = false;
-
+                    btn_integrar.Visible = false;
                 }
                 if (e.Row.Cells[5].Text == "Aprobado")
                 {
@@ -778,6 +769,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                         btn_denegar.Visible = false;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
                     }
                     else
                     {
@@ -785,6 +777,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                         btn_denegar.Visible = true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;
+                        btn_integrar.Visible = false;
                     }
                 }
                 if (e.Row.Cells[5].Text == "Denegado")
@@ -792,7 +785,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                     btn_aprobar.Visible = false;
                     btn_denegar.Visible = false;
                     tbx_motivo.Visible = true;
-                    tbx_motivo.ReadOnly = true;                   
+                    tbx_motivo.ReadOnly = true;
+                    btn_integrar.Visible = false;
                 }
                 if (e.Row.Cells[5].Text == "Integrado")
                 {
@@ -806,16 +800,14 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             }
             else
             {
-                //btn_aprobar.Visible = false;
-                //btn_comentar.Visible = false;
-                //btn_denegar.Visible = false;
-                //btn_integrar.Visible = false;
-                //tbx_motivo.ReadOnly = true;
-
-                btn_aprobar.Visible = false;
-                btn_comentar.Visible = false;
-                btn_denegar.Visible = false;
-                tbx_motivo.ReadOnly = true;
+                if (e.Row.Cells[5].Text == "Aprobado")
+                {
+                    btn_aprobar.Visible = false;
+                    btn_comentar.Visible = false;
+                    btn_denegar.Visible = false;
+                    tbx_motivo.ReadOnly = true;
+                    btn_integrar.Enabled = gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
+                }               
 
                 if (e.Row.Cells[5].Text == "Integrado")
                 {
@@ -826,6 +818,14 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = true;
                 }
+
+                btn_integrar.Visible = false;
+                btn_aprobar.Visible = false;
+                btn_denegar.Visible = false;
+                btn_comentar.Visible = false;
+                tbx_motivo.Visible = true;
+                tbx_motivo.ReadOnly = true;
+
             }
 
         }

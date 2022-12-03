@@ -186,8 +186,8 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
                     BindPackageInfo();
-                    
-                    upPackage.Visible = level <= 1;
+
+                    upPackage.Visible = roles.Min(x => x.Key) == level;
                     
                     //BindGridView();
                     if (!IsPostBack)
@@ -752,15 +752,6 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
             TextBox tbx_motivo = (TextBox)e.Row.Cells[7].Controls[1];
             Button btn_integrar = (Button)e.Row.Cells[9].Controls[1];
 
-            if (gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2)
-            {
-                btn_integrar.Enabled = true;
-            }
-            else
-            {
-                btn_integrar.Enabled = false;
-            }
-
             if (level - gasto.ApprovalLevel == 1)
             {
                 //partimos con la premisa de que solo vamos a ver anticipos de niveles de aprobacion = (nuestro - 1)
@@ -770,6 +761,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                     btn_denegar.Visible = true;
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = false;
+                    btn_integrar.Visible = false;
 
                 }
                 if (e.Row.Cells[4].Text == "Aprobado")
@@ -780,6 +772,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                         btn_denegar.Visible = false;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
                     }
                     else
                     {
@@ -787,6 +780,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                         btn_denegar.Visible = true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;
+                        btn_integrar.Visible = gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
                     }
                 }
                 if (e.Row.Cells[4].Text == "Denegado")
@@ -795,7 +789,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                     btn_denegar.Visible = false;
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = true;
-                  
+                    btn_integrar.Visible = false;
                 }
                 if (e.Row.Cells[4].Text == "Integrado")
                 {                   
@@ -804,6 +798,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                     btn_comentar.Visible = false;
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = true;
+                    btn_integrar.Visible = false;
                 }
             }
             else

@@ -163,7 +163,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         Page.Response.Cache.SetNoStore();
         Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
 
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 1).ToList();
         try
         {
             string rol = HttpContext.Current.Session["RolUser"].ToString();
@@ -186,8 +186,8 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
                     BindPackageInfo();
-                    
-                    upPackage.Visible = level == 2;
+
+                    upPackage.Visible = roles.Min(x => x.Key) == level;
 
                     //BindGridView();
                     if (!IsPostBack)
@@ -271,7 +271,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         DateTime? final = !string.IsNullOrEmpty(tbx_fecha_fin.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_fin.Text) : null;
         DateTime? inicio = !string.IsNullOrEmpty(tbx_fecha_inicio.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_inicio.Text) : null;
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        var roles = Doc_Tools.get_RolesValidadores();
+        var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 1).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         List<CorporateCardDTO> gastos = ReadFromDb(user_id, level).ToList();
         if (inicio!=null)
@@ -293,7 +293,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
     private void BindEmpleados()
     {
         List<EmpleadoDTO> empleados = new List<EmpleadoDTO>();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 1).ToList();
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.CorporateCard);
@@ -427,7 +427,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         int card_id = int.Parse(row.Cells[0].Text);
         var paquete = get_Package(pUserKey);
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        var roles = Doc_Tools.get_RolesValidadores();
+        var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 1).ToList();
         int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
 
         int user_id = 0;
@@ -721,7 +721,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         string acction_text = accion ? "Aprobado" : "Denegado";
         //Segun el nivel del usuario logueado traer la matriz
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 1).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         var matrix = Doc_Tools.get_MatrizValidadores(pUserKey, level);
         var jerarquia = Doc_Tools.get_JerarquiaValidadores(((int)Doc_Tools.DocumentType.CorporateCard));
@@ -770,7 +770,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
     {
         List<CorporateCardDTO> tarjetas = (List<CorporateCardDTO>)HttpContext.Current.Session["Tarjetas"];
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 1).ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 1).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         //9 - Aprobar
         //10 - Denegar
@@ -850,7 +850,15 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
                             btn_integrar.Visible = card.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
-                        }
+                        }          
+                        
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        btn_comentar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;                      
+
                     }
                     break;
                 case 3: case 4: //Tesoreria//Finanzas

@@ -162,7 +162,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         Page.Response.Cache.SetNoStore();
         Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);       
 
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
 
         try
         {
@@ -180,8 +180,8 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
-                    BindPackageInfo();                    
-                    upPackage.Visible = level <= 1;                    
+                    BindPackageInfo();
+                    upPackage.Visible = roles.Min(x => x.Key) == level;
                     //BindGridView();
                     if (!IsPostBack)
                     {
@@ -257,7 +257,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         DateTime? final = !string.IsNullOrEmpty(tbx_fecha_fin.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_fin.Text) : null;
         DateTime? inicio = !string.IsNullOrEmpty(tbx_fecha_inicio.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_inicio.Text) : null;
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        var roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
+        var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         List<AdvanceDTO> anticipos = ReadFromDb(user_id, level).ToList();
         if (inicio!=null)
@@ -279,7 +279,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     private void BindEmpleados()
     {
         List<EmpleadoDTO> empleados = new List<EmpleadoDTO>();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;       
         empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.Advance);     
@@ -364,7 +364,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         int advance_id = int.Parse(row.Cells[0].Text);
         var paquete = get_Package(pUserKey);
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        var roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
+        var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
         int user_id = 0;
         if (drop_empleados.SelectedItem != null)
@@ -696,7 +696,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     {        
         List<AdvanceDTO> anticipos = (List<AdvanceDTO>)HttpContext.Current.Session["Anticipos"];
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();       
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         //9 - Aprobar
         //10 - Denegar
@@ -787,7 +787,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         string acction_text = accion ? "Aprobado" : "Denegado";
         //Segun el nivel del usuario logueado traer la matriz
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         var matrix = Doc_Tools.get_MatrizValidadores(pUserKey, level);
         var jerarquia = Doc_Tools.get_JerarquiaValidadores(((int)Doc_Tools.DocumentType.Advance));

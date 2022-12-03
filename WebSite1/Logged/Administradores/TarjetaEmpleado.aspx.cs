@@ -218,7 +218,6 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                     //pUserKey = 0;
                     //pCompanyID = "";
 
-
                     if (IsPostBackEventControlRegistered)
                     {
                         HttpContext.Current.Session["Evento"] = null;
@@ -239,8 +238,6 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                 HttpContext.Current.Session["GridList"] = null;
                 HttpContext.Current.Session["GridTaxes"] = null;               
             }
-
-
         }
         catch (Exception ex)
         {
@@ -844,7 +841,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             if (e.Row.Cells[4].Text != "Pendiente")
             {
                 Button btnEdit = (Button)e.Row.Cells[5].Controls[0];
-                Button btnDelete = (Button)e.Row.Cells[6].Controls[0];
+                Button btnDelete = (Button)e.Row.Cells[6].Controls[1];
                 btnEdit.Visible = false;
                 btnDelete.Visible = false;
             }

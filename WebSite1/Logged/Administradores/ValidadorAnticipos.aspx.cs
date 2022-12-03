@@ -457,8 +457,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B35").Value;
                 ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
-            }
-            
+            }            
         }
         BindGridView(user_id, status_id);
         BindPackageInfo();

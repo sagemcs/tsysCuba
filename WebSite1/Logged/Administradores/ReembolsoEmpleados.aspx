@@ -337,10 +337,16 @@
                             <small class="form-text text-muted">Archivo Max 15 Mb.</small>
                         </div>
                     </div>
-                   
-                    <br />
-
-                   
+                   <div class="row">
+                       <%--Motivo del gasto--%>
+                    <div class="col-lg-8 col-sm-8 col-xs-8">
+                        <h4>Motivo del Gasto:</h4>
+                        <div class="col-lg-12 col-sm-12 col-xs-12">
+                            <asp:TextBox type="text" name="motivo" ID="tbx_motivo" AutoComplete="off" AutoCompleteType="Disabled" MaxLength="256" class="form-control" runat="server" EnableViewState="False" Height="68px" TextMode="MultiLine" />
+                        </div>
+                    </div>
+                   </div>
+                    <br />                   
                      </ContentTemplate>
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="drop_anticipos" EventName="selectedindexchanged" />                       
@@ -350,17 +356,9 @@
             </asp:UpdatePanel>
 
                <%--Agregar impuestos o Articulos--%>
-                <div class="row">
-                    <%--Motivo del gasto--%>
-                    <div class="col-lg-8 col-sm-8 col-xs-8">
-                        <h4>Motivo del Gasto:</h4>
-                        <div class="col-lg-12 col-sm-12 col-xs-12">
-                            <asp:TextBox type="text" name="motivo" ID="tbx_motivo" AutoComplete="off" AutoCompleteType="Disabled" MaxLength="256" class="form-control" runat="server" EnableViewState="False" Height="68px" TextMode="MultiLine" />
-                        </div>
-                    </div>
-                        <h3>Agregar Articulos</h3>
-                    <label class="col-form-label col-lg-4 col-sm-4 col-xs-4"></label>
-                    <div class="col-xs-4 col-md-4 col-xs-3">
+                <div class="row" >                    
+                     <h3>Agregar Articulos</h3>                    
+                    <div class="col-lg-1 col-sm-1 col-xs-1" style="align-content:start ">
                         <asp:Button ID="btn_new_article" runat="server" Class="btn btn-primary" title="Añadir Articulos" Text="Agregar Articulo" OnClick="btn_new_article_Click" />
                     </div>
                 </div>           

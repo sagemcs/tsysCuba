@@ -630,7 +630,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB26").Value;
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            MultiView1.SetActiveView(View_General);
+            MultiView1.SetActiveView(View_Articulos);
             return;
         }
 
@@ -675,6 +675,15 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         {
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B39").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
+        //validacion de impuestos 
+        if (drop_taxes.SelectedValue == "0")
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B54").Value;
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
@@ -810,6 +819,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
 
         //Limpiar controles
         drop_articulos.ClearSelection();
+        drop_taxes.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importegasto.Text = string.Empty;
         MultiView1.SetActiveView(View_General);

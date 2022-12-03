@@ -145,7 +145,7 @@
     
 
     <div class="col-lg-12 col-sm-12 col-12" id="M1" >
-        <h3>Captura de Anticipos de gastos</h3>
+        <h3>Edición de Anticipos de gastos</h3>
     </div>
     <asp:UpdatePanel runat="server" id="UpdatePanel3" updatemode="Always">
                     <ContentTemplate>

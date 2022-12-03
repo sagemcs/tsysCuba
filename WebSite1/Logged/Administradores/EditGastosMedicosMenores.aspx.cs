@@ -67,6 +67,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
     }
     private bool is_valid;
     string eventName = String.Empty;
+    string titulo = "T|SYS|", Msj, tipo;
 
     #endregion
 
@@ -292,19 +293,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         HttpContext.Current.Session["Items"] = lista;
 
 
-    }
-
-    public Dictionary<int, string> Dict_status()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pendiente" },
-            { 2, "Aprobado" },
-            { 3, "Cancelado" }
-        };
-        return dict;
-    }
-      
+    }   
 
     private bool CompruebaMontoFactura(MemoryStream fs, decimal importe)
     {
@@ -560,76 +549,65 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
 
     protected void btn_additem_Click(object sender, EventArgs e)
     {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
         //validaciones
         if (drop_articulos.SelectedValue == "0")
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B18);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B40").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
-        
-        //validacion del importe del articulo
-        if (tbx_importegasto.Text == string.Empty)
+
+        //validacion texto en importe
+        if (tbx_importegasto.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B20);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B16").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
-        else
+        if (tbx_importegasto.Text == string.Empty || decimal.Parse(tbx_importegasto.Text) <= 0)
         {
-            foreach (char d in tbx_importegasto.Text.ToArray())
-            {
-                if (!char.IsControl(d) && !char.IsDigit(d) && (d != '.') && (d != ','))
-                {
-                    tbx_importegasto.Text = string.Empty;
-                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B16);", true);
-                    System.Threading.Thread.Sleep(5000);
-                    MultiView1.SetActiveView(View_Articulos);
-                    return;
-                }
-            }
-            if (int.Parse(tbx_importegasto.Text) == 0)
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B20);", true);
-                System.Threading.Thread.Sleep(5000);
-                MultiView1.SetActiveView(View_Articulos);
-                return;
-            }
-        }
-       
-        //Validacion de la cantidad
-        if (tbx_cantidad.Text == string.Empty)
-        {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B19);", true);
-            System.Threading.Thread.Sleep(5000);
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B41").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
-        else
+
+        //validacion texto en cantidad
+        if (tbx_cantidad.Text.Any(x => !char.IsNumber(x)))
         {
-            foreach (char d in tbx_cantidad.Text.ToArray())
-            {
-                if (!char.IsControl(d) && !char.IsDigit(d) && (d != '.') && (d != ','))
-                {
-                    tbx_cantidad.Text = string.Empty;
-                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B16);", true);
-                    System.Threading.Thread.Sleep(5000);
-                    MultiView1.SetActiveView(View_Articulos);
-                    return;
-                }
-            }
-            if (int.Parse(tbx_cantidad.Text) == 0)
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B19);", true);
-                System.Threading.Thread.Sleep(5000);
-                MultiView1.SetActiveView(View_Articulos);
-                return;
-            }
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B39").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
         }
-        //validaciones taxes
-        
+        if (tbx_cantidad.Text == string.Empty || int.Parse(tbx_cantidad.Text) <= 0)
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B39").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
+
+        //validacion de impuestos 
+        if (drop_taxes.SelectedValue == "0")
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B54").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
+
         //Lista de articulos
         var items = (List<ItemDTO>)HttpContext.Current.Session["Items"];
         var taxes = (List<TaxesDTO>)HttpContext.Current.Session["Taxes"];
@@ -684,6 +662,9 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
 
     protected void tbx_fechagasto_TextChanged(object sender, EventArgs e)
     {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
         //Solo se admiten gastos del mes en curso
         DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
         if (DateTime.Today.Year == fecha_gasto.Year)
@@ -703,11 +684,13 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             System.Threading.Thread.Sleep(5000);
             return;
         }
-    }
-   
+    }   
 
     protected void btn_new_article_Click(object sender, EventArgs e)
     {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
         MultiView1.SetActiveView(View_Articulos);
     }
 
@@ -745,8 +728,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             cmd.ExecuteNonQuery();
             cmd.Connection.Close();
         }
-    }
-    
+    }    
 
     protected void btn_cancelar_item_Click(object sender, EventArgs e)
     {
@@ -794,61 +776,46 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
 
     protected void btn_validar_Click(object sender, EventArgs e)
     {
-        btnSage.Enabled = false;
-        is_valid = false;
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];      
 
         //validacion de fecha
         if (string.IsNullOrEmpty(tbx_fechagasto.Text))
         {
-            MultiView1.SetActiveView(View_General);
-
-            string titulo, Msj, tipo;
             tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB24").Value;
-            titulo = "T|SYS|";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB24").Value;          
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
             return;
         }
 
         //validacion de importe del Gasto
         if (string.IsNullOrEmpty(tbx_importe.Text))
         {
-            MultiView1.SetActiveView(View_General);
-
-            string titulo, Msj, tipo;
             tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B15").Value;
-            titulo = "T|SYS|";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B15").Value;           
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
             return;
         }
         //Si se subio archivo PDF
         if (fu_pdf.HasFile)
-        {
-            //ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B2);", true);
-            //System.Threading.Thread.Sleep(5000);
-            //return;
+        {            
             if (fu_pdf.PostedFile.ContentType.ToString() != "application/pdf")
             {
-                MultiView1.SetActiveView(View_General);
-
-                string titulo, Msj, tipo;
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;
-                titulo = "T|SYS|";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;             
                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                MultiView1.SetActiveView(View_General);
                 return;
             }
 
             if (fu_pdf.PostedFile.ContentLength > 1000000 * 15)
-            {
-                MultiView1.SetActiveView(View_General);
-
-                string titulo, Msj, tipo;
+            {               
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB27").Value;
-                titulo = "T|SYS|";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB27").Value;              
                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                MultiView1.SetActiveView(View_General);
                 return;
             }
         }
@@ -863,25 +830,19 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             //Validación del Formato del Archivo
             if (fu_xml.PostedFile.ContentType.ToString() != "text/xml")
             {
-                MultiView1.SetActiveView(View_General);
-
-                string titulo, Msj, tipo;
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B7").Value;
-                titulo = "T|SYS|";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B7").Value;               
                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                MultiView1.SetActiveView(View_General);
                 return;
             }
             //Validación del Tamaño
             if (fu_xml.PostedFile.ContentLength > 1000000 * 15)
             {
-                MultiView1.SetActiveView(View_General);
-
-                string titulo, Msj, tipo;
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB30").Value;
-                titulo = "T|SYS|";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB30").Value;               
                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                MultiView1.SetActiveView(View_General);
                 return;
             }
 
@@ -889,14 +850,11 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             memoryStream.Write(fu_xml.FileBytes, 0, fu_xml.FileBytes.Length);
             //Validacion de importe
             if (!CompruebaMontoFactura(memoryStream, importe_gasto))
-            {
-                MultiView1.SetActiveView(View_General);
-
-                string titulo, Msj, tipo;
+            {               
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B11").Value;
-                titulo = "T|SYS|";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B11").Value;               
                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                MultiView1.SetActiveView(View_General);
                 return;
             }
         }
@@ -906,37 +864,29 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
        
 
-        if (lista_detalles == null)
-        {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B24);", true);
-            System.Threading.Thread.Sleep(5000);
-            return;
-
-            string titulo, Msj, tipo;
+        if (lista_detalles == null || lista_detalles.Count == 0)
+        {          
             tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB41").Value;
-            titulo = "T|SYS|";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB41").Value;         
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
             return;
         }
 
         //Validaciones del Importe y Articulos - Impuestos
         if (importe_gasto != lista_detalles.Sum(x => x.Amount + x.TaxAmount))
-        {
-            string titulo, Msj, tipo;
+        {          
             tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;
-            titulo = "T|SYS|";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;         
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
             return;
         }
 
         //Solo alertas sin retorno
-        is_valid = true;
-        string tituloo, tipoo;
-        tipoo = "error";
-        tituloo = "T|SYS|";
-        string Msjj = "";
+        is_valid = true;      
+       
+     
         HttpContext.Current.Session["is_valid"] = is_valid;
 
         if (HttpContext.Current.Session["fu_xml"] != null)
@@ -946,7 +896,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
 
         if (!fu_xml.HasFile)
         {
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value + "\n";
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value;
         }
 
         if (HttpContext.Current.Session["fu_pdf"] != null)
@@ -956,12 +906,14 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
 
         if (!fu_pdf.HasFile)
         {
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value + "\n";
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value;
         }
 
-        if (Msjj != "")
+        if (Msj != "")
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + tituloo + "','" + Msjj + "','" + tipoo + "');", true);
+            tipo = "warning";
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
         }
 
         if (is_valid)
@@ -972,6 +924,9 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
 
     protected void btn_Cancelar_Click(object sender, EventArgs e)
     {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
         Response.Redirect("GastosMedicosMenoresEmpleados");
     }
 }

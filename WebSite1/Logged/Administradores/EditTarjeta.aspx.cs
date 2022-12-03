@@ -667,7 +667,15 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
-
+        //validacion de impuestos 
+        if (drop_taxes.SelectedValue == "0")
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B54").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
 
         //Lista de articulos
         var items = (List<ItemDTO>)HttpContext.Current.Session["Items"];
@@ -830,7 +838,15 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
    
     protected void btn_cancelar_item_Click(object sender, EventArgs e)
     {
-        MultiView1.SetActiveView(View_General);
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
+        //Limpiar controles
+        drop_articulos.ClearSelection();
+        drop_taxes.ClearSelection();
+        tbx_cantidad.Text = string.Empty;
+        tbx_importegasto.Text = string.Empty;
+        MultiView1.SetActiveView(View_General);       
     }
 
     protected void btn_Cancelar_Click(object sender, EventArgs e)
@@ -840,8 +856,8 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
     protected void btn_validar_Click(object sender, EventArgs e)
     {
-        btnSage.Enabled = false;
-        is_valid = false;
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];       
 
         //validacion de fecha
         if (string.IsNullOrEmpty(tbx_fechagasto.Text))
@@ -981,11 +997,8 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         }
 
         //Solo alertas sin retorno
-        is_valid = true;
-        string tituloo, tipoo;
-        tipoo = "warning";
-        tituloo = "T|SYS|";
-        string Msjj = "";
+        is_valid = true;            
+      
         HttpContext.Current.Session["is_valid"] = is_valid;
 
         if (HttpContext.Current.Session["fu_xml"] != null)
@@ -996,7 +1009,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         if (!fu_xml.HasFile)
         {
             
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value;
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value;
         }
 
         if (HttpContext.Current.Session["fu_pdf"] != null)
@@ -1006,7 +1019,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
         if (!fu_pdf.HasFile)
         {
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value ;
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value ;
         }
 
         if (HttpContext.Current.Session["fu_voucher"] != null)
@@ -1016,12 +1029,13 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
         if (!fu_voucher.HasFile)
         {
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB33").Value ;
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB33").Value ;
         }
 
-        if (Msjj != "")
+        if (Msj != "")
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + tituloo + "','" + Msjj + "','" + tipoo + "');", true);
+            tipo = "warning";
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
         }
 
         if (is_valid)

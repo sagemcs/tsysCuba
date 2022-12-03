@@ -966,7 +966,8 @@ public static class Doc_Tools
             { "8", "El importe máximo para el tipo de gasto Gastos Exraordinarios es de 2000" },
             { "B51", "El rol actual no puede validar documentos de este tipo" },
             { "B52", "Debe especificar el empleado, favor de verificar e intentar nuevamente." },
-            { "B53", " Número de Paquete requerido, favor de verificar e intentar nuevamente." },
+            { "B53", "Número de Paquete requerido, favor de verificar e intentar nuevamente." },
+            { "B54", "Debe seleccionar el tipo de impuesto, favor de verificar e intentar nuevamente." },
 
 
         };

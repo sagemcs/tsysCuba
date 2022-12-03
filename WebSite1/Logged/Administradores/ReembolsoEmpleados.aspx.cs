@@ -1143,6 +1143,15 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             MultiView1.SetActiveView(View_Articulos);
             return;
         }           
+        //validacion de impuestos 
+        if(drop_taxes.SelectedValue == "0")
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B54").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
 
         //Lista de articulos
         var items = (List<ItemDTO>)HttpContext.Current.Session["Items"];

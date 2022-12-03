@@ -993,7 +993,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             if (e.Row.Cells[4].Text != "Pendiente")
             {
                 Button btnEdit = (Button)e.Row.Cells[5].Controls[0];
-                Button btnDelete = (Button)e.Row.Cells[6].Controls[0];
+                Button btnDelete = (Button)e.Row.Cells[6].Controls[1];
                 btnEdit.Visible = false;
                 btnDelete.Visible = false;
             }

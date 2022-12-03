@@ -456,7 +456,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         if (e.CommandName == "Deny")
         {
             int status = 3;
-            TextBox motivo = (TextBox)(Control)row.Cells[9].Controls[1];
+            TextBox motivo = (TextBox)(Control)row.Cells[8].Controls[1];
             if (string.IsNullOrEmpty(motivo.Text))
             {
                 tipo = "error";
@@ -785,15 +785,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
             Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
             Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
-
-            if (card.ApprovalLevel == roles.Max(x => x.Key) && level == 2)
-            {
-                btn_integrar.Enabled = true;
-            }
-            else
-            {
-                btn_integrar.Enabled = false;
-            }
+           
             //3 escenarios a plantear  (CXP) (Tesoreria) (Finanzas)
             switch (level)
             {
@@ -806,6 +798,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             btn_denegar.Visible = true;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = false;
+                            btn_integrar.Visible = false;
 
                         }
                         if (e.Row.Cells[5].Text == "Aprobado")
@@ -816,6 +809,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                                 btn_denegar.Visible = false;
                                 tbx_motivo.Visible = true;
                                 tbx_motivo.ReadOnly = true;
+                                btn_integrar.Visible = false;
                             }
                             else
                             {
@@ -823,6 +817,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                                 btn_denegar.Visible = true;
                                 tbx_motivo.Visible = true;
                                 tbx_motivo.ReadOnly = false;
+                                btn_integrar.Visible = card.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
                             }
 
                         }
@@ -832,6 +827,8 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             btn_denegar.Visible = false;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
+                            btn_integrar.Visible = false;
+
                         }
                         if (e.Row.Cells[5].Text == "Integrado")
                         {
@@ -840,6 +837,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             btn_comentar.Visible = false;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
+                            btn_integrar.Visible = false;
                         }
                     }
                     else 
@@ -850,7 +848,8 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             btn_denegar.Visible = false;
                             btn_comentar.Visible = false;
                             tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = true;                           
+                            tbx_motivo.ReadOnly = true;
+                            btn_integrar.Visible = card.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
                         }
                     }
                     break;
@@ -863,6 +862,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             btn_denegar.Visible = true;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = false;
+                            btn_integrar.Visible = false;
 
                         }
                         if (e.Row.Cells[5].Text == "Aprobado")
@@ -873,6 +873,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                                 btn_denegar.Visible = false;
                                 tbx_motivo.Visible = true;
                                 tbx_motivo.ReadOnly = true;
+                                btn_integrar.Visible = false;
                             }
                             else
                             {
@@ -880,6 +881,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                                 btn_denegar.Visible = true;
                                 tbx_motivo.Visible = true;
                                 tbx_motivo.ReadOnly = false;
+                                btn_integrar.Visible = false;
                             }
 
                         }
@@ -889,6 +891,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             btn_denegar.Visible = false;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
+                            btn_integrar.Visible = false;
                         }
                         if (e.Row.Cells[5].Text == "Integrado")
                         {
@@ -897,6 +900,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             btn_comentar.Visible = false;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
+                            btn_integrar.Visible = false;
                         }
                     }
                     else
@@ -905,15 +909,16 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                         btn_comentar.Visible = false;
                         btn_denegar.Visible = false;
                         tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
 
                         if (e.Row.Cells[5].Text == "Integrado")
-                        {
-                            btn_integrar.Visible = false;
+                        {                          
                             btn_aprobar.Visible = false;
                             btn_denegar.Visible = false;
                             btn_comentar.Visible = false;
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
+                            btn_integrar.Visible = false;
                         }
                     }
                     break;              

@@ -75,7 +75,7 @@ public partial class SiteMaster : MasterPage
         }
         else if (menuItemName == "Anticipo")
         {
-            if (rol == "T|SYS| - Gerencia de Capital Humano")
+            if (rol == "T|SYS| - Gerencia de Capital Humano" || rol == "T|SYS| - Finanzas")
             {
                 return false;
             }

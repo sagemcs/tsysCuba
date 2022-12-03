@@ -160,11 +160,9 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
         Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
         Page.Response.Cache.SetNoStore();
-        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
-        
-        //Doc_Tools.ExecuteVoucherApi(new tapBatchCExtGst());
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);       
 
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
 
         try
         {
@@ -259,7 +257,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         DateTime? final = !string.IsNullOrEmpty(tbx_fecha_fin.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_fin.Text) : null;
         DateTime? inicio = !string.IsNullOrEmpty(tbx_fecha_inicio.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_inicio.Text) : null;
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        var roles = Doc_Tools.get_RolesValidadores();
+        var roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         List<AdvanceDTO> anticipos = ReadFromDb(user_id, level).ToList();
         if (inicio!=null)
@@ -281,7 +279,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     private void BindEmpleados()
     {
         List<EmpleadoDTO> empleados = new List<EmpleadoDTO>();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;       
         empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.Advance);     
@@ -366,7 +364,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         int advance_id = int.Parse(row.Cells[0].Text);
         var paquete = get_Package(pUserKey);
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        var roles = Doc_Tools.get_RolesValidadores();
+        var roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
         int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
         int user_id = 0;
         if (drop_empleados.SelectedItem != null)
@@ -698,7 +696,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     {        
         List<AdvanceDTO> anticipos = (List<AdvanceDTO>)HttpContext.Current.Session["Anticipos"];
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();       
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();       
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         //9 - Aprobar
         //10 - Denegar
@@ -714,17 +712,6 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
             Button btn_comentar = (Button)e.Row.Cells[12].Controls[1];
             Button btn_integrar = (Button)e.Row.Cells[13].Controls[1];
 
-            //bloquear Boton de Integrar si no es de nivel Finanzas
-            if(anticipo.ApprovalLevel == roles.Max(x => x.Key) && level == 2)
-            {
-                btn_integrar.Enabled = true;
-            }
-            else
-            {
-                btn_integrar.Enabled = false;
-            }
-           
-
             if (level - anticipo.ApprovalLevel == 1)
             {
                 //partimos con la premisa de que solo vamos a ver anticipos de niveles de aprobacion = (nuestro - 1)
@@ -734,6 +721,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                     btn_denegar.Visible = true;
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = false;
+                    btn_integrar.Visible = false;
                 }
                 if (e.Row.Cells[8].Text == "Aprobado")
                 {
@@ -743,6 +731,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                         btn_denegar.Visible = false;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
                     }
                     else
                     {
@@ -750,6 +739,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                         btn_denegar.Visible = true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;
+                        btn_integrar.Visible = false;
                     }
                 }
                 if (e.Row.Cells[8].Text == "Denegado")
@@ -758,6 +748,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                     btn_denegar.Visible = false;
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = true;
+                    btn_integrar.Visible = false;
                 }
                 if (e.Row.Cells[8].Text == "Integrado")
                 {
@@ -775,6 +766,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 btn_comentar.Visible = false;
                 btn_denegar.Visible = false;              
                 tbx_motivo.ReadOnly = true;
+                btn_integrar.Visible = anticipo.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
 
                 if (e.Row.Cells[8].Text == "Integrado")
                 {
@@ -795,7 +787,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         string acction_text = accion ? "Aprobado" : "Denegado";
         //Segun el nivel del usuario logueado traer la matriz
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().SkipWhile(x => x.Key == 4).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         var matrix = Doc_Tools.get_MatrizValidadores(pUserKey, level);
         var jerarquia = Doc_Tools.get_JerarquiaValidadores(((int)Doc_Tools.DocumentType.Advance));

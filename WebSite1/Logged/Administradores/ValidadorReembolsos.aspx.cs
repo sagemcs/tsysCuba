@@ -800,13 +800,20 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             }
             else
             {
+                btn_integrar.Visible = false;
+                btn_aprobar.Visible = false;
+                btn_denegar.Visible = false;
+                btn_comentar.Visible = false;
+                tbx_motivo.Visible = true;
+                tbx_motivo.ReadOnly = true;
+
                 if (e.Row.Cells[5].Text == "Aprobado")
                 {
                     btn_aprobar.Visible = false;
                     btn_comentar.Visible = false;
                     btn_denegar.Visible = false;
                     tbx_motivo.ReadOnly = true;
-                    btn_integrar.Enabled = gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
+                    btn_integrar.Visible = gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
                 }               
 
                 if (e.Row.Cells[5].Text == "Integrado")
@@ -818,13 +825,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = true;
                 }
-
-                btn_integrar.Visible = false;
-                btn_aprobar.Visible = false;
-                btn_denegar.Visible = false;
-                btn_comentar.Visible = false;
-                tbx_motivo.Visible = true;
-                tbx_motivo.ReadOnly = true;
+               
+                
 
             }
 

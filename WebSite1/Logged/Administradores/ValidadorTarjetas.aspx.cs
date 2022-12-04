@@ -842,6 +842,13 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                     }
                     else 
                     {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        btn_comentar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+
                         if (e.Row.Cells[5].Text == "Aprobado")
                         {                           
                             btn_aprobar.Visible = false;
@@ -850,14 +857,8 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                             tbx_motivo.Visible = true;
                             tbx_motivo.ReadOnly = true;
                             btn_integrar.Visible = card.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
-                        }          
-                        
-                        btn_aprobar.Visible = false;
-                        btn_denegar.Visible = false;
-                        btn_comentar.Visible = false;
-                        tbx_motivo.Visible = true;
-                        tbx_motivo.ReadOnly = true;
-                        btn_integrar.Visible = false;                      
+                        }                                 
+                                            
 
                     }
                     break;

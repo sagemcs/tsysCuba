@@ -14,6 +14,7 @@ public class ExpenseFilesDTO
 	public int ExpenseId { get; set; }
 	public string FileName { get; set; }
 	public FileType Type { get; set; }
+	public string ContentType { get; set; }
 	public byte[] FileBinary { get; set; }
 	public int FileLength { get; set; }
 	public ExpenseFilesDTO()

@@ -173,45 +173,87 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
     }
     public void fill_fileUploads()
     {
-        if (HttpContext.Current.Session["fu_pdf"] != null)
+        if (HttpContext.Current.Session["xml_files"] != null)
         {
-            
-            var f_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];
-            foreach (HttpPostedFile file in f_pdf.PostedFiles)
+            var xml_files =(List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
+            xml_files.ForEach(x=> tbx_xml.Text += x.FileName);                     
+        }      
+
+        if (HttpContext.Current.Session["pdf_files"] != null)
+        {
+            var pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
+            pdf_files.ForEach(x => tbx_pdf.Text += x.FileName);
+        }
+        
+
+        if (HttpContext.Current.Session["voucher_files"] != null)
+        {
+            var voucher_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["voucher_files"];
+            voucher_files.ForEach(x => tbx_voucher.Text += x.FileName);
+        }
+      
+    }
+
+    public void fill_filelists()
+    {
+        if (fu_xml.HasFiles)
+        {
+            var xml_files = new List<ExpenseFilesDTO>();
+            foreach (HttpPostedFile xml_postedFile in fu_xml.PostedFiles)
             {
-                tbx_pdf.Text += file.FileName + " ";
+                var xml_file = new ExpenseFilesDTO
+                {
+                    Type = ExpenseFilesDTO.FileType.Xml,
+                    ExpenseType = Doc_Tools.DocumentType.Expense
+                };
+                byte[] byte_array = new byte[xml_postedFile.ContentLength];
+                xml_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
+                xml_file.ContentType = xml_postedFile.ContentType;
+                xml_file.FileName = xml_postedFile.FileName;
+                xml_file.FileBinary = byte_array;
+                xml_files.Add(xml_file);
             }
-            
+            HttpContext.Current.Session["xml_files"] = xml_files;
+            HttpContext.Current.Session["fu_xml"] = fu_xml;
         }
         if (fu_pdf.HasFiles)
         {
+            var pdf_files = new List<ExpenseFilesDTO>();
+            foreach (HttpPostedFile pdf_postedFile in fu_pdf.PostedFiles)
+            {
+                var pdf_file = new ExpenseFilesDTO
+                {
+                    Type = ExpenseFilesDTO.FileType.Pdf,
+                    ExpenseType = Doc_Tools.DocumentType.Expense
+                };
+                byte[] byte_array = new byte[pdf_postedFile.ContentLength];
+                pdf_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
+                pdf_file.ContentType = pdf_postedFile.ContentType;
+                pdf_file.FileName = pdf_postedFile.FileName;
+                pdf_file.FileBinary = byte_array;
+                pdf_files.Add(pdf_file);
+            }
+            HttpContext.Current.Session["pdf_files"] = pdf_files;
             HttpContext.Current.Session["fu_pdf"] = fu_pdf;
-        }
-
-
-        if (HttpContext.Current.Session["fu_xml"] != null)
-        {
-            var f_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];
-            foreach (HttpPostedFile file in f_xml.PostedFiles)
-            {
-                tbx_xml.Text += file.FileName + " ";
-            }           
-        }
-        if (fu_xml.HasFiles)
-        {
-            HttpContext.Current.Session["fu_xml"] = fu_xml;
-        }
-
-        if (HttpContext.Current.Session["fu_voucher"] != null)
-        {
-            var f_voucher = (FileUpload)HttpContext.Current.Session["fu_voucher"];
-            foreach (HttpPostedFile file in f_voucher.PostedFiles)
-            {
-                tbx_voucher.Text += file.FileName + " ";
-            }           
         }
         if (fu_voucher.HasFiles)
         {
+            var voucher_files = new List<ExpenseFilesDTO>();
+            foreach (HttpPostedFile voucher_postedFile in fu_voucher.PostedFiles)
+            {
+                var voucher_file = new ExpenseFilesDTO
+                {
+                    Type = ExpenseFilesDTO.FileType.Voucher,
+                    ExpenseType = Doc_Tools.DocumentType.Expense
+                };
+                byte[] byte_array = new byte[voucher_postedFile.ContentLength];
+                voucher_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
+                voucher_file.ContentType = voucher_postedFile.ContentType;
+                voucher_file.FileName = voucher_postedFile.FileName;
+                voucher_file.FileBinary = byte_array;
+                voucher_files.Add(voucher_file);
+            }
+            HttpContext.Current.Session["voucher_files"] = voucher_files;
             HttpContext.Current.Session["fu_voucher"] = fu_voucher;
         }
     }
@@ -243,6 +285,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+                    fill_filelists();
                     fill_fileUploads();
                     BindGridView();
 
@@ -380,18 +423,11 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
     {
         is_valid = (bool)HttpContext.Current.Session["is_valid"];
         if (is_valid)
-        {
-            fu_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];          
-           
-            fu_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];                    
-
-            fu_voucher = (FileUpload)HttpContext.Current.Session["fu_voucher"];
-
+        {     
             if(HttpContext.Current.Session["motivo"]!=null &&  string.IsNullOrEmpty(tbx_motivo.Text))
             {
                 tbx_motivo.Text = HttpContext.Current.Session["motivo"].ToString();
-            }
-           
+            }           
             
             int advance_id = int.Parse(drop_anticipos.SelectedValue);
             var advance = LoadAdvanceById(advance_id, pUserKey);
@@ -413,7 +449,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 }
             }
 
-            int carga = WriteToDb(tipo_moneda, fecha_gasto, importe_gasto, fu_xml, fu_pdf, fu_voucher, pUserKey, pCompanyID, AdvanceId, lista_detalles, status, motivo_gasto);
+            int carga = WriteToDb(tipo_moneda, fecha_gasto, importe_gasto, pUserKey, pCompanyID, AdvanceId, lista_detalles, status, motivo_gasto);
 
             if (carga == -1)
             {
@@ -575,7 +611,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
     /// Metodo para Guardar el Gasto en BD
     /// </summary>
     /// <returns>Entero</returns>
-    private int WriteToDb(int tipo_moneda, DateTime fecha_gasto, decimal importe_gasto, FileUpload fu_xml, FileUpload fu_pdf, FileUpload fu_voucher, int userkey, string companyId, int AdvanceId, List<ExpenseDetailDTO> expenseDetails, int status, string motivo_gasto)
+    private int WriteToDb(int tipo_moneda, DateTime fecha_gasto, decimal importe_gasto, int userkey, string companyId, int AdvanceId, List<ExpenseDetailDTO> expenseDetails, int status, string motivo_gasto)
     {
         string val = "";
         int id = 0;
@@ -584,30 +620,20 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         var pdf_files = new List<ExpenseFilesDTO>();      
         var voucher_files = new List<ExpenseFilesDTO>();      
         try
-        {
-          
-            if(fu_xml!=null)
+        {        
+            if (HttpContext.Current.Session["xml_files"]!=null)
             {
-                if (fu_xml.HasFiles && HttpContext.Current.Session["xml_files"]!=null)
-                {
-                    xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
-                }
+                xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
+            }                  
+           
+            if (HttpContext.Current.Session["pdf_files"]!=null)
+            {                   
+                pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
             }
-                   
-            if (fu_pdf!=null)
-            {
-                if (fu_pdf.HasFiles && HttpContext.Current.Session["pdf_files"]!=null)
-                {                   
-                    pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
-                }
-            }
-          
-            if (fu_voucher!=null)
-            {
-                if (fu_voucher.HasFiles && HttpContext.Current.Session["voucher_files"]!=null)
-                {                    
-                    voucher_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["voucher_files"];
-                }
+            
+            if (HttpContext.Current.Session["voucher_files"]!=null)
+            {                     
+                voucher_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["voucher_files"];                
             }            
 
             //set Nivel
@@ -671,11 +697,12 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 }                
                cmd.Connection.Close();
 
-               foreach (ExpenseFilesDTO file in xml_files.Union(pdf_files).Union(voucher_files))
-               {
-                   file.ExpenseId = id;
-                   int id_file = Doc_Tools.SaveFile(file);                 
-               }               
+               xml_files.ForEach(x => x.ExpenseId = id);
+               xml_files.ForEach(file => Doc_Tools.SaveFile(file));
+               pdf_files.ForEach(x => x.ExpenseId = id);
+               pdf_files.ForEach(file => Doc_Tools.SaveFile(file));
+               voucher_files.ForEach(x => x.ExpenseId = id);
+               voucher_files.ForEach(file => Doc_Tools.SaveFile(file));
             }
 
             return id;
@@ -981,6 +1008,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             expense.FileNamePdf = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Pdf, expense_id);
             expense.FileNamePdfVoucher = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Voucher, expense_id);
             HttpContext.Current.Session["Expense"] = expense;
+            ClearControls();
             Response.Redirect("EditReembolso");
         }
 
@@ -1198,6 +1226,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
 
         //Limpiar controles
         drop_articulos.ClearSelection();
+        drop_taxes.ClearSelection();
         STipoGasto.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importe_item.Text = string.Empty;
@@ -1306,6 +1335,8 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
     {
         btnSage.Enabled = false;
         is_valid = false;
+        bool xml = false, pdf = false, voucher = false;
+        fill_filelists();
         
         //anticipo
         if (drop_anticipos.SelectedValue == "0")
@@ -1342,17 +1373,13 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         }
         
         HttpContext.Current.Session["motivo"] = tbx_motivo.Text;
-        
-        if (HttpContext.Current.Session["fu_xml"]!=null)
+
+        //Si el archivo tiene XMLs    
+        if (HttpContext.Current.Session["xml_files"] != null)
         {
-            fu_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];
-        }
-        //Si el archivo tiene XML
-        if (fu_xml.HasFiles)
-        {
-            var xml_files = new List<ExpenseFilesDTO>();
-            //Validación del Formato de los Archivos            
-            if (fu_xml.PostedFiles.Any(x => x.ContentType != "text/xml"))
+            var xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
+            //Validacion de tipo fichero
+            if (xml_files.Any(x => x.ContentType != "text/xml"))
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB29").Value;
@@ -1360,25 +1387,21 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 return;
             }
             //Validación del Tamaño
-            if (fu_xml.PostedFiles.Any(x => x.ContentLength > 1000000 * 15))
+            if (xml_files.Any(x => x.FileLength > 1000000 * 15))
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB30").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
-           
         }
+        else {xml = true;}
 
-        if (HttpContext.Current.Session["fu_pdf"] != null)
+        //Si el archivo tiene PDFs    
+        if (HttpContext.Current.Session["pdf_files"] != null)
         {
-            fu_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];
-        }
-        //Si se subio archivo PDF
-        if (fu_pdf.HasFiles)
-        {
-            var pdf_files = new List<ExpenseFilesDTO>();
-            if (fu_pdf.PostedFiles.Any(x => x.ContentType.ToString() != "application/pdf"))
+            var pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
+            if (pdf_files.Any(x => x.ContentType.ToString() != "application/pdf"))
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;
@@ -1386,24 +1409,21 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 return;
             }
 
-            if (fu_pdf.PostedFiles.Any(x => x.ContentLength > 1000000 * 15))
+            if (pdf_files.Any(x => x.FileLength > 1000000 * 15))
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB27").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
-            }            
+            }
         }
+        else  { pdf = true; }
 
-        if (HttpContext.Current.Session["fu_voucher"] != null)
-        {
-            fu_voucher = (FileUpload)HttpContext.Current.Session["fu_voucher"];
-        }
         //Si se subio archivo PDF Voucher
-        if (fu_voucher.HasFiles)
+        if (HttpContext.Current.Session["voucher_files"] != null)
         {
-            var voucher_files = new List<ExpenseFilesDTO>();
-            if (fu_voucher.PostedFiles.Any(x => x.ContentType.ToString() != "application/pdf"))
+            var voucher_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["voucher_files"];
+            if (voucher_files.Any(x => x.ContentType.ToString() != "application/pdf"))
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;
@@ -1411,14 +1431,15 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 return;
             }
 
-            if (fu_voucher.PostedFiles.Any(x => x.ContentLength > 1000000 * 15))
+            if (voucher_files.Any(x => x.FileLength > 1000000 * 15))
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB28").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
-            }            
+            }
         }
+        else { voucher = true; }
 
         int advance_id = int.Parse(drop_anticipos.SelectedValue);
         var advance = LoadAdvanceById(advance_id, pUserKey);
@@ -1432,8 +1453,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridItems"];       
 
         if (lista_detalles == null || lista_detalles.Count == 0)
-        {
-           
+        {           
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB41").Value;         
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
@@ -1448,8 +1468,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             return;
         }
         if (Check_Exist(pUserKey, importe_gasto))
-        {
-            
+        {            
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB22").Value;         
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
@@ -1467,49 +1486,33 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
 
         //Solo alertas sin retorno
         is_valid = true;               
-        HttpContext.Current.Session["is_valid"] = is_valid;
-        string Msjj = string.Empty;
+        HttpContext.Current.Session["is_valid"] = is_valid;  
 
-        if (HttpContext.Current.Session["fu_xml"] != null)
-        {
-            fu_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];
-        }
-
-        if (!fu_xml.HasFile)
+        if (xml)
         {          
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value ;
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value ;
         }
+       
 
-        if (HttpContext.Current.Session["fu_pdf"] != null)
-        {
-            fu_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];
-        }
-
-        if (!fu_pdf.HasFile)
+        if (pdf)
         {          
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value;
-        }
-
-        if (HttpContext.Current.Session["fu_voucher"] != null)
-        {
-            fu_voucher = (FileUpload)HttpContext.Current.Session["fu_voucher"];
-        }
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value;
+        }       
         
-        if (!fu_voucher.HasFile)
-        {
-          
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB33").Value;
+        if (voucher)
+        {          
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB33").Value;
         }
 
         if (!Check_Advance_Amount(AdvanceId, importe_gasto, pUserKey))
         {
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB34").Value;
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB34").Value;
         }
 
-        if (Msjj != "")
+        if (Msj != "")
         {            
             tipo = "warning";            
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msjj + "','" + tipo + "');", true);           
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);           
         }
 
         if (is_valid)
@@ -1530,63 +1533,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
     protected void View_General_Deactivate(object sender, EventArgs e)
     {
         HttpContext.Current.Session["motivo"] = tbx_motivo.Text;
-        if (fu_xml.HasFiles)
-        {
-            var xml_files = new List<ExpenseFilesDTO>();
-            foreach (HttpPostedFile xml_postedFile in fu_xml.PostedFiles)
-            {               
-                var xml_file = new ExpenseFilesDTO
-                {
-                    Type = ExpenseFilesDTO.FileType.Xml,
-                    ExpenseType = Doc_Tools.DocumentType.Expense
-                };
-                byte[] byte_array = new byte[xml_postedFile.ContentLength];
-                xml_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
-                xml_file.FileName = xml_postedFile.FileName;
-                xml_file.FileBinary = byte_array;
-                xml_files.Add(xml_file);
-            }
-            HttpContext.Current.Session["xml_files"] = xml_files;
-            HttpContext.Current.Session["fu_xml"] = fu_xml;           
-        }
-        if (fu_pdf.HasFiles)
-        {
-            var pdf_files = new List<ExpenseFilesDTO>();
-            foreach (HttpPostedFile pdf_postedFile in fu_pdf.PostedFiles)
-            {
-                var pdf_file = new ExpenseFilesDTO
-                {
-                    Type = ExpenseFilesDTO.FileType.Pdf,
-                    ExpenseType = Doc_Tools.DocumentType.Expense
-                };
-                byte[] byte_array = new byte[pdf_postedFile.ContentLength];
-                pdf_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
-                pdf_file.FileName = pdf_postedFile.FileName;
-                pdf_file.FileBinary = byte_array;
-                pdf_files.Add(pdf_file);
-            }
-            HttpContext.Current.Session["pdf_files"] = pdf_files;
-            HttpContext.Current.Session["fu_pdf"] = fu_pdf;           
-        }
-        if (fu_voucher.HasFiles)
-        {
-            var voucher_files = new List<ExpenseFilesDTO>();
-            foreach (HttpPostedFile voucher_postedFile in fu_voucher.PostedFiles)
-            {
-                var voucher_file = new ExpenseFilesDTO
-                {
-                    Type = ExpenseFilesDTO.FileType.Voucher,
-                    ExpenseType = Doc_Tools.DocumentType.Expense
-                };
-                byte[] byte_array = new byte[voucher_postedFile.ContentLength];
-                voucher_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
-                voucher_file.FileName = voucher_postedFile.FileName;
-                voucher_file.FileBinary = byte_array;
-                voucher_files.Add(voucher_file);
-            }
-            HttpContext.Current.Session["voucher_files"] = voucher_files;
-            HttpContext.Current.Session["fu_voucher"] = fu_voucher;            
-        }        
+        fill_filelists();
     }
 
     protected void tbx_fechagasto_TextChanged(object sender, EventArgs e)
@@ -1603,7 +1550,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
 
         HttpContext.Current.Session["Advance"] = null;
 
-        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex; //int.Parse(e.CommandArgument.ToString());
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex; 
         GridViewRow row = gvGastos.Rows[rowIndex];
 
         if (e.CommandName == "Delete")

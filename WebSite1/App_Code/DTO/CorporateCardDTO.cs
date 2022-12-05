@@ -49,10 +49,11 @@ public class CorporateCardDTO : Document
 public class CorporateCardReportDTO
 {
     public string Tipo { get; set; }
-    public DateTime Fecha { get; set; }
+    public string Fecha { get; set; }
     public string TipoMoneda { get; set; }
     public decimal Importe { get; set; }
     public string Estado { get; set; }
+
     public CorporateCardReportDTO()
     {
 
@@ -63,7 +64,7 @@ public class CorporateCardReportDTO
 public class CorporateCardGroupedDTO
 {
     private decimal _total;
-    public DateTime Fecha { get; set; }
+    public string Fecha { get; set; }
     public decimal Aereo { get; set; }
     public decimal Terrestre { get; set; }
     public decimal Casetas { get; set; }

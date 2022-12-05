@@ -53,46 +53,7 @@ public partial class Logged_Reports_MinorMedicalExpense : System.Web.UI.Page
             this.iLogKey = value;
         }
     }
-
-    public Dictionary<int, string> Dict_status()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pendiente" },
-            { 2, "Aprobado" },
-            { 3, "Cancelado" },
-            { 4, "Vencido" }
-        };
-        return dict;
-    }
-
-    public Dictionary<int, string> Dict_type()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Transporte Aéreo" },
-            { 2, "Transporte Terrestre" },
-            { 3, "Casetas" },
-            { 4, "Gasolina" },
-            { 5, "Estacionamiento" },
-            { 6, "Alimentos" },
-            { 7, "Hospedaje" },
-            { 8, "Transporte Terrestre" },
-            { 9, "Gastos Extraordinarios" }
-        };
-        return dict;
-    }
-
-    public Dictionary<int, string> Dict_moneda()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pesos" },
-            { 2, "Dolar" },
-            { 3, "Euros" }
-        };
-        return dict;
-    }
+       
 
     public List<MinorMedicalExpenseReportDTO> LoadData(int user_id)
     {
@@ -112,9 +73,9 @@ public partial class Logged_Reports_MinorMedicalExpense : System.Web.UI.Page
             while (dataReader.Read())
             {
                 var expense = new MinorMedicalExpenseReportDTO();
-                expense.Fecha = dataReader.GetDateTime(0);
+                expense.Fecha = dataReader.GetString(0);
                 expense.Importe = dataReader.GetDecimal(1);
-                expense.Estado = Dict_status().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(2)).Value;
                 gastos.Add(expense);
             }
         }

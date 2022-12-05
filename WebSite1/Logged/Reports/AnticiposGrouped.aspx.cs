@@ -94,9 +94,9 @@ public partial class Logged_Reports_AnticiposGrouped : System.Web.UI.Page
             while (dataReader.Read())
             {
                 var advance = new AdvanceReportGroupedDTO();
-                advance.FechaSalida = dataReader.GetDateTime(0);
-                advance.FechaLLegada = dataReader.GetDateTime(1);
-                advance.FechaComprobacion = dataReader.GetDateTime(2);
+                advance.FechaSalida = dataReader.GetString(0);
+                advance.FechaLLegada = dataReader.GetString(1);
+                advance.FechaComprobacion = dataReader.GetString(2);
                 advance.Viaje = dataReader.GetDecimal(3);
                 advance.GExtra = dataReader.GetDecimal(4);
                 gastos.Add(advance);

@@ -22,10 +22,10 @@
     <br/> <br/> <br/> <br /> <br/>
     <div class="row">
         <div class="col-lg-3 col-sm-3 col-xs-3">
-            <input id="btn_print" class="btn btn-primary" type="button" value="Imprimir" /> 
+            <input id="btn_print" class="btn btn-primary" type="button" value="Imprimir" style="position: relative; left: 45%;"/> 
         </div>
         <div class="col-lg-3 col-sm-3 col-xs-3">
-            <asp:Button runat="server" id="btn_back" class="btn btn-primary" type="button" text="Regresar a Anticipos"  OnClick="btn_back_Click"  /> 
+            <asp:Button runat="server" id="btn_back" class="btn btn-primary" type="button" text="Regresar a Anticipos"  OnClick="btn_back_Click" style="position: relative; left: 45%;" /> 
         </div>
     </div>
     <br/>

@@ -72,7 +72,7 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
             while (dataReader.Read())
             {
                 var expense = new ExpenseReportDTO();
-                expense.Fecha = dataReader.GetDateTime(0);
+                expense.Fecha = dataReader.GetString(0);
                 expense.Aereo = dataReader.GetDecimal(1);
                 expense.Terrestre = dataReader.GetDecimal(2);               
                 expense.Casetas = dataReader.GetDecimal(3);

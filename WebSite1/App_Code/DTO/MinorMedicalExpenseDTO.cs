@@ -26,7 +26,7 @@ using System.Web;
 
     public class MinorMedicalExpenseReportDTO
     {
-        public DateTime Fecha { get; set; }
+        public string Fecha { get; set; }
         public decimal Importe { get; set; }
         public string Estado { get; set; }
         public MinorMedicalExpenseReportDTO()

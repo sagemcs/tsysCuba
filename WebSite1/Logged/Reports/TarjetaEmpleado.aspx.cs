@@ -53,46 +53,7 @@ public partial class Logged_Reports_TarjetaEmpleado : System.Web.UI.Page
             this.iLogKey = value;
         }
     }
-
-    public Dictionary<int, string> Dict_status()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pendiente" },
-            { 2, "Aprobado" },
-            { 3, "Cancelado" },
-            { 4, "Vencido" }
-        };
-        return dict;
-    }
-
-    public Dictionary<int, string> Dict_type()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Transporte Aéreo" },
-            { 2, "Transporte Terrestre" },
-            { 3, "Casetas" },
-            { 4, "Gasolina" },
-            { 5, "Estacionamiento" },
-            { 6, "Alimentos" },
-            { 7, "Hospedaje" },
-            { 8, "Transporte Terrestre" },
-            { 9, "Gastos Extraordinarios" }
-        };
-        return dict;
-    }
-
-    public Dictionary<int, string> Dict_moneda()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pesos" },
-            { 2, "Dolar" },
-            { 3, "Euros" }
-        };
-        return dict;
-    }
+    
 
     public List<CorporateCardReportDTO> LoadData(int user_id)
     {
@@ -112,11 +73,11 @@ public partial class Logged_Reports_TarjetaEmpleado : System.Web.UI.Page
             while (dataReader.Read())
             {
                 var corpCard = new CorporateCardReportDTO();
-                corpCard.Tipo = Dict_type().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                corpCard.Fecha = dataReader.GetDateTime(1);
-                corpCard.TipoMoneda = Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                corpCard.Tipo = Doc_Tools.Dict_tipos_gastos().First(x => x.Key == dataReader.GetInt32(0)).Value;
+                corpCard.Fecha = dataReader.GetString(1);
+                corpCard.TipoMoneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
                 corpCard.Importe = dataReader.GetDecimal(3);
-                corpCard.Estado = Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
+                corpCard.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 gastos.Add(corpCard);
             }
         }
@@ -196,6 +157,7 @@ public partial class Logged_Reports_TarjetaEmpleado : System.Web.UI.Page
             //report_document.SetParameterValue("logo", "~/Img/TSYS.png");
             Reporte_TarjetEmpleado.ReportSource = report_document;
             Reporte_TarjetEmpleado.SeparatePages = false;
+
         }
         catch (Exception exp)
         {

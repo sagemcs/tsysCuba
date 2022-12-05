@@ -34,7 +34,7 @@ using System.Web;
     public class ExpenseReportDTO
     {
         private decimal _total;
-        public DateTime Fecha { get; set; }
+        public string Fecha { get; set; }
         public decimal Aereo { get; set; }
         public decimal Terrestre { get; set; }
         public decimal Casetas { get; set; }
@@ -43,6 +43,7 @@ using System.Web;
         public decimal Alimentos { get; set; }
         public decimal Hospedaje { get; set; }
         public decimal GExtra { get; set; }
+
         public decimal Total { get { return get_total(); } set { _total = value; } }
         public int PackageId { get; set; }
 

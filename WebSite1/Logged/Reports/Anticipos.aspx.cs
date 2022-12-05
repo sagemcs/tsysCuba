@@ -96,15 +96,9 @@ public partial class Logged_Reports_Anticipos : System.Web.UI.Page
                 var advance = new AdvanceReportDTO();
                 advance.Tipo = Dict_type().First(x => x.Key == dataReader.GetInt32(0)).Value;
                 advance.Importe = dataReader.GetDecimal(1);
-                if(!dataReader.IsDBNull(2))
-                { 
-                    advance.FechaSalida = dataReader.GetDateTime(2);
-                }
-                if (!dataReader.IsDBNull(3))
-                { 
-                    advance.FechaLLegada = dataReader.GetDateTime(3);
-                }
-                advance.FechaComprobacion = dataReader.GetDateTime(4);
+                advance.FechaSalida = dataReader.GetString(2);
+                advance.FechaLLegada = dataReader.GetString(3);
+                advance.FechaComprobacion = dataReader.GetString(4);
                 advance.JefeInmediato = dataReader.GetString(5);
                 advance.Estado = Dict_status().First(x => x.Key == dataReader.GetInt32(6)).Value;
                 gastos.Add(advance);

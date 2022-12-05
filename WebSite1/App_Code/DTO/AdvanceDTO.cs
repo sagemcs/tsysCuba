@@ -31,11 +31,12 @@ public class AdvanceReportDTO
 {
     public string Tipo { get; set; }
     public decimal Importe { get; set; }
-    public DateTime FechaSalida { get; set; }
-    public DateTime FechaLLegada { get; set; }
-    public DateTime FechaComprobacion { get; set; }
+    public string FechaSalida { get; set; }
+    public string FechaLLegada { get; set; }
+    public string FechaComprobacion { get; set; }
     public string JefeInmediato { get; set; }
     public string Estado { get; set; }
+
     public AdvanceReportDTO()
     {
 
@@ -46,9 +47,9 @@ public class AdvanceReportDTO
 public class AdvanceReportGroupedDTO
 {
     private decimal _total;
-    public DateTime FechaSalida { get; set; }
-    public DateTime FechaLLegada { get; set; }
-    public DateTime FechaComprobacion { get; set; }
+    public string FechaSalida { get; set; }
+    public string FechaLLegada { get; set; }
+    public string FechaComprobacion { get; set; }
     public decimal Viaje { get; set; }
     public decimal GExtra { get; set; }
     public decimal Total { get { return get_total(); } set { _total = value; } }
@@ -57,6 +58,7 @@ public class AdvanceReportGroupedDTO
     {
         return this.Viaje + this.GExtra;
     }
+
     public AdvanceReportGroupedDTO()
     {
 

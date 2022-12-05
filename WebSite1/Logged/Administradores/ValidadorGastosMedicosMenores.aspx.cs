@@ -364,7 +364,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT MinorMedicalExpenseId , Date ,Amount, Status, Isnull(FileNameXml,''), Isnull(FileNamePdf,''), CompanyId FROM MinorMedicalExpense where  MinorMedicalExpenseId = @MinorMedicalExpenseId;";
+            cmd.CommandText = "SELECT MinorMedicalExpenseId , Date ,Amount, Status,  CompanyId FROM MinorMedicalExpense where  MinorMedicalExpenseId = @MinorMedicalExpenseId;";
             cmd.Parameters.Add("@MinorMedicalExpenseId", SqlDbType.Int).Value = expense_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -373,10 +373,8 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 expense.MinorMedicalExpenseId = dataReader.GetInt32(0);
                 expense.Date = dataReader.GetDateTime(1);
                 expense.Amount = dataReader.GetDecimal(2);
-                expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(3)).Value;
-                expense.FileNameXml = dataReader.GetString(4);
-                expense.FileNamePdf = dataReader.GetString(5);
-                expense.CompanyId = dataReader.GetString(6);
+                expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(3)).Value;             
+                expense.CompanyId = dataReader.GetString(4);
             }
         }
         return expense;
@@ -762,6 +760,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                     tbx_motivo.Visible = true;
                     tbx_motivo.ReadOnly = false;
                     btn_integrar.Visible = false;
+                    btn_comentar.Visible = false;
 
                 }
                 if (e.Row.Cells[4].Text == "Aprobado")
@@ -773,6 +772,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = true;
                         btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
                     }
                     else
                     {
@@ -780,6 +780,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                         btn_denegar.Visible = true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;
+                        btn_comentar.Visible = false;
                         btn_integrar.Visible = gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
                     }
                 }
@@ -807,15 +808,38 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 btn_comentar.Visible = false;
                 btn_denegar.Visible = false;
                 tbx_motivo.ReadOnly = true;
+                btn_integrar.Visible = false;
 
-                if (e.Row.Cells[4].Text == "Integrado")
+                if (e.Row.Cells[4].Text == "Aprobado")
                 {
-                    btn_integrar.Visible = false;
-                    btn_aprobar.Visible = false;
-                    btn_denegar.Visible = false;
-                    btn_comentar.Visible = false;
-                    tbx_motivo.Visible = true;
-                    tbx_motivo.ReadOnly = true;
+                    if (gasto.ApprovalLevel == level)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
+                    }
+                    else
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_comentar.Visible = false;
+                        btn_integrar.Visible = gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
+                    }
+
+                    if (e.Row.Cells[4].Text == "Integrado")
+                    {
+                        btn_integrar.Visible = false;
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        btn_comentar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                    }
                 }
             }
         }

@@ -1143,8 +1143,12 @@ public static class Doc_Tools
             cmd.Connection.Open();
             cmd.ExecuteNonQuery();
 
-            DeleteDetailOnFail(type, expense_id);
-            DeleteFile(type, expense_id);
+            if(type != DocumentType.Advance)
+            {
+                DeleteDetailOnFail(type, expense_id);
+                DeleteFile(type, expense_id);
+            }
+           
             
         }
     }

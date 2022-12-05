@@ -208,7 +208,8 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                     }
                     btnSage.Enabled = is_valid;
                     BindGridView();
-
+                    fill_filelists();
+                    fill_fileUploads();
                     pVendKey = 0;
                     //pLogKey = 0;
                     //pUserKey = 0;
@@ -329,53 +330,43 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
     {
         tbx_fechagasto.Text = string.Empty;
         tbx_importe.Text = string.Empty;
-        if (fu_pdf != null)
-        {
-            fu_pdf.Attributes.Clear();
-        }
-        if (fu_xml != null)
-        {
-            fu_xml.Attributes.Clear();
-        }
+        HttpContext.Current.Session["fu_xml"] = null;
+        HttpContext.Current.Session["fu_pdf"] = null;        
+        HttpContext.Current.Session["xml_files"] = null;
+        HttpContext.Current.Session["pdf_files"] = null;      
+        HttpContext.Current.Session["motivo"] = null;
+        //if (fu_pdf != null)
+        //{
+        //    fu_pdf.Attributes.Clear();
+        //}
+        //if (fu_xml != null)
+        //{
+        //    fu_xml.Attributes.Clear();
+        //}
+       
         tbx_pdf.Text = string.Empty;
         tbx_xml.Text = string.Empty;
         btnSage.Enabled = false;
     }    
     
-    private int WriteToDb(DateTime fecha_gasto, decimal importe_gasto, FileUpload fu_xml, FileUpload fu_pdf, int userkey, string companyId, List<ExpenseDetailDTO> expenseDetails, int status)
+    private int WriteToDb(DateTime fecha_gasto, decimal importe_gasto, int userkey, string companyId, List<ExpenseDetailDTO> expenseDetails, int status)
     {
         string val = "";
         int id = 0;
         int? approval_level = null;
+        var xml_files = new List<ExpenseFilesDTO>();
+        var pdf_files = new List<ExpenseFilesDTO>();
         try
         {
 
-            string xml_filename = string.Empty;
-            byte[] bytes_xml = new byte[0];
-            if (fu_xml != null)
+            if (HttpContext.Current.Session["xml_files"] != null)
             {
-                if (fu_xml.HasFile)
-                {
-                    Stream fs_xml = fu_xml.PostedFile.InputStream;
-                    System.IO.BinaryReader br = new System.IO.BinaryReader(fs_xml);
-                    bytes_xml = (byte[])HttpContext.Current.Session["fu_xml_bytes"];
-                    xml_filename = fu_xml.FileName;
-                    //bytes_xml = fu_xml.FileBytes;
-                }
+                xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
             }
 
-            string pdf_filename = string.Empty;
-            byte[] bytes_pdf = new byte[0];
-            if (fu_pdf != null)
+            if (HttpContext.Current.Session["pdf_files"] != null)
             {
-                if (fu_pdf.HasFile)
-                {
-                    Stream fs_pdf = fu_pdf.PostedFile.InputStream;
-                    System.IO.BinaryReader br2 = new System.IO.BinaryReader(fs_pdf);
-                    bytes_pdf = (byte[])HttpContext.Current.Session["fu_pdf_bytes"];
-                    pdf_filename = fu_pdf.FileName;
-                    //bytes_pdf = fu_pdf.FileBytes;
-                }
+                pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
             }
 
             //set Nivel
@@ -393,15 +384,10 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
             {
                 SqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "Insert Into MinorMedicalExpense (Date, Amount, FileBinaryXml, FileNameXml, FileBinaryPdf, FileNamePdf, CreateDate, UpdateDate, UpdateUserKey, CompanyId, Status, ApprovalLevel) VALUES (@Date, @Amount, @FileBinaryXml,  @FileNameXml, @FileBinaryPdf, @FileNamePdf, @CreateDate, @UpdateDate, @UpdateUserKey, @CompanyId, @Status, @ApprovalLevel); SELECT SCOPE_IDENTITY();";
+                cmd.CommandText = "Insert Into MinorMedicalExpense (Date, Amount, CreateDate, UpdateDate, UpdateUserKey, CompanyId, Status, ApprovalLevel) VALUES (@Date, @Amount,  @CreateDate, @UpdateDate, @UpdateUserKey, @CompanyId, @Status, @ApprovalLevel); SELECT SCOPE_IDENTITY();";
                 cmd.Parameters.Add("@Date", SqlDbType.DateTime).Value = fecha_gasto;
-                cmd.Parameters.Add("@Amount", SqlDbType.Decimal).Value = importe_gasto;
-                //Documentos
-                cmd.Parameters.Add("@FileBinaryXml", SqlDbType.VarBinary, bytes_xml.Length).Value = bytes_xml;
-                cmd.Parameters.Add("@FileNameXml", SqlDbType.VarChar).Value = xml_filename;
-                cmd.Parameters.Add("@FileBinaryPdf", SqlDbType.VarBinary, bytes_pdf.Length).Value = bytes_pdf;                
-                cmd.Parameters.Add("@FileNamePdf", SqlDbType.VarChar).Value = pdf_filename;
-                //Documentos
+                cmd.Parameters.Add("@Amount", SqlDbType.Decimal).Value = importe_gasto;              
+                
                 cmd.Parameters.Add("@CreateDate", SqlDbType.DateTime).Value = DateTime.Now;
                 cmd.Parameters.Add("@UpdateDate", SqlDbType.DateTime).Value = DateTime.Now;
                 cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = userkey;
@@ -440,6 +426,9 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                 }
               
                 cmd.Connection.Close();
+
+                xml_files.ForEach((x) => { x.ExpenseId = id; Doc_Tools.SaveFile(x); });
+                pdf_files.ForEach((x) => { x.ExpenseId = id; Doc_Tools.SaveFile(x); });
             }
 
             return id;
@@ -448,15 +437,9 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         {
             if (id > 0)
             {
-                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-                {
-                    SqlCommand cmd = conn.CreateCommand();
-                    cmd.CommandText = "DELETE FROM MinorMedicalExpense WHERE MinorMedicalExpenseId = @ExpenseId;";
-                    cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = id;
-                    cmd.Connection.Open();
-                    cmd.ExecuteNonQuery();
-                    cmd.Connection.Close();
-                }
+                Doc_Tools.DeleteExpenseOnFail(Doc_Tools.DocumentType.MinorMedicalExpense, id);
+                Doc_Tools.DeleteDetailOnFail(Doc_Tools.DocumentType.MinorMedicalExpense, id);
+                Doc_Tools.DeleteFile(Doc_Tools.DocumentType.MinorMedicalExpense, id);
             }
             LogError(pLogKey, pUserKey, "Insertar-Pago-GastoMedicoMenor-Empleados:Insertar-Pago", ex.Message, pCompanyID);
             string err;
@@ -464,8 +447,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             HttpContext.Current.Session["Error"] = err;
             return -1;
         }
-    }
-          
+    }          
 
     private List<MinorMedicalExpenseDTO> ReadFromDb(int user_id)
     {
@@ -615,12 +597,6 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         is_valid = (bool)HttpContext.Current.Session["is_valid"];
         if (is_valid)
         {
-            fu_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];
-            var fu_xml_bytes = (byte[])HttpContext.Current.Session["fu_xml_bytes"];
-
-            fu_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];
-            var fu_pdf_bytes = (byte[])HttpContext.Current.Session["fu_pdf_bytes"];
-
             DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
             decimal importe_gasto = decimal.Parse(tbx_importe.Text);
             int status = 1;
@@ -634,16 +610,19 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                     status = 2;
                 }
             }
-            int carga = WriteToDb(fecha_gasto, importe_gasto, fu_xml, fu_pdf, pUserKey, pCompanyID, lista_detalles, status);
+            int carga = WriteToDb(fecha_gasto, importe_gasto, pUserKey, pCompanyID, lista_detalles, status);
 
             if (carga == -1)
             {
                 gvGastos.DataSource = null;
                 gvGastos.Visible = false;
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B4);", true);
-                System.Threading.Thread.Sleep(5000);
-                ClearControls();
-                btnSage.Enabled = false;
+                tbx_importe.Text = Math.Round(lista_detalles.Sum(x => x.Amount + x.TaxAmount), 2).ToString("0.00");
+                HttpContext.Current.Session["is_valid"] = false;
+                btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                MultiView1.SetActiveView(View_General);
                 return;
             }
             EnviarCorreo();
@@ -652,8 +631,9 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             HttpContext.Current.Session["GridList"] = null;
             HttpContext.Current.Session["GridTaxes"] = null;           
             GvItems.DataSource = null;
-            GvItems.DataBind();
-            btnSage.Enabled = false;
+            GvItems.DataBind();          
+            HttpContext.Current.Session["is_valid"] = false;
+            btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
         }
         else
         {
@@ -680,6 +660,8 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         {
             int expense_id = int.Parse(row.Cells[0].Text);
             var expense = LoadMedicalExpenseById(expense_id, pUserKey);
+            expense.FileNameXml = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.MinorMedicalExpense, ExpenseFilesDTO.FileType.Xml, expense_id);
+            expense.FileNamePdf = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.MinorMedicalExpense, ExpenseFilesDTO.FileType.Pdf, expense_id);
             HttpContext.Current.Session["MinorMedicalExpense"] = expense;
             Response.Redirect("EditGastosMedicosMenores");
         }
@@ -691,7 +673,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT MinorMedicalExpenseId , Date ,Amount, Status, Isnull(FileNameXml,''), Isnull(FileNamePdf,'') FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey and MinorMedicalExpenseId = @MinorMedicalExpenseId and Status = 1;";
+            cmd.CommandText = "SELECT MinorMedicalExpenseId , Date ,Amount, Status FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey and MinorMedicalExpenseId = @MinorMedicalExpenseId and Status = 1;";
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
             cmd.Parameters.Add("@MinorMedicalExpenseId", SqlDbType.Int).Value = expense_id;
             cmd.Connection.Open();
@@ -701,9 +683,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                 expense.MinorMedicalExpenseId = dataReader.GetInt32(0);               
                 expense.Date = dataReader.GetDateTime(1);                
                 expense.Amount = dataReader.GetDecimal(2);
-                expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(3)).Value;
-                expense.FileNameXml = dataReader.GetString(4);
-                expense.FileNamePdf = dataReader.GetString(5);               
+                expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(3)).Value;                        
             }
         }
         return expense;
@@ -883,7 +863,9 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             if (e.Row.Cells[3].Text != "Pendiente")
             {
                 Button btnEdit = (Button)e.Row.Cells[4].Controls[0];
+                Button btnDelete = (Button)e.Row.Cells[5].Controls[1];
                 btnEdit.Visible = false;
+                btnDelete.Visible = false;
             }
         }
     }   
@@ -949,24 +931,68 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
 
     public void fill_fileUploads()
     {
-        if (HttpContext.Current.Session["fu_pdf"] != null)
+        if (HttpContext.Current.Session["xml_files"] != null)
         {
-            var f_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];
-            tbx_pdf.Text = f_pdf.FileName;
+            var xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
+            xml_files.ForEach(x => tbx_xml.Text += x.FileName);
         }
 
-        if (HttpContext.Current.Session["fu_xml"] != null)
+        if (HttpContext.Current.Session["pdf_files"] != null)
         {
-            var f_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];
-            tbx_xml.Text = f_xml.FileName;
+            var pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
+            pdf_files.ForEach(x => tbx_pdf.Text += x.FileName);
+        }    
+    }
+    public void fill_filelists()
+    {
+        if (fu_xml.HasFiles)
+        {
+            var xml_files = new List<ExpenseFilesDTO>();
+            foreach (HttpPostedFile xml_postedFile in fu_xml.PostedFiles)
+            {
+                var xml_file = new ExpenseFilesDTO
+                {
+                    Type = ExpenseFilesDTO.FileType.Xml,
+                    ExpenseType = Doc_Tools.DocumentType.MinorMedicalExpense
+                };
+                byte[] byte_array = new byte[xml_postedFile.ContentLength];
+                xml_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
+                xml_file.ContentType = xml_postedFile.ContentType;
+                xml_file.FileName = xml_postedFile.FileName;
+                xml_file.FileBinary = byte_array;
+                xml_files.Add(xml_file);
+            }
+            HttpContext.Current.Session["xml_files"] = xml_files;
+            HttpContext.Current.Session["fu_xml"] = fu_xml;
         }
-       
+        if (fu_pdf.HasFiles)
+        {
+            var pdf_files = new List<ExpenseFilesDTO>();
+            foreach (HttpPostedFile pdf_postedFile in fu_pdf.PostedFiles)
+            {
+                var pdf_file = new ExpenseFilesDTO
+                {
+                    Type = ExpenseFilesDTO.FileType.Pdf,
+                    ExpenseType = Doc_Tools.DocumentType.MinorMedicalExpense
+                };
+                byte[] byte_array = new byte[pdf_postedFile.ContentLength];
+                pdf_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
+                pdf_file.ContentType = pdf_postedFile.ContentType;
+                pdf_file.FileName = pdf_postedFile.FileName;
+                pdf_file.FileBinary = byte_array;
+                pdf_files.Add(pdf_file);
+            }
+            HttpContext.Current.Session["pdf_files"] = pdf_files;
+            HttpContext.Current.Session["fu_pdf"] = fu_pdf;
+        }        
     }
 
     protected void btn_validar_Click(object sender, EventArgs e)
     {
         btnSage.Enabled = false;
         is_valid = false;
+        bool xml = false, pdf = false;
+        fill_filelists();
 
         //validacion de fecha
         if (string.IsNullOrEmpty(tbx_fechagasto.Text))
@@ -985,61 +1011,55 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }
-        //Si se subio archivo PDF
-        if (fu_pdf.HasFile)
+        //Si el archivo tiene XMLs    
+        if (HttpContext.Current.Session["xml_files"] != null)
         {
-            if (fu_pdf.PostedFile.ContentType.ToString() != "application/pdf")
-            {                       
+            var xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
+            //Validacion de tipo fichero
+            if (xml_files.Any(x => x.ContentType != "text/xml"))
+            {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;              
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB29").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
+            }
+            //Validación del Tamaño
+            if (xml_files.Any(x => x.FileLength > 1000000 * 15))
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB30").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
+            }
+        }
+        else { xml = true; }
+
+        //Si el archivo tiene PDFs    
+        if (HttpContext.Current.Session["pdf_files"] != null)
+        {
+            var pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
+            if (pdf_files.Any(x => x.ContentType.ToString() != "application/pdf"))
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
 
-            if (fu_pdf.PostedFile.ContentLength > 1000000 * 15)
-            {                  
+            if (pdf_files.Any(x => x.FileLength > 1000000 * 15))
+            {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB27").Value;               
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB27").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
-        }        
+        }
+        else { pdf = true; }
 
         //Escribir info en BD
 
         DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
-        decimal importe_gasto = decimal.Parse(tbx_importe.Text);
-
-        if (fu_xml.HasFile)
-        {
-            //Validación del Formato del Archivo
-            if (fu_xml.PostedFile.ContentType.ToString() != "text/xml")
-            {               
-                tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B7").Value;               
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                return;
-            }
-            //Validación del Tamaño
-            if (fu_xml.PostedFile.ContentLength > 1000000 * 15)
-            {            
-                tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB27").Value;               
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                return;
-            }
-
-            MemoryStream memoryStream = new MemoryStream();
-            memoryStream.Write(fu_xml.FileBytes, 0, fu_xml.FileBytes.Length);
-            //Validacion de importe
-            if (!CompruebaMontoFactura(memoryStream, importe_gasto))
-            {              
-                tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B11").Value;               
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                return;
-            }
-        }
+        decimal importe_gasto = decimal.Parse(tbx_importe.Text);      
 
         fill_fileUploads();
 
@@ -1071,36 +1091,23 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         }
 
         //Solo alertas sin retorno
-        is_valid = true;
-        string tituloo, tipoo;
-        tipoo = "warning";
-        tituloo = "T|SYS|";
-        string Msjj = "";
+        is_valid = true;        
         HttpContext.Current.Session["is_valid"] = is_valid;
 
-        if (HttpContext.Current.Session["fu_xml"] != null)
+        if (xml)
         {
-            fu_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value;
         }
 
-        if (!fu_xml.HasFile)
+        if (pdf)
         {
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value + "\n";
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value;
         }
 
-        if (HttpContext.Current.Session["fu_pdf"] != null)
+        if (!string.IsNullOrEmpty(Msj))
         {
-            fu_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];
-        }
-
-        if (!fu_pdf.HasFile)
-        {
-            Msjj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value + "\n";
-        }
-
-        if (Msjj != "")
-        {
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + tituloo + "','" + Msjj + "','" + tipoo + "');", true);
+            tipo = "warning";
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
         }
 
         if (is_valid)
@@ -1117,15 +1124,23 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
 
     protected void View_General_Deactivate(object sender, EventArgs e)
     {
-        if (fu_xml.HasFile)
+        fill_filelists();
+    }
+
+    protected void btnDelete_Command(object sender, CommandEventArgs e)
+    {
+        BindGridView();
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
+        GridViewRow row = gvGastos.Rows[rowIndex];
+
+        if (e.CommandName == "Delete")
         {
-            HttpContext.Current.Session["fu_xml"] = fu_xml;
-            HttpContext.Current.Session["fu_xml_bytes"] = fu_xml.FileBytes;
+            int advance_id = int.Parse(row.Cells[0].Text);
+            Doc_Tools.DeleteExpense(Doc_Tools.DocumentType.MinorMedicalExpense, advance_id, pUserKey);
+            BindGridView();
         }
-        if (fu_pdf.HasFile)
-        {
-            HttpContext.Current.Session["fu_pdf"] = fu_pdf;
-            HttpContext.Current.Session["fu_pdf_bytes"] = fu_pdf.FileBytes;
-        }        
     }
 }

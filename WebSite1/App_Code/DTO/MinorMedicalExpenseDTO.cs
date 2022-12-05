@@ -10,16 +10,11 @@ using System.Web;
     public class MinorMedicalExpenseDTO : Document
     {
         public int MinorMedicalExpenseId { get; set; }
-        public DateTime Date { get; set; }
-        public decimal Amount { get; set; }
-        public string Status { get; set; }
+        public DateTime Date { get; set; }             
         public string DeniedReason { get; set; }
         public int? PackageId { get; set; }
-        public DateTime CreateDate { get; set; }
-        public DateTime UpdateDate { get; set; }
-        public string FileNameXml { get; set; }
-        public string FileNamePdf { get; set; }
-        public int ApprovalLevel { get; set; }
+        public List<string> FileNameXml { get; set; }
+        public List<string> FileNamePdf { get; set; }
         public bool SageIntegration { get; set; }
         public MinorMedicalExpenseDTO()
             {

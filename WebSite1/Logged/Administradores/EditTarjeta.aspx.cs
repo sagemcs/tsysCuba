@@ -192,7 +192,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
-
+                    fill_fileUploads();
                     pVendKey = 0;
                     MultiView1.SetActiveView(View_General);
                     if (IsPostBackEventControlRegistered)
@@ -223,9 +223,19 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                    // STipoGasto.SelectedValue = Dict_tipos_gastos().FirstOrDefault(x => x.Value == card.Type).Key.ToString();
                   
                     Load_Articles_By_Expense(card.CorporateCardId, pUserKey, pCompanyID);
-                    tbx_pdf.Text = card.FileNamePdf;
-                    tbx_xml.Text = card.FileNameXml;                   
-                    tbx_voucher.Text = card.FileNamePdfVoucher;
+                    if (card.FileNamePdf != null)
+                    {
+                        card.FileNamePdf.ForEach(x => tbx_pdf.Text += x.ToString());
+                    }
+                    if (card.FileNameXml != null)
+                    {
+                        card.FileNameXml.ForEach(x => tbx_xml.Text += x.ToString());
+                    }
+                    if (card.FileNamePdfVoucher != null)
+                    {
+                        card.FileNamePdfVoucher.ForEach(x => tbx_voucher.Text += x.ToString());
+                    }
+
                     tbx_motivo.Text = card.ExpenseReason;
                 }
             }
@@ -242,9 +252,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                 {
                     drop_currency.SelectedValue = HttpContext.Current.Session["currency"].ToString();
                 }
-                tbx_pdf.Text = card.FileNamePdf;
-                tbx_xml.Text = card.FileNameXml;
-                tbx_voucher.Text = card.FileNamePdfVoucher;
+                
             }
 
         }
@@ -322,15 +330,6 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
 
     }
-    public Dictionary<int, string> Dict_type()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Viaje" },
-            { 2, "Compra Extraordinaria" }
-        };
-        return dict;
-    }       
    
     private bool CompruebaMontoFactura(MemoryStream fs, decimal importe)
     {
@@ -422,38 +421,28 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         return false;
     }
    
-    private int WriteToDb(int card_id,int tipo_moneda, DateTime fecha_gasto, decimal importe_gasto, FileUpload fu_xml, FileUpload fu_pdf, FileUpload fu_voucher,int userkey, string companyId, List<ExpenseDetailDTO> expenseDetails, string motivo_gasto)
+    private int WriteToDb(int card_id,int tipo_moneda, DateTime fecha_gasto, decimal importe_gasto, int userkey, string companyId, List<ExpenseDetailDTO> expenseDetails, string motivo_gasto)
     {
-        string xml_filename = ""; 
-        string pdf_filename = "";  
-        string pdf_voucher_filename = "";    
-        
+        var xml_files = new List<ExpenseFilesDTO>();
+        var pdf_files = new List<ExpenseFilesDTO>();
+        var voucher_files = new List<ExpenseFilesDTO>();
+
         int id = 0;
         try
-        {               
-            byte[] bytes_xml = new byte[0];
-            if (fu_xml.HasFile)
+        {
+            if (HttpContext.Current.Session["xml_files"] != null)
             {
-                Stream fs_xml = fu_xml.PostedFile.InputStream;
-                System.IO.BinaryReader br = new System.IO.BinaryReader(fs_xml);
-                bytes_xml = fu_xml.FileBytes;
-                xml_filename = fu_pdf.FileName;
+                xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
             }
-            byte[] bytes_pdf = new byte[0];
-            if (fu_pdf.HasFile)
+
+            if (HttpContext.Current.Session["pdf_files"] != null)
             {
-                Stream fs_pdf = fu_pdf.PostedFile.InputStream;
-                System.IO.BinaryReader br2 = new System.IO.BinaryReader(fs_pdf);
-                bytes_pdf = fu_pdf.FileBytes;
-                pdf_filename = fu_pdf.FileName;
+                pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
             }
-            byte[] bytes_pdf_voucher = new byte[0];
-            if (fu_voucher.HasFile)
+
+            if (HttpContext.Current.Session["voucher_files"] != null)
             {
-                Stream fs_pdf_voucher = fu_voucher.PostedFile.InputStream;
-                System.IO.BinaryReader br2 = new System.IO.BinaryReader(fs_pdf_voucher);                
-                bytes_pdf_voucher = (byte[])HttpContext.Current.Session["fu_voucher_bytes"];
-                pdf_voucher_filename = fu_voucher.FileName;
+                voucher_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["voucher_files"];
             }
 
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
@@ -461,29 +450,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                 SqlCommand cmd = conn.CreateCommand();
                 StringBuilder sb = new StringBuilder();
                 //Cadena Inicial
-                sb.Append("UPDATE CorporateCard SET  Date = @Date, Currency = @Currency, Amount = @Amount");
-                
-                if(fu_xml.HasFile)
-                {
-                    sb.Append(", FileBinaryXml = @FileBinaryXml");
-                    sb.Append(", FileNameXml = @FileNameXml");
-                    cmd.Parameters.Add("@FileBinaryXml", SqlDbType.VarBinary, bytes_xml.Length).Value = bytes_xml;
-                    cmd.Parameters.Add("@FileNameXml", SqlDbType.VarChar).Value = xml_filename;
-                }
-                if(fu_pdf.HasFile)
-                {
-                    sb.Append(", FileBinaryPdf = @FileBinaryPdf");
-                    sb.Append(", FileNamePdf = @FileNamePdf");
-                    cmd.Parameters.Add("@FileBinaryPdf", SqlDbType.VarBinary, bytes_pdf.Length).Value = bytes_pdf;
-                    cmd.Parameters.Add("@FileNamePdf", SqlDbType.VarChar).Value = pdf_filename;
-                }
-                if (fu_voucher.HasFile)
-                {
-                    sb.Append(", FileBinaryPdfVoucher = @FileBinaryPdfVoucher");
-                    sb.Append(", FileNamePdfVoucher = @FileNamePdfVoucher");
-                    cmd.Parameters.Add("@FileBinaryPdfVoucher", SqlDbType.VarBinary, bytes_pdf_voucher.Length).Value = bytes_pdf_voucher;
-                    cmd.Parameters.Add("@FileNamePdfVoucher", SqlDbType.VarChar).Value = pdf_voucher_filename;
-                }
+                sb.Append("UPDATE CorporateCard SET  Date = @Date, Currency = @Currency, Amount = @Amount");               
                 sb.Append(", UpdateDate = @UpdateDate, ExpenseReason = @ExpenseReason Where UpdateUserKey = @UpdateUserKey and CorporateCardId = @CorporateCardId;");               
                 cmd.CommandText = sb.ToString();               
                 cmd.Parameters.Add("@Date", SqlDbType.DateTime).Value = fecha_gasto;
@@ -516,9 +483,12 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                         var inserted = cmd.ExecuteScalar();
                         cmd.Parameters.Clear();
                     }
-                }
-              
+                }              
                 cmd.Connection.Close();
+
+                xml_files.ForEach((x) => { x.ExpenseId = id; if (!Doc_Tools.CheckFileExist(x)) { Doc_Tools.SaveFile(x); } });
+                pdf_files.ForEach((x) => { x.ExpenseId = id; if (!Doc_Tools.CheckFileExist(x)) { Doc_Tools.SaveFile(x); } });
+                voucher_files.ForEach((x) => { x.ExpenseId = id; if (!Doc_Tools.CheckFileExist(x)) { Doc_Tools.SaveFile(x); } });
             }
 
             return id;
@@ -560,7 +530,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
        
 
-        var result = WriteToDb(card.CorporateCardId, tipo_moneda, fecha_gasto, importe_gasto, fu_xml, fu_pdf, fu_voucher, pUserKey, pCompanyID, lista_detalles, motivo_gasto);
+        var result = WriteToDb(card.CorporateCardId, tipo_moneda, fecha_gasto, importe_gasto, pUserKey, pCompanyID, lista_detalles, motivo_gasto);
         if (result == -1)
         {
             tipo = "error";
@@ -857,7 +827,10 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
     protected void btn_validar_Click(object sender, EventArgs e)
     {
         HttpContext.Current.Session["is_valid"] = false;
-        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];       
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+        bool xml = false, pdf = false, voucher = false;
+        var card = (CorporateCardDTO)HttpContext.Current.Session["CorporateCard"];
+        fill_filelists();
 
         //validacion de fecha
         if (string.IsNullOrEmpty(tbx_fechagasto.Text))
@@ -894,86 +867,75 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);        
         decimal importe_gasto = decimal.Parse(tbx_importe.Text);
 
-        //PDF No Obligatorio
-        if (fu_pdf.HasFile)
-        {            
-            if (fu_pdf.PostedFile.ContentType.ToString() != "application/pdf")
-            {                
-                tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;             
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                MultiView1.SetActiveView(View_General);
-                return;
-            }
-
-            if (fu_pdf.PostedFile.ContentLength > 1000000 * 15)
-            {     
-                tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB27").Value;               
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                MultiView1.SetActiveView(View_General);
-                return;
-            }
-        }
-        //Si tiene fichero XML (No Obligatorio)
-        if (fu_xml.HasFile)
+        //Si el archivo tiene XMLs    
+        if (HttpContext.Current.Session["xml_files"] != null)
         {
-            //Validación del Formato del Archivo XML
-            if (fu_xml.PostedFile.ContentType.ToString() != "text/xml")
+            var xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
+            //Validacion de tipo fichero
+            if (xml_files.Any(x => x.ContentType != "text/xml"))
             {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B7").Value;              
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                MultiView1.SetActiveView(View_General);
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB29").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
             //Validación del Tamaño
-            if (fu_xml.PostedFile.ContentLength > 1000000 * 15)
+            if (xml_files.Any(x => x.FileLength > 1000000 * 15))
             {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB30").Value;               
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                MultiView1.SetActiveView(View_General);
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB30").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
-
-            MemoryStream memoryStream = new MemoryStream();
-            memoryStream.Write(fu_xml.FileBytes, 0, fu_xml.FileBytes.Length);
-            //Validacion de importe
-            if (!CompruebaMontoFactura(memoryStream, importe_gasto))
-            {   
-                tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B11").Value;                
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                MultiView1.SetActiveView(View_General);
-                return;
-            }
-
         }
-        //Documento PDF Voucher no Obligatorio
-        if (fu_voucher.HasFile)
+        else { if (card.FileNameXml.Count == 0) { xml = true; } }
+
+        //Si el archivo tiene PDFs    
+        if (HttpContext.Current.Session["pdf_files"] != null)
         {
-            if (fu_voucher.PostedFile.ContentType.ToString() != "application/pdf")
+            var pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
+            if (pdf_files.Any(x => x.ContentType.ToString() != "application/pdf"))
             {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;               
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                MultiView1.SetActiveView(View_General);
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
 
-            if (fu_voucher.PostedFile.ContentLength > 1000000 * 15)
+            if (pdf_files.Any(x => x.FileLength > 1000000 * 15))
             {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB42").Value;                
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                MultiView1.SetActiveView(View_General);
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB27").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
         }
-        var card = (CorporateCardDTO)HttpContext.Current.Session["CorporateCard"];
-        var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
-       
+        else { if (card.FileNamePdf.Count == 0) { pdf = true; } }
+
+        //Si se subio archivo PDF Voucher
+        if (HttpContext.Current.Session["voucher_files"] != null)
+        {
+            var voucher_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["voucher_files"];
+            if (voucher_files.Any(x => x.ContentType.ToString() != "application/pdf"))
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B8").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
+            }
+
+            if (voucher_files.Any(x => x.FileLength > 1000000 * 15))
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB28").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
+            }
+        }
+        else { if (card.FileNamePdfVoucher.Count == 0) { voucher = true; } }
+
+        
+        var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];       
 
         if (lista_detalles == null || lista_detalles.Count == 0)
         {
@@ -1001,41 +963,25 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
       
         HttpContext.Current.Session["is_valid"] = is_valid;
 
-        if (HttpContext.Current.Session["fu_xml"] != null)
+        if (xml)
         {
-            fu_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];
-        }
-
-        if (!fu_xml.HasFile)
-        {
-            
             Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value;
         }
 
-        if (HttpContext.Current.Session["fu_pdf"] != null)
+        if (pdf)
         {
-            fu_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value;
         }
 
-        if (!fu_pdf.HasFile)
+        if (voucher)
         {
-            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB32").Value ;
+            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB33").Value;
         }
 
-        if (HttpContext.Current.Session["fu_voucher"] != null)
-        {
-            fu_voucher = (FileUpload)HttpContext.Current.Session["fu_voucher"];
-        }
-
-        if (!fu_voucher.HasFile)
-        {
-            Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB33").Value ;
-        }
-
-        if (Msj != "")
+        if (!string.IsNullOrEmpty(Msj))
         {
             tipo = "warning";
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
         }
 
         if (is_valid)
@@ -1047,22 +993,89 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
     public void fill_fileUploads()
     {
-        if (HttpContext.Current.Session["fu_pdf"] != null)
+        if (HttpContext.Current.Session["xml_files"] != null)
         {
-            var f_pdf = (FileUpload)HttpContext.Current.Session["fu_pdf"];
-            tbx_pdf.Text = f_pdf.FileName;
+            var xml_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["xml_files"];
+            xml_files.ForEach(x => tbx_xml.Text += x.FileName);
         }
 
-        if (HttpContext.Current.Session["fu_xml"] != null)
+        if (HttpContext.Current.Session["pdf_files"] != null)
         {
-            var f_xml = (FileUpload)HttpContext.Current.Session["fu_xml"];
-            tbx_xml.Text = f_xml.FileName;
+            var pdf_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["pdf_files"];
+            pdf_files.ForEach(x => tbx_pdf.Text += x.FileName);
         }
 
-        if (HttpContext.Current.Session["fu_voucher"] != null)
+
+        if (HttpContext.Current.Session["voucher_files"] != null)
         {
-            var f_voucher = (FileUpload)HttpContext.Current.Session["fu_voucher"];
-            tbx_voucher.Text = f_voucher.FileName;
+            var voucher_files = (List<ExpenseFilesDTO>)HttpContext.Current.Session["voucher_files"];
+            voucher_files.ForEach(x => tbx_voucher.Text += x.FileName);
+        }
+    }
+
+    public void fill_filelists()
+    {
+        if (fu_xml.HasFiles)
+        {
+            var xml_files = new List<ExpenseFilesDTO>();
+            foreach (HttpPostedFile xml_postedFile in fu_xml.PostedFiles)
+            {
+                var xml_file = new ExpenseFilesDTO
+                {
+                    Type = ExpenseFilesDTO.FileType.Xml,
+                    ExpenseType = Doc_Tools.DocumentType.CorporateCard
+                };
+                byte[] byte_array = new byte[xml_postedFile.ContentLength];
+                xml_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
+                xml_file.ContentType = xml_postedFile.ContentType;
+                xml_file.FileName = xml_postedFile.FileName;
+                xml_file.FileBinary = byte_array;
+                xml_files.Add(xml_file);
+            }
+            HttpContext.Current.Session["xml_files"] = xml_files;
+            HttpContext.Current.Session["fu_xml"] = fu_xml;
+        }
+
+        if (fu_pdf.HasFiles)
+        {
+            var pdf_files = new List<ExpenseFilesDTO>();
+            foreach (HttpPostedFile pdf_postedFile in fu_pdf.PostedFiles)
+            {
+                var pdf_file = new ExpenseFilesDTO
+                {
+                    Type = ExpenseFilesDTO.FileType.Pdf,
+                    ExpenseType = Doc_Tools.DocumentType.CorporateCard
+                };
+                byte[] byte_array = new byte[pdf_postedFile.ContentLength];
+                pdf_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
+                pdf_file.ContentType = pdf_postedFile.ContentType;
+                pdf_file.FileName = pdf_postedFile.FileName;
+                pdf_file.FileBinary = byte_array;
+                pdf_files.Add(pdf_file);
+            }
+            HttpContext.Current.Session["pdf_files"] = pdf_files;
+            HttpContext.Current.Session["fu_pdf"] = fu_pdf;
+        }
+
+        if (fu_voucher.HasFiles)
+        {
+            var voucher_files = new List<ExpenseFilesDTO>();
+            foreach (HttpPostedFile voucher_postedFile in fu_voucher.PostedFiles)
+            {
+                var voucher_file = new ExpenseFilesDTO
+                {
+                    Type = ExpenseFilesDTO.FileType.Voucher,
+                    ExpenseType = Doc_Tools.DocumentType.CorporateCard
+                };
+                byte[] byte_array = new byte[voucher_postedFile.ContentLength];
+                voucher_postedFile.InputStream.Read(byte_array, 0, byte_array.Length);
+                voucher_file.ContentType = voucher_postedFile.ContentType;
+                voucher_file.FileName = voucher_postedFile.FileName;
+                voucher_file.FileBinary = byte_array;
+                voucher_files.Add(voucher_file);
+            }
+            HttpContext.Current.Session["voucher_files"] = voucher_files;
+            HttpContext.Current.Session["fu_voucher"] = fu_voucher;
         }
     }
 
@@ -1083,21 +1096,8 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
     protected void View_General_Deactivate(object sender, EventArgs e)
     {
-        if (fu_xml.HasFile)
-        {
-            HttpContext.Current.Session["fu_xml"] = fu_xml;
-            HttpContext.Current.Session["fu_xml_bytes"] = fu_xml.FileBytes;
-        }
-        if (fu_pdf.HasFile)
-        {
-            HttpContext.Current.Session["fu_pdf"] = fu_pdf;
-            HttpContext.Current.Session["fu_pdf_bytes"] = fu_pdf.FileBytes;
-        }
-        if (fu_voucher.HasFile)
-        {
-            HttpContext.Current.Session["fu_voucher"] = fu_voucher;
-            HttpContext.Current.Session["fu_voucher_bytes"] = fu_voucher.FileBytes;
-        }
+        HttpContext.Current.Session["motivo"] = tbx_motivo.Text;
+        fill_filelists();
         HttpContext.Current.Session["fecha_gasto"] = DateTime.Parse(tbx_fechagasto.Text);
         HttpContext.Current.Session["currency"] = drop_currency.SelectedValue;
 

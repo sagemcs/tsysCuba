@@ -193,7 +193,6 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         }
       
     }
-
     public void fill_filelists()
     {
         if (fu_xml.HasFiles)
@@ -651,34 +650,34 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
 
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
             {
-               SqlCommand cmd = conn.CreateCommand();               
-               cmd.CommandText = "Insert Into Expense (Date, Currency, Amount, UpdateDate, UpdateUserKey, CompanyId, Status, AdvanceId, ApprovalLevel, ExpenseReason) VALUES (@Date, @Currency, @Amount,  @UpdateDate, @UpdateUserKey, @CompanyId, @Status, @AdvanceId, @ApprovalLevel, @ExpenseReason); SELECT SCOPE_IDENTITY();";
-           
-               cmd.Parameters.Add("@Date", SqlDbType.DateTime).Value = fecha_gasto;
-               cmd.Parameters.Add("@Currency", SqlDbType.Int).Value = tipo_moneda;
-               cmd.Parameters.Add("@Amount", SqlDbType.Decimal).Value = importe_gasto;             
-               cmd.Parameters.Add("@UpdateDate", SqlDbType.DateTime).Value = DateTime.Now;
-               cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = userkey;
-               cmd.Parameters.Add("@CompanyId", SqlDbType.NVarChar).Value = companyId;
-               cmd.Parameters.Add("@Status", SqlDbType.Int).Value = status; //Estado inicial Pendiente
-               cmd.Parameters.Add("@AdvanceId", SqlDbType.Int).Value = AdvanceId; 
-               if(approval_level==null)
-               {
-                    cmd.Parameters.Add("@ApprovalLevel", SqlDbType.Int).Value = DBNull.Value;
-               }
-               else 
-               {
-                    cmd.Parameters.Add("@ApprovalLevel", SqlDbType.Int).Value = approval_level.Value;
-               }
-               cmd.Parameters.Add("@ExpenseReason", SqlDbType.VarChar).Value = motivo_gasto ?? (object)DBNull.Value;
+                SqlCommand cmd = conn.CreateCommand();
+                cmd.CommandText = "Insert Into Expense (Date, Currency, Amount, UpdateDate, UpdateUserKey, CompanyId, Status, AdvanceId, ApprovalLevel, ExpenseReason) VALUES (@Date, @Currency, @Amount,  @UpdateDate, @UpdateUserKey, @CompanyId, @Status, @AdvanceId, @ApprovalLevel, @ExpenseReason); SELECT SCOPE_IDENTITY();";
 
-               cmd.Connection.Open();
-               var modified = cmd.ExecuteScalar();
-               val = modified.ToString();
-               id = Convert.ToInt32(val);
+                cmd.Parameters.Add("@Date", SqlDbType.DateTime).Value = fecha_gasto;
+                cmd.Parameters.Add("@Currency", SqlDbType.Int).Value = tipo_moneda;
+                cmd.Parameters.Add("@Amount", SqlDbType.Decimal).Value = importe_gasto;
+                cmd.Parameters.Add("@UpdateDate", SqlDbType.DateTime).Value = DateTime.Now;
+                cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = userkey;
+                cmd.Parameters.Add("@CompanyId", SqlDbType.NVarChar).Value = companyId;
+                cmd.Parameters.Add("@Status", SqlDbType.Int).Value = status; //Estado inicial Pendiente
+                cmd.Parameters.Add("@AdvanceId", SqlDbType.Int).Value = AdvanceId;
+                if (approval_level == null)
+                {
+                    cmd.Parameters.Add("@ApprovalLevel", SqlDbType.Int).Value = DBNull.Value;
+                }
+                else
+                {
+                    cmd.Parameters.Add("@ApprovalLevel", SqlDbType.Int).Value = approval_level.Value;
+                }
+                cmd.Parameters.Add("@ExpenseReason", SqlDbType.VarChar).Value = motivo_gasto ?? (object)DBNull.Value;
+
+                cmd.Connection.Open();
+                var modified = cmd.ExecuteScalar();
+                val = modified.ToString();
+                id = Convert.ToInt32(val);
 
                 foreach (ExpenseDetailDTO detail in expenseDetails)
-                {                    
+                {
                     cmd.CommandText = "INSERT INTO ExpenseDetail (ExpenseId,Type,ItemKey,Qty,UnitCost,Amount,CreateDate,UpdateDate,CreateUser,CompanyId,STaxCodeKey,TaxAmount) VALUES (@_ExpenseId,@_Type,@_ItemKey,@_Qty,@_UnitCost,@_Amount,@_CreateDate,@_UpdateDate,@_CreateUser,@_CompanyId, @_STaxCodeKey, @_TaxAmount);";
                     cmd.Parameters.Add("@_ExpenseId", SqlDbType.Int).Value = id;
                     cmd.Parameters.Add("@_Type", SqlDbType.Int).Value = detail.Type;
@@ -689,20 +688,17 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                     cmd.Parameters.Add("@_CreateDate", SqlDbType.DateTime).Value = DateTime.Now;
                     cmd.Parameters.Add("@_UpdateDate", SqlDbType.DateTime).Value = DateTime.Now;
                     cmd.Parameters.Add("@_CreateUser", SqlDbType.Int).Value = userkey;
-                    cmd.Parameters.Add("@_CompanyId", SqlDbType.VarChar).Value = companyId;                   
+                    cmd.Parameters.Add("@_CompanyId", SqlDbType.VarChar).Value = companyId;
                     cmd.Parameters.Add("@_STaxCodeKey", SqlDbType.Decimal).Value = detail.STaxCodeKey;
                     cmd.Parameters.Add("@_TaxAmount", SqlDbType.Decimal).Value = detail.TaxAmount;
                     var inserted = cmd.ExecuteScalar();
                     cmd.Parameters.Clear();
-                }                
-               cmd.Connection.Close();
+                }
+                cmd.Connection.Close();
 
-               xml_files.ForEach(x => x.ExpenseId = id);
-               xml_files.ForEach(file => Doc_Tools.SaveFile(file));
-               pdf_files.ForEach(x => x.ExpenseId = id);
-               pdf_files.ForEach(file => Doc_Tools.SaveFile(file));
-               voucher_files.ForEach(x => x.ExpenseId = id);
-               voucher_files.ForEach(file => Doc_Tools.SaveFile(file));
+                xml_files.ForEach((x) => { x.ExpenseId = id; Doc_Tools.SaveFile(x); });
+                pdf_files.ForEach((x) => { x.ExpenseId = id; Doc_Tools.SaveFile(x); });
+                voucher_files.ForEach((x) => { x.ExpenseId = id; Doc_Tools.SaveFile(x); });               
             }
 
             return id;
@@ -714,8 +710,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 Doc_Tools.DeleteExpenseOnFail(Doc_Tools.DocumentType.Expense, id);
                 Doc_Tools.DeleteDetailOnFail(Doc_Tools.DocumentType.Expense, id);
                 Doc_Tools.DeleteFile(Doc_Tools.DocumentType.Expense,id);
-            }
-           
+            }           
           
             LogError(pLogKey, pUserKey, "Insertar-Pago-Reembolso-Empleados:Insertar-Pago", ex.Message, pCompanyID);
             string err;
@@ -765,7 +760,9 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
 
     protected void btnSage_Click(object sender, EventArgs e)
     {
-        Sage();        
+        Sage();
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
     }
 
     protected void btnFinalizar_Click(object sender, EventArgs e)
@@ -1491,8 +1488,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         if (xml)
         {          
             Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB31").Value ;
-        }
-       
+        }       
 
         if (pdf)
         {          
@@ -1509,7 +1505,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             Msj += Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB34").Value;
         }
 
-        if (Msj != "")
+        if (!string.IsNullOrEmpty(Msj))
         {            
             tipo = "warning";            
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);           

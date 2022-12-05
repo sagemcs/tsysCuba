@@ -367,7 +367,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, FileNameXml ,FileNamePdf ,FileNamePdfVoucher, CompanyId FROM CorporateCard where CorporateCardId = @CorporateCardId ;";
+            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, CompanyId FROM CorporateCard where CorporateCardId = @CorporateCardId ;";
             cmd.Parameters.Add("@CorporateCardId", SqlDbType.Int).Value = expense_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -377,11 +377,8 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                 card.Date = dataReader.GetDateTime(1);
                 card.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
                 card.Amount = dataReader.GetDecimal(3);
-                card.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
-                card.FileNameXml = dataReader.GetString(5);
-                card.FileNamePdf = dataReader.GetString(6);
-                card.FileNamePdfVoucher = dataReader.GetString(7);
-                card.CompanyId = dataReader.GetString(8);
+                card.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;              
+                card.CompanyId = dataReader.GetString(5);
             }
         }
         return card;

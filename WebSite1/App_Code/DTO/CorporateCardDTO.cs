@@ -10,16 +10,12 @@ public class CorporateCardDTO : Document
 {
     public int CorporateCardId { get; set; }
     public DateTime Date { get; set; }
-    public string Currency { get; set; }
-    public decimal Amount { get; set; }
-    public string Status { get; set; }
+    public string Currency { get; set; }     
     public string DeniedReason { get; set; }
-    public int? PackageId { get; set; }
-    public DateTime CreateDate { get; set; }
-    public string FileNameXml { get; set; }
-    public string FileNamePdf { get; set; }
-    public string FileNamePdfVoucher { get; set; }
-    public int ApprovalLevel { get; set; }
+    public int? PackageId { get; set; }    
+    public List<string> FileNameXml { get; set; }
+    public List<string> FileNamePdf { get; set; }
+    public List<string> FileNamePdfVoucher { get; set; }    
     public string ExpenseReason { get; set; }
     public bool SageIntegration { get; set; }
     public CorporateCardDTO()

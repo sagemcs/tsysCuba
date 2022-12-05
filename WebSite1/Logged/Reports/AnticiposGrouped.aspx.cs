@@ -52,19 +52,7 @@ public partial class Logged_Reports_AnticiposGrouped : System.Web.UI.Page
         {
             this.iLogKey = value;
         }
-    }
-
-    public Dictionary<int, string> Dict_status()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pendiente" },
-            { 2, "Aprobado" },
-            { 3, "Cancelado" },
-            { 4, "Vencido" }
-        };
-        return dict;
-    }
+    }    
 
     public Dictionary<int, string> Dict_type()
     {

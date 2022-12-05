@@ -67,6 +67,7 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
                 ParameterName = "@UpdateUserKey",
                 Value = user_id
             });            
+
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -199,7 +200,6 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
         }
         reportDocument.Close();
     }
-
 
     protected void btn_back_Click(object sender, EventArgs e)
     {

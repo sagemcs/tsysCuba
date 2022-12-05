@@ -53,19 +53,7 @@ public partial class Logged_Reports_Anticipos : System.Web.UI.Page
             this.iLogKey = value;
         }
     }
-
-    public Dictionary<int, string> Dict_status()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Pendiente" },
-            { 2, "Aprobado" },
-            { 3, "Cancelado" },
-            { 4, "Vencido" }
-        };
-        return dict;
-    }
-
+  
     public Dictionary<int, string> Dict_type()
     {
         Dictionary<int, string> dict = new Dictionary<int, string>
@@ -100,7 +88,7 @@ public partial class Logged_Reports_Anticipos : System.Web.UI.Page
                 advance.FechaLLegada = dataReader.GetString(3);
                 advance.FechaComprobacion = dataReader.GetString(4);
                 advance.JefeInmediato = dataReader.GetString(5);
-                advance.Estado = Dict_status().First(x => x.Key == dataReader.GetInt32(6)).Value;
+                advance.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(6)).Value;
                 gastos.Add(advance);
             }
         }

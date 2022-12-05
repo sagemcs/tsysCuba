@@ -614,7 +614,7 @@ public static class Doc_Tools
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT  ItemKey, ItemId, CompanyID, PriceUnitMeasId FROM vluItem WITH (NOLOCK) WHERE @CompanyID = CompanyID AND ItemType < 5 ORDER BY ItemID ASC;";
+            cmd.CommandText = "SELECT ItemKey, ItemId, CompanyID, PriceUnitMeasId FROM vluItem WITH (NOLOCK) WHERE @CompanyID = CompanyID AND Status = 1 AND (ItemType = 1 OR ItemType = 3 OR ItemType = 4) ORDER BY ItemID ASC,ShortDesc ASC;";
             cmd.Parameters.Add("@CompanyID", SqlDbType.VarChar).Value = company_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();

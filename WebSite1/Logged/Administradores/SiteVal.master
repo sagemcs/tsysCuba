@@ -195,6 +195,10 @@
                                          <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/SolicitudCheque">Generar solicitud de cheque</a>
                                         </li>
+
+                                         <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/Reports/AllReports">Reportes de Validador</a>
+                                        </li>
                                        
                                         <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/ReportsFilter/EmpresasFilter">Empresas</a>

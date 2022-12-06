@@ -919,7 +919,7 @@ public static class Doc_Tools
             { "B3", "La fecha de llegada debe ser posterior a la fecha de salida, favor de verificar e intentar nuevamente." },
             { "B2", "Fecha de llegada requerida, favor de verificar e intentar nuevamente." },
             { "B1", "Fecha de salida requerida, favor de verificar e intentar nuevamente." },
-            { "B30", "El paquete actual no contiene reembolsos, favor de verificar e intentar nuevamente." },
+            { "B30", "El paquete actual no contiene pagos, favor de verificar e intentar nuevamente." },
             { "B31", "Motivo de la cancelacion requerido, favor de verificar e intentar nuevamente." },
             { "B32", "El gasto se ha integrado satisfactoriamente en Sage." },
             { "B33", "El gasto no se ha podido integrar a Sage, favor de verificar e intentar nuevamente." },

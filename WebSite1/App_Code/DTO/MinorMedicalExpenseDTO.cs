@@ -35,3 +35,18 @@ using System.Web;
 
         }
     }
+
+public class MinorMedicalExpenseReport2DTO : Document
+{
+    public decimal Importe { get; set; }
+    public string Estado { get; set; }
+    public string Fecha { get; set; }
+    public string Username { get; set; }
+
+    public MinorMedicalExpenseReport2DTO()
+    {
+
+
+    }
+
+}

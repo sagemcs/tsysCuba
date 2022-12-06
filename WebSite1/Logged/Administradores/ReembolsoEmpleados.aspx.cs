@@ -274,6 +274,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             }
             else
             {
+                
                 try
                 {
                     //string Var = HttpContext.Current.Session["VendKey"].ToString();
@@ -284,6 +285,24 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+                    //Si no es carga inicial
+                    if (!IsPostBack)
+                    {
+                        get_anticipos(pUserKey);
+                        get_items(pCompanyID);
+                        get_taxes();
+                        HttpContext.Current.Session["GridItems"] = null;
+                        HttpContext.Current.Session["GridTaxes"] = null;
+                        //Limpiar Variables de sesion del Gastos
+                        HttpContext.Current.Session["fu_xml"] = null;
+                        HttpContext.Current.Session["fu_pdf"] = null;
+                        HttpContext.Current.Session["fu_voucher"] = null;
+                        HttpContext.Current.Session["xml_files"] = null;
+                        HttpContext.Current.Session["pdf_files"] = null;
+                        HttpContext.Current.Session["voucher_files"] = null;
+                        HttpContext.Current.Session["motivo"] = null;
+                        HttpContext.Current.Session["is_valid"] = null;
+                    }
                     fill_filelists();
                     fill_fileUploads();
                     BindGridView();
@@ -322,15 +341,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                     LogError(0, 1, "Facturas_Load", "Error al Cargar Variables de Sesion : " + xD.Message, "TSM");
                 }
             }
-            //Si no es carga inicial
-            if (!IsPostBack)
-            {
-                get_anticipos(pUserKey);              
-                get_items(pCompanyID);
-                get_taxes();
-                HttpContext.Current.Session["GridItems"] = null;
-                HttpContext.Current.Session["GridTaxes"] = null;                
-            }           
+                    
 
         }
         catch (Exception ex)

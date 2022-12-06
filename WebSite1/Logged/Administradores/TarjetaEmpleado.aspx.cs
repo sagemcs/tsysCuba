@@ -188,6 +188,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             }
             else
             {
+                
                 try
                 {
                     //string Var = HttpContext.Current.Session["VendKey"].ToString();
@@ -198,6 +199,24 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+
+                    if (!IsPostBack)
+                    {
+                        get_taxes();
+                        get_items(pCompanyID);
+                        HttpContext.Current.Session["GridList"] = null;
+                        HttpContext.Current.Session["GridTaxes"] = null;
+                        //Limpiar Variables de sesion del Gastos
+                        HttpContext.Current.Session["fu_xml"] = null;
+                        HttpContext.Current.Session["fu_pdf"] = null;
+                        HttpContext.Current.Session["fu_voucher"] = null;
+                        HttpContext.Current.Session["xml_files"] = null;
+                        HttpContext.Current.Session["pdf_files"] = null;
+                        HttpContext.Current.Session["voucher_files"] = null;
+                        HttpContext.Current.Session["motivo"] = null;
+                        HttpContext.Current.Session["is_valid"] = null;
+                    }
+
                     fill_filelists();
                     fill_fileUploads();
                     BindGridView();
@@ -232,13 +251,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                 }
             }
 
-            if (!IsPostBack)
-            {
-                get_taxes();
-                get_items(pCompanyID);
-                HttpContext.Current.Session["GridList"] = null;
-                HttpContext.Current.Session["GridTaxes"] = null;               
-            }
+           
         }
         catch (Exception ex)
         {

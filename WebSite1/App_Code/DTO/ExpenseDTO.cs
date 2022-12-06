@@ -60,4 +60,20 @@ using System.Web;
             //
         }
     
-}
+    }
+    public class ExpenseReport2DTO : Document
+    {
+        public string Tipo { get; set; }
+        public decimal Importe { get; set; }
+        public string Estado { get; set; }
+        public string Moneda { get; set; }
+        public string FechaCreado { get; set; }
+        public string Username { get; set; }
+
+        public ExpenseReport2DTO()
+        {
+
+
+        }
+
+    }

@@ -187,13 +187,24 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
             }
             else
             {
+               
                 try
                 {                    
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
-                    
-                    HttpContext.Current.Session["Documento"] = Doc_Tools.DocumentType.Advance;
+                    if (!IsPostBack)
+                    {
+                        //Limpiar Variables de sesion del Gastos
+                        HttpContext.Current.Session["fu_xml"] = null;
+                        HttpContext.Current.Session["fu_pdf"] = null;
+                        HttpContext.Current.Session["fu_voucher"] = null;
+                        HttpContext.Current.Session["xml_files"] = null;
+                        HttpContext.Current.Session["pdf_files"] = null;
+                        HttpContext.Current.Session["voucher_files"] = null;
+                        HttpContext.Current.Session["motivo"] = null;
+                        HttpContext.Current.Session["is_valid"] = null;
+                    }                 
                     pVendKey = 0;                   
 
                     tbx_jefe_inmediato.Text = get_JefeInmediato(pUserKey);
@@ -215,11 +226,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                 }
             }
 
-            if (!IsPostBack)
-            {
-
-              
-            }
+            
         }
         catch (Exception ex)
         {

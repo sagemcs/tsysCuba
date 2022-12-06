@@ -59,8 +59,7 @@ public partial class SiteMaster : MasterPage
 
     }
     public bool HasRightsForSpecifiedMenu(string menuItemName)
-    {
-
+    {         
         int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
 
         if (menuItemName == "Facturas")
@@ -159,7 +158,7 @@ public partial class SiteMaster : MasterPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        
     }
 
     protected void Unnamed_LoggingOut(object sender, LoginCancelEventArgs e)

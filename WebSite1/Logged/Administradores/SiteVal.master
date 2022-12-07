@@ -192,6 +192,9 @@
                                         <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/Contrarecibo">Generar contrarecibo</a>
                                         </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/AprobSolCheq">Aprobar solicitudes de Cheques</a>
+                                        </li>
                                          <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/SolicitudCheque">Generar solicitud de cheque</a>
                                         </li>
@@ -236,6 +239,9 @@
                                         <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/ReportsFilter/CargaArticulosFilter">Carga de Artículos</a>
                                         </li> 
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/Reports/AprobacionSolicitudCheque">Reporte de Solicitudes de Cheques</a>
+                                        </li>
                                     </ul>
                                 </li>
                                 <li>

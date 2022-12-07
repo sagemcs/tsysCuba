@@ -5,45 +5,45 @@
 
 //REFERENCIAS UTILIZADAS
 using CrystalDecisions.CrystalReports.Engine;
-using Proveedores_Model;
-using SAGE_Model;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Web;
-using System.Web.Script.Serialization;
-using System.Web.Security;
+using Proveedores_Model;
+using SAGE_Model;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Data;
+using System.Text;
 using System.Web.UI.WebControls;
+using System.Web.Security;
+using System.Web.Script.Serialization;
 /// <summary>
 /// Summary description for ContrareciboDTO
 /// </summary>
 public class ContrareciboDTO
 {
     public int Id { get; set; }
-    public string Folio { get; set; }
+    public string Folio{ get; set; }
     public string Proveedor { get; set; }
     public string RFC { get; set; }
     public string Fecha_Recepcion { get; set; }
     public DateTime DateRx { get; set; }
-    public string Condiciones { get; set; }
+    public string Condiciones{ get; set; }
     public Double Condiiones_In_Double { get; set; }
     public string Fecha_Programada_Pago { get; set; }
     public DateTime DatePr { get; set; }
     public string Moneda { get; set; }
-    public string Fecha_AprobacionF { get; set; }
+    public string Fecha_AprobacionF{ get; set; }
     public DateTime DateAr { get; set; }
     public string Total { get; set; }
     public double Total_In_Double { get; set; }
     public ContrareciboDTO()
     { }
-    public ContrareciboDTO(string Moneda, int Key, string Folio, string Proveedor, string RFC, string Condiciones, string Fecha_Recepcion, string Fecha_Programada_Pago, string Total, int InvKey, DateTime Fr, DateTime Fpr)
-    {
+    public ContrareciboDTO(string Moneda,int Key, string Folio, string Proveedor, string RFC, string Condiciones, string Fecha_Recepcion, string Fecha_Programada_Pago, string Total,int InvKey,DateTime Fr,DateTime Fpr)
+    {   
         this.Moneda = Moneda;
         this.Id = Key;
         this.Folio = Folio;
@@ -60,7 +60,7 @@ public class ContrareciboDTO
 
         PortalProveedoresEntities db = new PortalProveedoresEntities();
         Vendors vendor = db.Vendors.Where(v => v.VendorID == this.Proveedor).FirstOrDefault();
-        Invoice Factura = db.Invoice.Where(b => b.InvoiceKey == InvKey).FirstOrDefault();
+        Invoice Factura = db.Invoice.Where(b=>b.InvoiceKey == InvKey).FirstOrDefault();
 
         this.Fecha_AprobacionF = Factura.AprovDate == null ? "Dato No disponible" : Factura.AprovDate.Value.ToString("dd/MM/yyyy");
         this.DateAr = Factura.AprovDate == null ? DateTime.MinValue : Convert.ToDateTime(Factura.AprovDate);
@@ -90,7 +90,7 @@ public class ContrareciboDTO2
     public string Genera { get; set; }
     public ContrareciboDTO2()
     { }
-    public ContrareciboDTO2(string Moneda, int Key, string Folio, string Proveedor, string RFC, string Condiciones, string Fecha_Recepcion, string Fecha_Programada_Pago, string Total, int InvKey, DateTime Fr, DateTime Fpr, string Fechapro, DateTime Fapr, string Aprobadors, string Bloqueo, string Genera)
+    public ContrareciboDTO2(string Moneda, int Key, string Folio, string Proveedor, string RFC, string Condiciones, string Fecha_Recepcion, string Fecha_Programada_Pago, string Total, int InvKey, DateTime Fr, DateTime Fpr, string Fechapro, DateTime Fapr,string Aprobadors,string Bloqueo, string Genera)
     {
         this.Moneda = Moneda;
         this.Id = Key;
@@ -98,7 +98,7 @@ public class ContrareciboDTO2
         this.Proveedor = Proveedor;
         this.RFC = RFC;
         this.Condiciones = Condiciones;
-
+        
         this.Fecha_Recepcion = Fecha_Recepcion == null ? "Dato No disponible" : Fecha_Recepcion;
         //this.Fecha_Recepcion = Fecha_Recepcion == null ? "Dato No disponible" : Convert.ToString(DateTime.ParseExact(Fecha_Recepcion, "dd/MM/YYYY", null).ToString());
         this.DateRx = Fr == null ? DateTime.MinValue : Convert.ToDateTime(Fr);
@@ -166,7 +166,7 @@ public class Contrarecibos
             {
 
                 ProveedorDTO proveedor = Proveedores.BuscarProveedorEnSAGE(contra.Vendors.VendorID);
-
+                
                 string DBA = "Información de Proveedor no encontrada";
                 short? condiciones = 0;
                 if (proveedor != null)
@@ -176,21 +176,21 @@ public class Contrarecibos
                     if (string.IsNullOrWhiteSpace(proveedor.Condiciones))
                         //throw new MulticonsultingException("El proveedor no tiene definido las condiciones de pago");
                         //condiciones = Convert.ToInt16(proveedor.Condiciones);
-                        condiciones = null;
+                    condiciones = null;
                 }
                 InvcRcptDetails invcRcptDetails = contra.InvcRcptDetails.FirstOrDefault();
                 contrarecibos.Add(new ContrareciboDTO(
                     invcRcptDetails.Moneda,
-                    contra.InvcRcptKey,
+                    contra.InvcRcptKey, 
                     contra.Folio.ToString(),
-                    contra.Vendors != null ? contra.Vendors.VendName : string.Empty,
-                    DBA,
+                    contra.Vendors != null ? contra.Vendors.VendName : string.Empty, 
+                    DBA, 
                     condiciones != null ? proveedor.Condiciones_Descripcion /*condiciones.ToString()*/ : "Información no encontrada",
                     contra.CreateDate != null ? contra.CreateDate.Date.ToString("dd/MM/yyy") : string.Empty,
-                    contra.PaymentDate != null ? contra.PaymentDate.Date.ToString("dd/MM/yyy") : string.Empty,
+                    contra.PaymentDate != null ? contra.PaymentDate.Date.ToString("dd/MM/yyy") : string.Empty, 
                     Math.Round(contra.Total, 2).ToString(),
-                    invcRcptDetails != null ? invcRcptDetails.InvoiceKey : -1,
-                    contra.CreateDate != null ? contra.CreateDate : DateTime.MinValue,
+                    invcRcptDetails != null ? invcRcptDetails.InvoiceKey : -1, 
+                    contra.CreateDate != null ? contra.CreateDate : DateTime.MinValue, 
                     contra.PaymentDate != null ? contra.PaymentDate : DateTime.MinValue));
             }
 
@@ -224,7 +224,7 @@ public class Contrarecibos
             {
                 SqlCommand cmd = new SqlCommand(SQL, conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Opcion", Value = 1 });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Opcion", Value = 1});
                 cmd.Parameters.Add(new SqlParameter() { ParameterName = "@UserKey", Value = usker });
                 cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Prov", Value = "" });
                 if (conn.State == ConnectionState.Open)
@@ -243,7 +243,7 @@ public class Contrarecibos
                     rdr["CreateDate"] != null ? rdr["CreateDate"].ToString() : "",
                     rdr["PaymentDate"] != null ? rdr["PaymentDate"].ToString() : "",
                     rdr["Total"] != null ? Math.Round(Convert.ToDecimal(rdr["Total"]), 2).ToString() : "0.00",
-                    rdr["InvoiceKey"] != null ? Convert.ToInt32(rdr["InvoiceKey"].ToString()) : -1,
+                    rdr["InvoiceKey"] != null ? Convert.ToInt32(rdr["InvoiceKey"].ToString()): -1,
                     rdr["CreateDate"] != null ? Convert.ToDateTime(rdr["CreateDate"].ToString()) : DateTime.MinValue,
                     rdr["PaymentDate"] != null ? Convert.ToDateTime(rdr["PaymentDate"].ToString()) : DateTime.MinValue
                     ));
@@ -298,16 +298,16 @@ public class Contrarecibos
                 InvcRcptDetails invcRcptDetails = contra.InvcRcptDetails.FirstOrDefault();
                 contrarecibos.Add(new ContrareciboDTO(
                     invcRcptDetails != null ? invcRcptDetails.Moneda : "",
-                    contra.InvcRcptKey,
+                    contra.InvcRcptKey, 
                     contra.Folio.ToString(),
-                    contra.Vendors != null ? contra.Vendors.VendorID : string.Empty,
-                    DBA,
+                    contra.Vendors != null ? contra.Vendors.VendorID : string.Empty, 
+                    DBA, 
                     proveedor != null ? proveedor.Condiciones_Descripcion : "Información no encontrada" /*contra.PaymentTerms*/,
                     contra.RcptDate != null ? contra.RcptDate.ToShortDateString() : "",
-                    contra.PaymentDate != null ? contra.PaymentDate.ToShortDateString() : "",
+                    contra.PaymentDate != null ? contra.PaymentDate.ToShortDateString() : "", 
                     Math.Round(contra.Total, 2).ToString(),
                     invcRcptDetails != null ? invcRcptDetails.InvoiceKey : -1,
-                    contra.CreateDate == null ? DateTime.MinValue : contra.CreateDate,
+                    contra.CreateDate == null ? DateTime.MinValue : contra.CreateDate, 
                     contra.PaymentDate == null ? DateTime.MinValue : contra.PaymentDate));
             }
 
@@ -327,7 +327,7 @@ public class Contrarecibos
         {
             List<ContrareciboDTO> contrarecibos = ObtenerContrarecibos(sin_solicitud);
 
-            if (!string.IsNullOrWhiteSpace(Folio) && Folio != "null")
+            if (!string.IsNullOrWhiteSpace(Folio) && Folio !="null")
             {
                 contrarecibos = contrarecibos.Where(c => c.Folio.ToUpper().Contains(Folio.ToUpper())).ToList();
             }
@@ -356,7 +356,7 @@ public class Contrarecibos
             {
                 contrarecibos = contrarecibos.Where(c => c.Fecha_Recepcion == Fecha).ToList();
             }
-            if (!string.IsNullOrWhiteSpace(FechaP) && FechaP != "null")
+            if (!string.IsNullOrWhiteSpace(FechaP) && FechaP!= "null")
             {
                 contrarecibos = contrarecibos.Where(c => c.Fecha_Programada_Pago == FechaP).ToList();
             }
@@ -371,7 +371,7 @@ public class Contrarecibos
         }
     }
 
-    public static List<ContrareciboDTO2> ObtenerContrarecibos_2_0(string order_col, string order_dir, string Folio, string Proveedor, string RFC, string Total, string Fecha, string FechaP, bool sin_solicitud = false, bool directo_en_vista = false)
+    public static List<ContrareciboDTO2> ObtenerContrarecibos_2_0(string order_col, string order_dir, string Folio, string Proveedor, string RFC, string Total, string Fecha, string FechaP,  bool sin_solicitud = false, bool directo_en_vista = false)
     {
         try
         {
@@ -394,20 +394,6 @@ public class Contrarecibos
 
             List<ContrareciboDTO2> contrarecibos = new List<ContrareciboDTO2>();
             string roles = HttpContext.Current.Session["RolUser"].ToString();
-
-            //string SQL = " SELECT T3.Moneda,t1.InvcRcptKey,t3.Folio,d.vendName,a.VendDBA,c.PmtTermsID,T1.CreateDate,T1.PaymentDate,t3.Total,t3.InvoiceKey,t1.Approved,t4.AprovDate,FORMAT (T1.CreateDate, 'dd/MM/yyyy ') as CreateDate,FORMAT (t1.PaymentDate, 'dd/MM/yyyy ') as PaymentDate,FORMAT (t4.AprovDate, 'dd/MM/yyyy ') as AprovDate ";
-            string SQL = " SELECT T3.Moneda,t1.InvcRcptKey,t3.Folio,d.vendName,a.VendDBA,c.PmtTermsID,T1.CreateDate,T1.PaymentDate,t3.Total,t3.InvoiceKey,ISNULL(t5.username + ' -' + t7.roleID,''),t4.AprovDate,FORMAT (T1.CreateDate, 'dd/MM/yyyy ') as CreateDate,FORMAT (t1.PaymentDate, 'dd/MM/yyyy ') as PaymentDate,FORMAT (t4.AprovDate, 'dd/MM/yyyy ') as AprovDate ";
-            SQL += "  FROM InvoiceReceipt t1 ";
-            SQL += "  LEFT JOIN invcRcptDetails t3 on t1.InvcRcptKey = t3.InvcRcptKey ";
-            SQL += "  LEFT JOIN invoice t4 on t3.InvoiceKey = t4.InvoiceKey ";
-            SQL += "  LEFT JOIN Vendors d on t1.VendorKey = d.VendorKey ";
-            SQL += "  LEFT JOIN[sage500_Portal].dbo.TapVendor a ON a.VendKey = d.VendorKey ";
-            SQL += "  LEFT JOIN[sage500_Portal].dbo.tciPaymentTerms c ON a.PmtTermsKey = c.PmtTermsKey ";
-            SQL += "  LEFT JOIN users t5 on t1.Aprobador = t5.userkey ";
-            SQL += "  LEFT JOIN usersinroles t6 on t5.userkey = t6.userkey ";
-            SQL += "  LEFT JOIN roles t7 on t6.rolekey = t7.rolekey ";
-            SQL += "  WHERE NOT EXISTS(SELECT NULL FROM ChkReqDetail t2 WHERE t2.InvcRcptKey = t1.InvcRcptKey) ";
-
             string sSQL = "";
 
             if (!string.IsNullOrWhiteSpace(Folio) && Folio != "null")
@@ -444,7 +430,151 @@ public class Contrarecibos
             if (order_col == "7") { sSQL += " Order by t3.Total "; }
             if (order_dir == "desc") { sSQL += " desc "; } else { sSQL += " asc "; }
 
-            SQL += sSQL;
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+            {
+                SqlCommand cmd = new SqlCommand("spSelSO", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Filtros", Value = sSQL });
+                if (conn.State == ConnectionState.Open) { conn.Close(); }
+
+                conn.Open();
+                SqlDataReader sqlQueryResult = cmd.ExecuteReader();
+                while (sqlQueryResult.Read())
+                {
+                    string Moneda = string.Empty;
+                    string Folioc = string.Empty;
+                    string Vendor = string.Empty;
+                    string RFCven = string.Empty;
+                    string Condic = string.Empty;
+                    string Create = string.Empty;
+                    string Paymen = string.Empty;
+                    string Totalc = string.Empty;
+                    string Aprov = string.Empty;
+                    string FecAp = string.Empty;
+                    string Bloqueo = string.Empty;
+                    string Genera = string.Empty;
+                    string Genero = string.Empty;
+
+                    int InvcR = -1;
+                    int Invci = -1;
+                    Bloqueo = "NO";
+                    Genera = "NO";
+                    DateTime fcrea = DateTime.MinValue;
+                    DateTime fpaym = DateTime.MinValue;
+                    DateTime fapro = DateTime.MinValue;
+                    try
+                    {
+                        if (sqlQueryResult.GetValue(0).ToString() != null) { Moneda = sqlQueryResult.GetValue(0).ToString(); } else { Moneda = "MXN"; } // Moneda
+                        if (sqlQueryResult.GetValue(2).ToString() != null) { Folioc = sqlQueryResult.GetValue(2).ToString(); } else { Folioc = ""; }   // Folio
+                        if (sqlQueryResult.GetValue(3).ToString() != null) { Vendor = sqlQueryResult.GetValue(3).ToString(); } else { Vendor = ""; }   // VendName
+                        if (sqlQueryResult.GetValue(4).ToString() != null) { RFCven = sqlQueryResult.GetValue(4).ToString(); } else { RFCven = ""; }   // RFC
+                        if (sqlQueryResult.GetValue(5).ToString() != null) { Condic = sqlQueryResult.GetValue(5).ToString(); } else { Condic = ""; }   // Condiciones
+                        if (sqlQueryResult.GetValue(6).ToString() != null) { Create = sqlQueryResult.GetValue(12).ToString(); } else { Create = ""; }   // CreateDate
+                        if (sqlQueryResult.GetValue(7).ToString() != null) { Paymen = sqlQueryResult.GetValue(13).ToString(); } else { Paymen = ""; }   // PaymentDate
+                        if (sqlQueryResult.GetValue(8).ToString() != null) { Totalc = sqlQueryResult.GetValue(8).ToString(); } else { Totalc = ""; }   // Total
+                        if (sqlQueryResult.GetValue(10).ToString() != null) { Aprov = sqlQueryResult.GetValue(10).ToString(); } else { Aprov = ""; }    // Aprobador
+                        if (sqlQueryResult.GetValue(11).ToString() != null) { FecAp = sqlQueryResult.GetValue(14).ToString(); } else { FecAp = ""; }    // Fecha Aprobacion
+
+                        if (sqlQueryResult.GetValue(15).ToString() != null) { Genero = sqlQueryResult.GetValue(15).ToString(); } else { Genero = ""; }    // Fecha Aprobacion
+
+                        if (sqlQueryResult.GetValue(1).ToString() != null) { InvcR = Convert.ToInt32(sqlQueryResult.GetValue(1).ToString()); } else { InvcR = -1; } // InvcRcptKey
+                        if (sqlQueryResult.GetValue(9).ToString() != null) { Invci = Convert.ToInt32(sqlQueryResult.GetValue(9).ToString()); } else { Invci = -1; } // InvoiceKey
+
+                        if (sqlQueryResult.GetValue(6).ToString() != null) { fcrea = Convert.ToDateTime(sqlQueryResult.GetValue(6).ToString()); } else { fcrea = DateTime.MinValue; } // CreateDate
+                        if (sqlQueryResult.GetValue(7).ToString() != null) { fpaym = Convert.ToDateTime(sqlQueryResult.GetValue(7).ToString()); } else { fpaym = DateTime.MinValue; } // PaymentDate
+                        if (sqlQueryResult.GetValue(11).ToString() != null) { fapro = Convert.ToDateTime(sqlQueryResult.GetValue(11).ToString()); } else { fapro = DateTime.MinValue; }   // Fecha Aprobacion
+
+
+                        if (Aprov != "" || Aprov != null)
+                        {
+                            Bloqueo = revisarol(Aprov, roles, Genero);
+                        }
+                        if (Aprov != "" || Aprov != null)
+                        {
+                            Genera = revisagen(Aprov, roles, Genero);
+                        }
+
+                        //if (roles.Contains("Admin") || roles.Contains("Tesoreria")) 
+                        //if (roles.Contains("Admin") || roles.Contains("Finanzas")) { Genera = "SI"; }
+                    }
+                    catch (Exception ex)
+                    {
+                        var erro = ex.Message;
+                    }
+
+                    contrarecibos.Add(new ContrareciboDTO2(Moneda, InvcR, Folioc, Vendor, RFCven, Condic, Create, Paymen, Totalc, Invci, fcrea, fpaym, FecAp, fapro, Aprov, Bloqueo, Genera));
+                }
+                conn.Close();
+            }
+
+            return contrarecibos;
+        }
+        catch (Exception exp)
+        {
+            if (directo_en_vista)
+                throw new MulticonsultingException(exp.ToString());
+            return new List<ContrareciboDTO2>();
+        }
+    }
+
+    public static List<ContrareciboDTO2> ObtenerContrarecibos_3_0(string order_col, string order_dir, string Folio, string Proveedor, string RFC, string Total, string Fecha, string FechaP, bool sin_solicitud = false, bool directo_en_vista = false)
+    {
+        try
+        {
+            Company company = Tools.EmpresaAutenticada();
+            if (company == null)
+                return null;
+            Users user = Tools.UsuarioAutenticado();
+            if (user == null)
+                return null;
+
+            Expression<Func<InvoiceReceipt, bool>> predicate;
+            bool is_tsys_user = user.UsersInRoles.Where(r => r.Roles.RoleID.Contains("T|SYS|")).FirstOrDefault() != null;
+            if (is_tsys_user)
+                predicate = (a => a.CompanyID == company.CompanyID);
+            else
+            {
+                List<int> VendorsIds = user.Vendors.Select(v => v.VendorKey).ToList();
+                predicate = (a => a.CompanyID == company.CompanyID && VendorsIds.Contains(a.VendorKey));
+            }
+
+            List<ContrareciboDTO2> contrarecibos = new List<ContrareciboDTO2>();
+            string roles = HttpContext.Current.Session["RolUser"].ToString();
+            string sSQL = "";
+
+            if (!string.IsNullOrWhiteSpace(Folio) && Folio != "null")
+            {
+                sSQL += " AND t3.Folio LIKE '%" + Folio + "%' ";
+            }
+            if (!string.IsNullOrWhiteSpace(Proveedor) && Proveedor != "null")
+            {
+                sSQL += " AND d.vendName LIKE '%" + Proveedor + "%' ";
+            }
+            if (!string.IsNullOrWhiteSpace(RFC) && RFC != "null")
+            {
+                sSQL += " AND a.VendDBA LIKE '%" + RFC + "%' ";
+            }
+            if (!string.IsNullOrWhiteSpace(Total) && Total != "null")
+            {
+                sSQL += " AND t3.Total LIKE '%" + Total + "%' ";
+            }
+            if (!string.IsNullOrWhiteSpace(Fecha) && Fecha != "null")
+            {
+                sSQL += " AND FORMAT (T1.CreateDate, ''dd/MM/yyyy '') LIKE '%" + Fecha + "%' ";
+            }
+            if (!string.IsNullOrWhiteSpace(FechaP) && FechaP != "null")
+            {
+                sSQL += " AND FORMAT (t1.PaymentDate, ''dd/MM/yyyy '') LIKE '%" + FechaP + "%' ";
+            }
+
+            if (order_col == "1") { sSQL += " Order by t3.Folio   "; }
+            if (order_col == "2") { sSQL += " Order by d.vendName "; }
+            if (order_col == "3") { sSQL += " Order by a.VendDBA  "; }
+            if (order_col == "4") { sSQL += " Order by c.PmtTermsID "; }
+            if (order_col == "5") { sSQL += " Order by T1.CreateDate "; }
+            if (order_col == "6") { sSQL += " Order by T1.PaymentDate "; }
+            if (order_col == "7") { sSQL += " Order by t3.Total "; }
+            if (order_dir == "desc") { sSQL += " desc "; } else { sSQL += " asc "; }
 
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
             {
@@ -469,6 +599,8 @@ public class Contrarecibos
                     string FecAp = string.Empty;
                     string Bloqueo = string.Empty;
                     string Genera = string.Empty;
+                    string Genero = string.Empty;
+
                     int InvcR = -1;
                     int Invci = -1;
                     Bloqueo = "NO";
@@ -489,6 +621,8 @@ public class Contrarecibos
                         if (sqlQueryResult.GetValue(10).ToString() != null) { Aprov = sqlQueryResult.GetValue(10).ToString(); } else { Aprov = ""; }    // Aprobador
                         if (sqlQueryResult.GetValue(11).ToString() != null) { FecAp = sqlQueryResult.GetValue(14).ToString(); } else { FecAp = ""; }    // Fecha Aprobacion
 
+                        if (sqlQueryResult.GetValue(15).ToString() != null) { Genero = sqlQueryResult.GetValue(15).ToString(); } else { Genero = ""; }    // Fecha Aprobacion
+
                         if (sqlQueryResult.GetValue(1).ToString() != null) { InvcR = Convert.ToInt32(sqlQueryResult.GetValue(1).ToString()); } else { InvcR = -1; } // InvcRcptKey
                         if (sqlQueryResult.GetValue(9).ToString() != null) { Invci = Convert.ToInt32(sqlQueryResult.GetValue(9).ToString()); } else { Invci = -1; } // InvoiceKey
 
@@ -496,8 +630,8 @@ public class Contrarecibos
                         if (sqlQueryResult.GetValue(7).ToString() != null) { fpaym = Convert.ToDateTime(sqlQueryResult.GetValue(7).ToString()); } else { fpaym = DateTime.MinValue; } // PaymentDate
                         if (sqlQueryResult.GetValue(11).ToString() != null) { fapro = Convert.ToDateTime(sqlQueryResult.GetValue(11).ToString()); } else { fapro = DateTime.MinValue; }   // Fecha Aprobacion
 
-                        if (Aprov != "" || Aprov != null) { Bloqueo = revisarol(Aprov, roles); }
-                        if (roles.Contains("Admin") || roles.Contains("Finanzas")) { Genera = "SI"; }
+                        Bloqueo = "0";
+                        Genera = "0";
                     }
                     catch (Exception ex)
                     {
@@ -509,70 +643,6 @@ public class Contrarecibos
                 conn.Close();
             }
 
-
-            //SqlConnection sqlConnection1 = new SqlConnection();
-            //sqlConnection1 = SqlConnectionDB("PortalConnection");
-            //sqlConnection1.Open();
-            //using (var sqlQuery = new SqlCommand(SQL, sqlConnection1))
-            //{
-            //    using (var sqlQueryResult = sqlQuery.ExecuteReader())
-            //        if (sqlQueryResult != null)
-            //        {
-            //            while (sqlQueryResult.Read())
-            //            {
-            //                string Moneda = string.Empty;
-            //                string Folioc = string.Empty;
-            //                string Vendor = string.Empty;
-            //                string RFCven = string.Empty;
-            //                string Condic = string.Empty;
-            //                string Create = string.Empty;
-            //                string Paymen = string.Empty;
-            //                string Totalc = string.Empty;
-            //                string Aprov = string.Empty;
-            //                string FecAp = string.Empty;
-            //                string Bloqueo = string.Empty;
-            //                string Genera = string.Empty;
-            //                int InvcR  = -1;
-            //                int Invci  = -1;
-            //                Bloqueo = "NO";
-            //                Genera = "NO";
-            //                DateTime fcrea = DateTime.MinValue;
-            //                DateTime fpaym = DateTime.MinValue;
-            //                DateTime fapro = DateTime.MinValue;
-            //                try
-            //                {
-            //                    if (sqlQueryResult.GetValue(0).ToString() != null)  { Moneda = sqlQueryResult.GetValue(0).ToString(); } else { Moneda = "MXN"; } // Moneda
-            //                    if (sqlQueryResult.GetValue(2).ToString() != null)  { Folioc = sqlQueryResult.GetValue(2).ToString(); } else { Folioc = ""; }   // Folio
-            //                    if (sqlQueryResult.GetValue(3).ToString() != null)  { Vendor = sqlQueryResult.GetValue(3).ToString(); } else { Vendor = ""; }   // VendName
-            //                    if (sqlQueryResult.GetValue(4).ToString() != null)  { RFCven = sqlQueryResult.GetValue(4).ToString(); } else { RFCven = ""; }   // RFC
-            //                    if (sqlQueryResult.GetValue(5).ToString() != null)  { Condic = sqlQueryResult.GetValue(5).ToString(); } else { Condic = ""; }   // Condiciones
-            //                    if (sqlQueryResult.GetValue(6).ToString() != null)  { Create = sqlQueryResult.GetValue(12).ToString(); } else { Create = ""; }   // CreateDate
-            //                    if (sqlQueryResult.GetValue(7).ToString() != null)  { Paymen = sqlQueryResult.GetValue(13).ToString(); } else { Paymen = ""; }   // PaymentDate
-            //                    if (sqlQueryResult.GetValue(8).ToString() != null)  { Totalc = sqlQueryResult.GetValue(8).ToString(); } else { Totalc = ""; }   // Total
-            //                    if (sqlQueryResult.GetValue(10).ToString() != null) { Aprov = sqlQueryResult.GetValue(10).ToString(); } else { Aprov = ""; }    // Aprobador
-            //                    if (sqlQueryResult.GetValue(11).ToString() != null) { FecAp = sqlQueryResult.GetValue(14).ToString(); } else { FecAp = ""; }    // Fecha Aprobacion
-
-            //                    if (sqlQueryResult.GetValue(1).ToString() != null)  { InvcR = Convert.ToInt32(sqlQueryResult.GetValue(1).ToString()); } else { InvcR = -1; } // InvcRcptKey
-            //                    if (sqlQueryResult.GetValue(9).ToString() != null)  { Invci = Convert.ToInt32(sqlQueryResult.GetValue(9).ToString()); } else { Invci = -1; } // InvoiceKey
-
-            //                    if (sqlQueryResult.GetValue(6).ToString() != null)  { fcrea = Convert.ToDateTime(sqlQueryResult.GetValue(6).ToString()); }  else { fcrea = DateTime.MinValue; } // CreateDate
-            //                    if (sqlQueryResult.GetValue(7).ToString() != null)  { fpaym = Convert.ToDateTime(sqlQueryResult.GetValue(7).ToString()); }  else { fpaym = DateTime.MinValue; } // PaymentDate
-            //                    if (sqlQueryResult.GetValue(11).ToString() != null) { fapro = Convert.ToDateTime(sqlQueryResult.GetValue(11).ToString()); } else { fapro = DateTime.MinValue; }   // Fecha Aprobacion
-
-            //                    if (Aprov != "" || Aprov != null){ Bloqueo = revisarol(Aprov,roles);}
-            //                    if (roles.Contains("Admin") || roles.Contains("Tesoreria")) { Genera = "SI"; }
-            //                }
-            //                catch (Exception ex)
-            //                {
-            //                    var erro = ex.Message;
-            //                }
-
-            //                contrarecibos.Add(new ContrareciboDTO2(Moneda,InvcR,Folioc,Vendor,RFCven,Condic,Create,Paymen,Totalc,Invci,fcrea,fpaym,FecAp, fapro, Aprov, Bloqueo, Genera));
-            //            }
-            //        }
-            //}
-            //sqlConnection1.Close();
-
             return contrarecibos;
         }
         catch (Exception exp)
@@ -583,11 +653,28 @@ public class Contrarecibos
         }
     }
 
-    protected static string revisarol(string aprov, string rol)
+    protected static string revisagen(string aprov, string rol,string Genero)
+    {
+        string valor = "NO";
+        try
+        {
+            int Gen = Convert.ToInt32(Genero.ToString());
+
+            if (rol == "T|SYS| - Admin" && Gen > 0) { valor = "SI"; return valor; }
+            if (rol == "T|SYS| - Validador" && aprov != "" || aprov != null && Gen > 0) { valor = "SI"; return valor; }
+
+        }
+        catch (Exception ex) { }
+        return valor;
+
+    }
+
+    protected static string revisarol(string aprov,string rol,string Genero) 
     {
         string valor = "SI";
         try
         {
+            int Gen = Convert.ToInt32(Genero.ToString());
             //if (rol == "T|SYS| - Admin") { valor = "SI"; return valor; }
             //if (rol == "T|SYS| - Validador" && aprov == "" || aprov == null) { valor = "SI"; return valor; }
             //if (rol == "T|SYS| - Tesoreria" && aprov.Contains("Validador")) { valor = "SI"; return valor; }
@@ -596,6 +683,8 @@ public class Contrarecibos
 
             if (rol == "T|SYS| - Admin") { valor = "NO"; return valor; }
             if (rol == "T|SYS| - Validador" && aprov == "" || aprov == null) { valor = "NO"; return valor; }
+
+            if (rol == "T|SYS| - Validador" && aprov != "" || aprov != null && Gen > 0) { valor = "NO"; return valor; }
             //if (rol == "T|SYS| - Validador" && aprov.Contains("Admin")) { valor = "NO"; return valor; }
             if (rol == "T|SYS| - Tesoreria" && aprov.Contains("Validador") || aprov.Contains("Admin")) { valor = "NO"; return valor; }
             if (rol == "T|SYS| - Finanzas" && aprov.Contains("Tesoreria") || aprov.Contains("Admin")) { valor = "NO"; return valor; }
@@ -649,16 +738,16 @@ public class Contrarecibos
 
             if (token == "")
             {
-                token = GeneraryEnviar();
+                token =  GeneraryEnviar();
             }
-            else
+            else 
             {
                 token = "enviado";
             }
         }
         catch (Exception exp)
         {
-            throw new MulticonsultingException(exp.ToString());
+           throw new MulticonsultingException(exp.ToString());
         }
         return token;
     }
@@ -687,7 +776,7 @@ public class Contrarecibos
                 sqlConnection1.Open();
                 using (var sqlQuery = new SqlCommand("", sqlConnection1))
                 {
-                    sqlQuery.CommandText = "Update [SecurityToken] set Activo = 0 Where Userkey = " + usker;
+                    sqlQuery.CommandText =  "Update [SecurityToken] set Activo = 0 Where Userkey = " + usker;
                     sqlQuery.CommandType = CommandType.Text;
                     sqlQuery.ExecuteNonQuery();
                     token = "enviado";
@@ -704,21 +793,21 @@ public class Contrarecibos
             string SSl = "insert into SecurityToken (Activo,userkey,token,CreationDate,ExpirationDate) values (1," + usker + ",'" + PassNew + "',GETDATE(),GETDATE())";
             try
             {
-                sqlConnection1 = SqlConnectionDB("PortalConnection");
-                sqlConnection1.Open();
-                using (var sqlQuery = new SqlCommand("", sqlConnection1))
-                {
+               sqlConnection1 = SqlConnectionDB("PortalConnection");
+               sqlConnection1.Open();
+               using (var sqlQuery = new SqlCommand("", sqlConnection1))
+               {
                     sqlQuery.CommandText = SSl;
                     sqlQuery.CommandType = CommandType.Text;
                     sqlQuery.ExecuteNonQuery();
                     token = "enviado";
-                }
-                sqlConnection1.Close();
-            }
-            catch (Exception exp)
-            {
+               }
+              sqlConnection1.Close();
+             }
+             catch (Exception exp)
+             {
                 token = "error";
-            }
+             }
 
             //ENVIA POR CORREO NUEVO TOKEN
             if (token == "enviado")
@@ -730,7 +819,7 @@ public class Contrarecibos
                 {
                     Body = reader.ReadToEnd();
                     Body = Body.Replace("{PassTemp}", PassNew);
-                    Body = Body.Replace("{Time}", "15");
+                    Body = Body.Replace("{Time}", "15");                    
                 }
 
                 //correo = "luis.ang.b1one@gmail.com";
@@ -856,6 +945,329 @@ public class Contrarecibos
         return token;
     }
 
+    public static string updatetoken2(string ids)
+    {
+        string token = string.Empty;
+        try
+        {
+            Company company = Tools.EmpresaAutenticada();
+            if (company == null)
+                return null;
+            Users user = Tools.UsuarioAutenticado();
+            if (user == null)
+                return null;
+
+            string usker = HttpContext.Current.Session["UserKey"].ToString();
+
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+
+            try
+            {
+                var js = new JavaScriptSerializer();
+                var UUIDs_obj = (IEnumerable<object>)js.DeserializeObject(ids);
+                if (sqlConnection1.State == ConnectionState.Open) { sqlConnection1.Close(); }
+                sqlConnection1.Open();
+                foreach (var item in UUIDs_obj)
+                {
+                    using (var sqlQuery = new SqlCommand("", sqlConnection1))
+                    {
+                        var invckey = item.ToString();
+                        var Query = "";
+                        Query += " IF((Select count(*) From approInvcReceipt Where InvcRcptKey = " + invckey + " ) = 0) ";
+                        Query += " BEGIN ";
+                        Query += "      Insert into approInvcReceipt(InvcRcptKey, Nivel1, Date1) Values(" + invckey + ", " + usker + ", GETDATE() ";
+                        Query += "      Update InvoiceReceipt set Aprobador = " + usker + " Where InvcRcptKey = " + item.ToString() + " ";
+                        Query += " END ";
+                        Query += " ELSE IF((Select Nivel2 From approInvcReceipt Where InvcRcptKey = " + invckey + ") IS NULL) ";
+                        Query += " BEGIN ";
+                        Query += "      Update approInvcReceipt set Nivel2 = " + usker + ", Date2 = GETDATE() Where InvcRcptKey = " + invckey + " ";
+                        Query += "      Update InvoiceReceipt set Aprobador = " + usker + " Where InvcRcptKey = " + item.ToString() + " ";
+                        Query += " END ";
+                        Query += " ELSE IF((Select Nivel3 From approInvcReceipt Where InvcRcptKey = " + invckey + ") IS NULL) ";
+                        Query += " BEGIN ";
+                        Query += "      Update approInvcReceipt set Nivel3 = " + usker + ", Date3 = GETDATE() Where InvcRcptKey = " + invckey + " ";
+                        Query += "      Update InvoiceReceipt set Aprobador = " + usker + " Where InvcRcptKey = " + item.ToString() + " ";
+                        Query += " END ";
+                        Query += " ELSE IF((Select Nivel3 From approInvcReceipt Where InvcRcptKey = " + invckey + ") IS NOT NULL AND(Select Generado From approInvcReceipt Where InvcRcptKey = " + invckey + ") IS NULL) ";
+                        Query += " BEGIN ";
+                        Query += "      Update approInvcReceipt set Generado = 1, DateGenerado = GETDATE() Where InvcRcptKey = " + invckey + " ";
+                        Query += " END ";                        
+                        sqlQuery.CommandText = Query;
+                        sqlQuery.CommandType = CommandType.Text;
+                        sqlQuery.ExecuteNonQuery();
+                        token = "actualizado";
+                    }
+                }
+                sqlConnection1.Close();
+            }
+            catch (Exception exp)
+            {
+                token = "error al actualizar contrarrecibo";
+            }
+        }
+        catch (Exception exp)
+        {
+            throw new MulticonsultingException(exp.ToString());
+        }
+        return token;
+    }
+
+    public static string updatetoken3(string folio, string llave, string fila)
+    {
+        string token = string.Empty;
+        try
+        {
+            Company company = Tools.EmpresaAutenticada();
+            if (company == null)
+                return null;
+            Users user = Tools.UsuarioAutenticado();
+            if (user == null)
+                return null;
+
+            string usker = HttpContext.Current.Session["UserKey"].ToString();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+                {
+                    SqlCommand cmd = new SqlCommand("UpdateSolCheq", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter() { ParameterName = "@UserKey", Value = usker });
+                    cmd.Parameters.Add(new SqlParameter() { ParameterName = "@FacKey", Value = folio });
+                    cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Opcion", Value = 2 });
+                    if (conn.State == ConnectionState.Open) { conn.Close(); }
+
+                    conn.Open();
+                    SqlDataReader sqlQueryResult = cmd.ExecuteReader();
+                    while (sqlQueryResult.Read()) 
+                    {
+                        token = "actualizado";
+                    }
+                    conn.Close();
+                    token = "actualizado";
+
+                }
+
+                //SqlConnection sqlConnection1 = new SqlConnection();
+                //sqlConnection1 = SqlConnectionDB("PortalConnection");
+                //sqlConnection1.Open();
+                //string sSQL;
+
+                //sSQL = "UpdateSolCheq";
+                //List<SqlParameter> parsT = new List<SqlParameter>();
+                //parsT.Add(new SqlParameter("@UserKey", user));
+                //parsT.Add(new SqlParameter("@FacKey", folio));
+                //parsT.Add(new SqlParameter("@Opcion", 2));
+
+                //using (System.Data.SqlClient.SqlCommand Cmd = new System.Data.SqlClient.SqlCommand(sSQL, sqlConnection1))
+                //{
+
+                //    Cmd.CommandType = CommandType.StoredProcedure;
+                //    Cmd.CommandText = sSQL;
+
+                //    foreach (System.Data.SqlClient.SqlParameter par in parsT)
+                //    {
+                //        Cmd.Parameters.AddWithValue(par.ParameterName, par.Value);
+                //    }
+                //    System.Data.SqlClient.SqlDataReader rdr = null;
+                //    rdr = Cmd.ExecuteReader();
+                //    sqlConnection1.Close();
+                //    token = "actualizado";
+                //}
+            
+            }
+            catch (Exception ex)
+            {
+                throw new MulticonsultingException(ex.Message);
+            }
+        }
+        catch (Exception exp)
+        {
+            throw new MulticonsultingException(exp.ToString());
+        }
+        return token;
+    }
+
+    //Rutina de Conexión
+    public static SqlConnection SqlConnectionDB(string cnx)
+    {
+        try
+        {
+            SqlConnection SqlConnectionDB = new SqlConnection();
+            ConnectionStringSettings connSettings = ConfigurationManager.ConnectionStrings[cnx];
+            if ((connSettings != null) && (connSettings.ConnectionString != null))
+            {
+                SqlConnectionDB.ConnectionString = ConfigurationManager.ConnectionStrings[cnx].ConnectionString;
+            }
+
+            return SqlConnectionDB;
+        }
+        catch (Exception ex)
+        {
+            return null;
+            throw new MulticonsultingException(ex.Message);
+
+        }
+    }
+
+    public static string revisanuevos2(string ids)
+    {
+        string token = "NO";
+        string roles = HttpContext.Current.Session["RolUser"].ToString();
+
+        try
+        {
+            Company company = Tools.EmpresaAutenticada();
+            if (company == null)
+                return null;
+            Users user = Tools.UsuarioAutenticado();
+            if (user == null)
+                return null;
+
+            int contador = 0;
+            string cadena = "";
+            string SQL = " ";
+            var js = new JavaScriptSerializer();
+            var UUIDs_obj = (IEnumerable<object>)js.DeserializeObject(ids);
+            foreach (var item in UUIDs_obj) 
+            {
+                if (cadena == "")
+                {
+                    cadena = item.ToString();
+                }
+                else 
+                {
+                    cadena = cadena + "," + item.ToString();
+                }
+            }
+
+            SQL += " Select InvcRcptKey From approInvcReceipt Where Nivel3 IS NOT NULL AND Generado IS NULL AND InvcRcptKey IN  ( " + cadena + " )";
+
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+            sqlConnection1.Open();
+            using (var sqlQuery = new SqlCommand(SQL, sqlConnection1))
+            {
+                using (var sqlQueryResult = sqlQuery.ExecuteReader())
+                    if (sqlQueryResult != null)
+                    {
+                        while (sqlQueryResult.Read())
+                        {
+                            try
+                            {
+                                if (sqlQueryResult.GetValue(0).ToString() != null) 
+                                {
+                                    contador = contador + 1;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                var erro = ex.Message;
+                            }
+                        }
+                    }
+            }
+            sqlConnection1.Close();
+
+            if (contador == 0)
+            {
+                token = "NO";
+            }
+            else
+            {
+                token = "SI";
+            }
+        }
+        catch (Exception exp)
+        {
+            throw new MulticonsultingException(exp.ToString());
+        }
+        return token;
+    }
+
+    public static string revisanuevos3(string ids)
+    {
+        string token = "";
+        string roles = HttpContext.Current.Session["RolUser"].ToString();
+
+        try
+        {
+            Company company = Tools.EmpresaAutenticada();
+            if (company == null)
+                return null;
+            Users user = Tools.UsuarioAutenticado();
+            if (user == null)
+                return null;
+
+            string cadena = "";
+            string reultado = "";
+            string SQL = " ";
+            var js = new JavaScriptSerializer();
+            var UUIDs_obj = (IEnumerable<object>)js.DeserializeObject(ids);
+            foreach (var item in UUIDs_obj)
+            {
+                if (cadena == "")
+                {
+                    cadena = item.ToString();
+                }
+                else
+                {
+                    cadena = cadena + "," + item.ToString();
+                }
+            }
+
+            SQL += " Select InvcRcptKey From approInvcReceipt Where Nivel3 IS NOT NULL AND Generado IS NULL AND InvcRcptKey IN  ( " + cadena + " )";
+
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+            sqlConnection1.Open();
+            using (var sqlQuery = new SqlCommand(SQL, sqlConnection1))
+            {
+                using (var sqlQueryResult = sqlQuery.ExecuteReader())
+                    if (sqlQueryResult != null)
+                    {
+                        while (sqlQueryResult.Read())
+                        {
+                            try
+                            {
+                                if (sqlQueryResult.GetValue(0).ToString() != null)
+                                {
+                                    if (reultado == "")
+                                    {
+                                        reultado = sqlQueryResult.GetValue(0).ToString();
+                                    }
+                                    else
+                                    {
+                                        reultado = reultado + "-" + sqlQueryResult.GetValue(0).ToString();
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                var erro = ex.Message;
+                            }
+                        }
+                    }
+            }
+            sqlConnection1.Close();
+
+            if (reultado == "")
+            {
+                token = "";
+            }
+            else
+            {
+                token = reultado;
+            }
+        }
+        catch (Exception exp)
+        {
+            throw new MulticonsultingException(exp.ToString());
+        }
+        return token;
+    }
+
     protected static string GetEmailAddress()
     {
         MembershipUser currUser = null;
@@ -872,7 +1284,7 @@ public class Contrarecibos
         string caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         StringBuilder res = new StringBuilder();
         Random rnd = new Random();
-        while (0 < longitud--)
+        while (0 < longitud --)
         {
             res.Append(caracteres[rnd.Next(caracteres.Length)]);
         }
@@ -929,32 +1341,13 @@ public class Contrarecibos
         }
     }
 
-    public static SqlConnection SqlConnectionDB(string cnx)
-    {
-        try
-        {
-            SqlConnection SqlConnectionDB = new SqlConnection();
-            ConnectionStringSettings connSettings = ConfigurationManager.ConnectionStrings[cnx];
-            if ((connSettings != null) && (connSettings.ConnectionString != null))
-            {
-                SqlConnectionDB.ConnectionString = ConfigurationManager.ConnectionStrings[cnx].ConnectionString;
-            }
-
-            return SqlConnectionDB;
-        }
-        catch (Exception ex)
-        {
-            return null;
-        }
-    }
-
     public static string correo3(string VendID)
     {
         string correo = string.Empty;
         try
         {
             string SQL = "  Select ISNULL(f.UserID,(Select UserID from vendors a LEFT JOIN Users f on a.UserKey = f.UserKey Where VendorID = @VendID)) ";
-            SQL += " As Correo from vendors a LEFT JOIN Users f on a.superior = f.UserKey Where VendorID = @VendID";
+                   SQL += " As Correo from vendors a LEFT JOIN Users f on a.superior = f.UserKey Where VendorID = @VendID";
             SqlConnection sqlConnection1 = new SqlConnection();
             sqlConnection1 = SqlConnectionDB("PortalConnection");
 
@@ -976,12 +1369,12 @@ public class Contrarecibos
             sqlConnection1.Close();
 
         }
-        catch (Exception ec)
+        catch (Exception ec) 
         {
-
+        
         }
         return correo;
-
+    
     }
 
     public static int GenerarContrarecibo(List<string> UUIDs, string rpt_path)
@@ -1002,10 +1395,7 @@ public class Contrarecibos
 
             ReportDocument report_document = new ReportDocument();
             report_document.Load(rpt_path);
-            //List<Invoice> list = db.Invoice.Where(i => i.CompanyID == company.CompanyID && UUIDs.Contains(i.UUID)).ToList();
-            //La siguiente linea fue modificada por: Cesilio Hernández
-            List<Invoice> list = db.Invoice.Where(i => i.CompanyID == company.CompanyID && UUIDs.Contains(i.UUID)).Where(i => i.Status.Value == 4).ToList();
-
+            List<Invoice> list = db.Invoice.Where(i => i.CompanyID == company.CompanyID && UUIDs.Contains(i.UUID)).ToList();
             if (list.Count > 1 && list.Where(l => l.UpdateDate.Value.Date != list.First().UpdateDate.Value.Date).FirstOrDefault() != null)
                 throw new MulticonsultingException("Hay facturas que son de diferentes fechas"); // Son de diferentes fechas
             if (list.Count > 1 && list.Where(l => l.VendorKey != list.First().VendorKey).FirstOrDefault() != null)
@@ -1021,7 +1411,7 @@ public class Contrarecibos
                     Int32 AprovUserKey = Convert.ToInt32(invoice.AprovUserKey);
                     Users user = db.Users.Where(u => u.UserKey == AprovUserKey).FirstOrDefault();
                     Total += invoice.Total;
-
+                    
                     //List<NotaDTO> Notas = new List<NotaDTO>();
 
                     bool sin_notas = true;
@@ -1069,7 +1459,7 @@ public class Contrarecibos
                 if (proveedor != null)
                 {
                     if (string.IsNullOrWhiteSpace(proveedor.Condiciones))
-                        throw new MulticonsultingException("El proveedor no tiene definido las condiciones de pago");
+                    throw new MulticonsultingException("El proveedor no tiene definido las condiciones de pago");
 
                     //Terminos_de_Pago = proveedor.Condiciones;
                     Terminos_de_Pago = "60";
@@ -1101,7 +1491,7 @@ public class Contrarecibos
                 };
 
                 db.InvoiceReceipt.Add(nuevo_contrarecibo);
-                db.SaveChanges();
+                db.SaveChanges();                
                 foreach (FacturaDTO factura in facturas)
                 {
                     InvcRcptDetails details = new InvcRcptDetails()
@@ -1115,8 +1505,8 @@ public class Contrarecibos
                         IVA = Math.Round(Convert.ToDecimal(factura.Traslados), 2),
                         ISR = Math.Round(Convert.ToDecimal(factura.Retenciones), 2),
                         TotalTax = Convert.ToDecimal(factura.Retenciones) + Convert.ToDecimal(factura.Traslados),
-                        Total = Convert.ToDecimal(factura.Total)
-                    };
+                        Total = Convert.ToDecimal(factura.Total)                     
+                };
                     Folios1 = Folios1 + factura.Folio + ", ";
                     Conta = Conta + 1;
                     db.InvcRcptDetails.Add(details);
@@ -1146,7 +1536,7 @@ public class Contrarecibos
                 report_document.SetParameterValue("fecha_datos", Tools.FechaEnEspañol(nuevo_contrarecibo.CreateDate));
                 report_document.SetParameterValue("proveedor", proveedor.Social);
                 report_document.SetParameterValue("total", Total);
-
+                
                 Stream stream = report_document.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
                 BinaryReader br = new BinaryReader(stream);
 
@@ -1186,11 +1576,11 @@ public class Contrarecibos
                 {
                     Global.EmailGlobalAdd(proveedor.Correo, body, "Contrarecibo", stream, "Contrarecibo.pdf");
                 }
-                else
+                else 
                 {
                     Global.EmailGlobalAdd(corre, body, "Contrarecibo", stream, "Contrarecibo.pdf");
                 }
-
+                
                 Facturas.ActualizarEstadoFacturasSql();
 
                 return nuevo_contrarecibo.InvcRcptKey;
@@ -1198,8 +1588,8 @@ public class Contrarecibos
         }
         catch (Exception e)
         {
-            throw new MulticonsultingException(e.Message, e.InnerException);
+            throw new MulticonsultingException(e.Message, e.InnerException); 
         }
         return -1;
-    }
+    }    
 }

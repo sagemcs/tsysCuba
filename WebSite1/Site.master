@@ -194,6 +194,9 @@
                                         <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/Contrarecibo">Generar contrarecibo</a>
                                         </li>
+                                        <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/AprobSolCheq">Aprobacion solicitud de cheque</a>
+                                        </li>
                                          <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/SolicitudCheque">Generar solicitud de cheque</a>
                                         </li>

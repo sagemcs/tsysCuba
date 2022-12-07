@@ -5,10 +5,8 @@
 
 //REFERENCIAS UTILIZADAS
 
-using Proveedores_Model;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,6 +14,8 @@ using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
+using Proveedores_Model;
+using System.Globalization;
 
 /// <summary>
 /// Summary description for ContrarecibosWebService
@@ -23,7 +23,7 @@ using System.Web.Services;
 [WebService(Namespace = "http://tempuri.org/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
-[System.Web.Script.Services.ScriptService]
+ [System.Web.Script.Services.ScriptService]
 public class ContrarecibosWebService : System.Web.Services.WebService
 {
     private PortalProveedoresEntities db = new PortalProveedoresEntities();
@@ -50,7 +50,7 @@ public class ContrarecibosWebService : System.Web.Services.WebService
                 RcptPago = Tools.ObtenerFechaEnFormatoNew(RcptPago);
 
                 list_dto = Contrarecibos.ObtenerContrarecibos(Folio, VendID, AliasDBA, Total, RcptDate, RcptPago, sin_solicitud);
-
+                
                 //list_dto = Contrarecibos.ObtenerContrarecibos_2_0(order_col, order_dir, Folio, VendID, AliasDBA, Total, RcptDate, RcptPago, sin_solicitud);
                 var js = new JavaScriptSerializer();
                 Context.Response.Clear();
@@ -148,7 +148,6 @@ public class ContrarecibosWebService : System.Web.Services.WebService
         }
     }
 
-
     [WebMethod(EnableSession = true)]
     [ScriptMethod(UseHttpGet = true)]
     public void listar2(string order_col, string order_dir, string Folio, string VendID, string AliasDBA, string Total, string RcptDate, string RcptPago, int start, int length, bool sin_solicitud = false)
@@ -164,6 +163,80 @@ public class ContrarecibosWebService : System.Web.Services.WebService
                 RcptDate = Tools.ObtenerFechaEnFormatoNew(RcptDate);
                 RcptPago = Tools.ObtenerFechaEnFormatoNew(RcptPago);
                 list_dto = Contrarecibos.ObtenerContrarecibos_2_0(order_col, order_dir, Folio, VendID, AliasDBA, Total, RcptDate, RcptPago, sin_solicitud);
+                
+                var js = new JavaScriptSerializer();
+                Context.Response.Clear();
+                Context.Response.ContentType = "application/json";
+
+                if (list_dto != null)
+                {
+                    for (int i = 0; i <= list_dto.Count() - 1; i++)
+                    {
+                        string regin = "es-MX";
+                        if (list_dto[i].Moneda == "USD")
+                        {
+                            regin = "en-US";
+                        }
+                        else if (list_dto[i].Moneda == "EUR")
+                        {
+                            regin = "fr-FR";
+                        }
+
+                        CultureInfo gbCulture = new CultureInfo(regin);
+                        string Simbol = gbCulture.NumberFormat.CurrencySymbol;
+                        list_dto[i].Total = Simbol + " " + Convert.ToDecimal(list_dto[i].Total).ToString("#,##0.00");
+                    }
+
+
+                    int total = list_dto.Count();
+                    list_dto = length == -1 ? list_dto.Skip(start).ToList() : list_dto.Skip(start).Take(length).ToList();
+                    int cantidad = list_dto.Count();
+
+                    var result = new
+                    {
+                        recordsTotal = cantidad,
+                        recordsFiltered = total,
+                        data = list_dto
+                    };
+                    Context.Response.Write(js.Serialize(result));
+                }
+                else
+                {
+                    var result = new
+                    {
+                        error = "No se obtubieron los datos peticionados"
+                    };
+                    Context.Response.Write(js.Serialize(result));
+                }
+            }
+            else
+            {
+                Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                Context.Response.End();
+            }
+        }
+        catch
+        {
+            Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            Context.Response.End();
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(UseHttpGet = true)]
+    public void listar3(string order_col, string order_dir, string Folio, string VendID, string AliasDBA, string Total, string RcptDate, string RcptPago, int start, int length, bool sin_solicitud = false)
+    {
+        try
+        {
+            string supuesto_token = Context.Request.Headers.GetValues("Authorization").First();
+
+            if (Tools.EsTokenValido(supuesto_token) && Tools.UsuarioAutenticado() != null)
+            {
+                List<ContrareciboDTO2> list_dto = new List<ContrareciboDTO2>();
+
+                RcptDate = Tools.ObtenerFechaEnFormatoNew(RcptDate);
+                RcptPago = Tools.ObtenerFechaEnFormatoNew(RcptPago);
+                list_dto = Contrarecibos.ObtenerContrarecibos_3_0(order_col, order_dir, Folio, VendID, AliasDBA, Total, RcptDate, RcptPago, sin_solicitud);
 
                 var js = new JavaScriptSerializer();
                 Context.Response.Clear();
@@ -246,7 +319,7 @@ public class ContrarecibosWebService : System.Web.Services.WebService
                 {
                     list_dto = Contrarecibos.ObtenerContrarecibosEmpleado(Folio, VendID, AliasDBA, Total, RcptDate, RcptPago, sin_solicitud);
                 }
-                else
+                else 
                 {
                     list_dto = Contrarecibos.ObtenerContrarecibos(Folio, VendID, AliasDBA, Total, RcptDate, RcptPago, sin_solicitud);
                 }
@@ -440,10 +513,16 @@ public class ContrarecibosWebService : System.Web.Services.WebService
             {
                 string usker = HttpContext.Current.Session["UserKey"].ToString();
                 string roles = HttpContext.Current.Session["RolUser"].ToString();
-
-                string token = Contrarecibos.updatetoken(ids);
+                
+                string token = Contrarecibos.updatetoken2(ids);
                 string Genera = "NO";
-                if (roles.Contains("Admin") || roles.Contains("Finanzas")) { Genera = "SI"; }
+                if (roles.Contains("Admin") || roles.Contains("Validador")) 
+                {
+                    Genera = Contrarecibos.revisanuevos2(ids);
+                }
+
+                //string Genera = "NO";
+                //if (roles.Contains("Admin") || roles.Contains("Finanzas")) { Genera = "SI"; }
 
                 var js = new JavaScriptSerializer();
                 Context.Response.Clear();
@@ -456,6 +535,97 @@ public class ContrarecibosWebService : System.Web.Services.WebService
                     user = usker,
                     token = token,
                     Genera = Genera
+                };
+                Context.Response.Write(js.Serialize(result));
+            }
+            else
+            {
+                Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                Context.Response.End();
+            }
+        }
+        catch
+        {
+            Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            Context.Response.End();
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(UseHttpGet = true)]
+    public void updateSOL2(string folio,string llave, string fila)
+    {
+        try
+        {
+            string supuesto_token = Context.Request.Headers.GetValues("Authorization").First();
+
+            if (Tools.EsTokenValido(supuesto_token) && Tools.UsuarioAutenticado() != null)
+            {
+                string usker = HttpContext.Current.Session["UserKey"].ToString();
+                string roles = HttpContext.Current.Session["RolUser"].ToString();
+
+                string token = Contrarecibos.updatetoken3(folio,llave,fila);
+
+                var js = new JavaScriptSerializer();
+                Context.Response.Clear();
+                Context.Response.ContentType = "application/json";
+
+                var result = new
+                {
+                    success = true,
+                    rol = roles,
+                    user = usker,
+                    token = token,
+                    Genera = "SI"
+                };
+                Context.Response.Write(js.Serialize(result));
+            }
+            else
+            {
+                Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                Context.Response.End();
+            }
+        }
+        catch
+        {
+            Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            Context.Response.End();
+        }
+    }
+       
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(UseHttpGet = true)]
+    public void revisaNvos(string ids)
+    {
+        try
+        {
+            string supuesto_token = Context.Request.Headers.GetValues("Authorization").First();
+
+            if (Tools.EsTokenValido(supuesto_token) && Tools.UsuarioAutenticado() != null)
+            {
+                string usker = HttpContext.Current.Session["UserKey"].ToString();
+                string roles = HttpContext.Current.Session["RolUser"].ToString();
+                string token = "";
+
+                if (roles.Contains("Admin") || roles.Contains("Validador"))
+                {
+                    token = Contrarecibos.revisanuevos3(ids);
+                }
+
+                //string Genera = "NO";
+                //if (roles.Contains("Admin") || roles.Contains("Finanzas")) { Genera = "SI"; }
+
+                var js = new JavaScriptSerializer();
+                Context.Response.Clear();
+                Context.Response.ContentType = "application/json";
+
+                var result = new
+                {
+                    success = true,
+                    rol = roles,
+                    user = usker,
+                    token = token
                 };
                 Context.Response.Write(js.Serialize(result));
             }

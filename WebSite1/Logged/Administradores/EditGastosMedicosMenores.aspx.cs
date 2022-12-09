@@ -911,15 +911,15 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             return;
         }
 
-        //Validaciones del Importe y Articulos - Impuestos
-        if (importe_gasto != lista_detalles.Sum(x => x.Amount + x.TaxAmount))
-        {          
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;         
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            MultiView1.SetActiveView(View_General);
-            return;
-        }
+        ////Validaciones del Importe y Articulos - Impuestos
+        //if (importe_gasto != lista_detalles.Sum(x => x.Amount + x.TaxAmount))
+        //{          
+        //    tipo = "error";
+        //    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;         
+        //    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+        //    MultiView1.SetActiveView(View_General);
+        //    return;
+        //}
 
         //Solo alertas sin retorno
         is_valid = true;             

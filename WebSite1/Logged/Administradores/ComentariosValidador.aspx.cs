@@ -153,18 +153,7 @@ public partial class Logged_Administradores_ComentariosValidador : System.Web.UI
             return null;
         }
     }
-
-    public Dictionary<int, string> Dict_Level()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "T|SYS| - Validador" },
-            { 2, "T|SYS|- Gerente-de-Área" },
-            { 3, "T | SYS | -ValidadorTesorería" },
-            { 4, "T | SYS | -ValidadorFinanzas" }
-        };
-        return dict;
-    }
+    
     protected void Page_Load(object sender, EventArgs e)
     {
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
@@ -175,8 +164,8 @@ public partial class Logged_Administradores_ComentariosValidador : System.Web.UI
         try
         {
             string rol = HttpContext.Current.Session["RolUser"].ToString();
-            var validadores = Doc_Tools.get_RolesValidadores();
-            if (!validadores.Any(x=> x.ID == rol))
+            List<RolDTO> roles = Doc_Tools.get_RolesValidadores();
+            if (!roles.Any(x=> x.ID == rol))
             {
                 Context.GetOwinContext().Authentication.SignOut();
                 Response.Redirect("~/Account/Login.aspx");
@@ -188,7 +177,7 @@ public partial class Logged_Administradores_ComentariosValidador : System.Web.UI
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
-                    int level = Dict_Level().FirstOrDefault(x=> x.Value == rol).Key;
+                    int level = roles.FirstOrDefault(x => x.ID == rol).Key;
 
                     if (!IsPostBack)
                     {
@@ -207,9 +196,8 @@ public partial class Logged_Administradores_ComentariosValidador : System.Web.UI
                                 btn_GuardarComentario.Enabled = false;
                             }
                             foreach (var comentario in comentarios)
-                            {
-                                var nivel_desc = Dict_Level().FirstOrDefault(x => x.Key == level).Value;
-                                tbx_ListaComentarios.Text += string.Format("{0} -- {1}", nivel_desc,comentario.DeniedReason)  + Environment.NewLine;
+                            {                                
+                                tbx_ListaComentarios.Text += string.Format("{0} -- {1}", comentario.Role,comentario.DeniedReason)  + Environment.NewLine;
                             }
                         }
                     }
@@ -264,12 +252,13 @@ public partial class Logged_Administradores_ComentariosValidador : System.Web.UI
 
     protected List<DeniedComentDTO> read_coments(int expense_id, string company_id, Doc_Tools.DocumentType doc_type)
     {
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores();
         List<DeniedComentDTO> lista = new List<DeniedComentDTO>();
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = string.Format("SELECT ApprovalLevel, DeniedReason FROM {0}DeniedComent  where  {0}Id = @{0}Id and CompanyId = @CompanyId", doc_type.ToString());
-            cmd.Parameters.Add(string.Format("@{0}Id",doc_type.ToString()), SqlDbType.VarChar).Value = expense_id;
+            cmd.CommandText = string.Format("SELECT ApprovalLevel, DeniedReason FROM {0} where  {0}Id = @{0}Id and CompanyId = @CompanyId", doc_type.ToString());
+            cmd.Parameters.Add(string.Format("@{0}Id", doc_type.ToString()), SqlDbType.VarChar).Value = expense_id;
             cmd.Parameters.Add("@CompanyId", SqlDbType.VarChar).Value = company_id;
             cmd.Connection.Open();
             SqlDataReader lector = cmd.ExecuteReader();
@@ -277,7 +266,23 @@ public partial class Logged_Administradores_ComentariosValidador : System.Web.UI
             {
                 var coment = new DeniedComentDTO();
                 coment.ApprovalLevel = lector.GetInt32(0);
+                coment.Role = roles.FirstOrDefault(x => x.Key == coment.ApprovalLevel).ID;
                 coment.DeniedReason = lector.GetString(1);
+                lista.Add(coment);
+            }
+            cmd.Connection.Close();
+            cmd.Parameters.Clear();
+            cmd.CommandText = string.Format("SELECT ApprovalLevel, DeniedReason FROM {0}DeniedComent  where  {0}Id = @{0}Id and CompanyId = @CompanyId", doc_type.ToString());
+            cmd.Parameters.Add(string.Format("@{0}Id",doc_type.ToString()), SqlDbType.VarChar).Value = expense_id;
+            cmd.Parameters.Add("@CompanyId", SqlDbType.VarChar).Value = company_id;
+            cmd.Connection.Open();
+            SqlDataReader lector2 = cmd.ExecuteReader();
+            while (lector2.Read())
+            {
+                var coment = new DeniedComentDTO();
+                coment.ApprovalLevel = lector2.GetInt32(0);
+                coment.Role = roles.FirstOrDefault(x => x.Key == coment.ApprovalLevel).ID;
+                coment.DeniedReason = lector2.GetString(1);
                 lista.Add(coment);
             }
             cmd.Connection.Close();
@@ -290,7 +295,8 @@ public partial class Logged_Administradores_ComentariosValidador : System.Web.UI
         string comentario = tbx_coment.Text;
         int expense_id = (int)HttpContext.Current.Session["ExpenseComentId"];
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        int nivel = Dict_Level().FirstOrDefault(x => x.Value == rol).Key;
+        List<RolDTO> roles = Doc_Tools.get_RolesValidadores();
+        int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         var doc_type = (Doc_Tools.DocumentType)HttpContext.Current.Session["DocumentType"];
 
         if (string.IsNullOrEmpty(comentario))
@@ -300,7 +306,7 @@ public partial class Logged_Administradores_ComentariosValidador : System.Web.UI
             return;
         }       
 
-        save_coment(expense_id, pUserKey, tbx_coment.Text, nivel,pCompanyID, doc_type);
+        save_coment(expense_id, pUserKey, tbx_coment.Text, level, pCompanyID, doc_type);
         Response.Redirect(Dict_rutas().FirstOrDefault(x=> x.Value == doc_type.ToString()).Key);
     }
 

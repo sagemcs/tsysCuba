@@ -188,12 +188,14 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
-                    BindPackageInfo();                    
+                    BindPackageInfo();
+                    
                     upPackage.Visible = level <= 1;
                     //BindGridView();
                     if (!IsPostBack)
                     {
-                        BindEmpleados(); 
+                        BindEmpleados();
+                        BindStatus();                        
                     }
                    
                     pVendKey = 0;
@@ -275,6 +277,10 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         var roles = Doc_Tools.get_RolesValidadores();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         List<ExpenseDTO> gastos = ReadFromDb(user_id, level).ToList();
+        if (status_id != 0)
+        {
+            gastos = gastos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d => d.Key == status_id).Value).ToList();
+        }
         if (inicio!=null)
         {
             gastos = gastos.Where(x => x.Date >= inicio.Value).ToList();
@@ -283,11 +289,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         {
             gastos = gastos.Where(x => x.Date <= final.Value).ToList();
         }
-        if(status_id!=0)
-        {
-            gastos = gastos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d=> d.Key == status_id).Value).ToList();
-        }
-        gvGastos.DataSource = gastos;
+       
+        gvGastos.DataSource = gastos.OrderByDescending(x => x.Date).ToList();
         gvGastos.DataBind();
     }
 
@@ -308,6 +311,17 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
        
     }
 
+    private void BindStatus()
+    {
+        var estados = Doc_Tools.Dict_status().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
+        estados.Add(new { Id = 0, Nombre = "Todos" });
+        drop_status.DataSource = estados.OrderBy(o => o.Id).ToList();
+        drop_status.DataTextField = "Nombre";
+        drop_status.DataValueField = "Id";
+        drop_status.DataBind();
+        drop_status.SelectedIndex = -1;
+    }
+    
     private void BindPackageInfo()    
     {        
         var paquete = get_Package(pUserKey);

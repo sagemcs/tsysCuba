@@ -77,3 +77,15 @@ using System.Web;
         }
 
     }
+    public class ExpenseValidatorReportDTO
+    {
+        public string Nombre { get; set; }
+        public string Fecha { get; set; }
+        public string Tipo { get; set; }
+        public decimal Importe { get; set; }
+        public ExpenseValidatorReportDTO()
+        {
+
+
+        }
+    }

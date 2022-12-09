@@ -166,7 +166,7 @@
              <div class="col-lg-8 col-sm-8 col-xs-8">
                 <h4>Comentarios previos:</h4>   
                 <div class="col-lg-12 col-sm-12 col-xs-12">               
-                    <asp:TextBox runat="server" type="text" AutoComplete = "off" AutoCompleteType="Disabled" ID="tbx_ListaComentarios" MaxLength="1000" class="form-control" ReadOnly="true" BackColor="White" TextMode="MultiLine"/>
+                    <asp:TextBox runat="server" type="text" AutoComplete = "off" AutoCompleteType="Disabled" ID="tbx_ListaComentarios" MaxLength="1000" class="form-control" ReadOnly="true" BackColor="White" TextMode="MultiLine" Rows="5"/>
                 </div>
              </div>             
             </div>

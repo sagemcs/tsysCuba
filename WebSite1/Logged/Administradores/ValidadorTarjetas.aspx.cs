@@ -192,7 +192,8 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                     //BindGridView();
                     if (!IsPostBack)
                     {
-                        BindEmpleados();       
+                        BindEmpleados();
+                        BindStatus();                       
                     }
                    
                     pVendKey = 0;
@@ -274,19 +275,20 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 1).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         List<CorporateCardDTO> gastos = ReadFromDb(user_id, level).ToList();
+        if (status_id != 0)
+        {
+            gastos = gastos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d => d.Key == status_id).Value).ToList();
+        }
         if (inicio!=null)
         {
-            gastos = gastos.Where(x => x.CreateDate >= inicio.Value).ToList();
+            gastos = gastos.Where(x => x.Date >= inicio.Value).ToList();
         }
         if(final!=null)
         {
-            gastos = gastos.Where(x => x.CreateDate <= final.Value).ToList();
+            gastos = gastos.Where(x => x.Date <= final.Value).ToList();
         }
-        if(status_id!=0)
-        {
-            gastos = gastos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d=> d.Key == status_id).Value).ToList();
-        }
-        gvGastos.DataSource = gastos;
+        
+        gvGastos.DataSource = gastos.OrderByDescending(x => x.Date).ToList();
         gvGastos.DataBind();
     }
 
@@ -305,6 +307,17 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         drop_empleados.DataBind();
         drop_empleados.SelectedIndex = -1;
     }
+
+    private void BindStatus()
+    {
+        var estados = Doc_Tools.Dict_status().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
+        estados.Add(new { Id = 0, Nombre = "Todos" });
+        drop_status.DataSource = estados.OrderBy(o => o.Id).ToList();
+        drop_status.DataTextField = "Nombre";
+        drop_status.DataValueField = "Id";
+        drop_status.DataBind();
+        drop_status.SelectedIndex = -1;
+    }    
 
     private void BindPackageInfo()
     {        

@@ -85,4 +85,22 @@ public class AdvanceReportGroupedDTO
 
 
     }
+
+
+}
+
+public class AdvanceValidatorReportDTO
+{
+    public string Nombre { get; set; }
+    public string Folio { get; set; }
+    public string Tipo { get; set; }
+    public string FechaSalida { get; set; }
+    public string FechaLLegada { get; set; }
+    public string FechaComprobacion { get; set; }
+    public decimal Importe { get; set; }
+    public AdvanceValidatorReportDTO()
+    {
+
+
+    }
 }

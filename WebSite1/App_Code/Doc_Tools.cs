@@ -937,7 +937,7 @@ public static class Doc_Tools
             { "MB40", "No coincide el importe total del gasto con los artículos e impuestos declarados." },
             { "MB39", "Ya existe una tarjeta con ese monto el dia actual." },
             { "MB38", "Solo se admiten gastos del mes actual." },
-            { "MB37", "No coincide el importe total del reembolso con los artículos e impuestos declarados." },
+            { "MB37", "No coincide el importe total del gasto con los artículos e impuestos declarados." },
             { "MB36", "Ya existe un Gasto Medico Menor con ese monto el dia actual." },
             { "MB35", "Debe especificar los elementos del gasto." },
             { "MB34", "La suma de los reembolsos rebasa el importe del anticipo." },

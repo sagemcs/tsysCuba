@@ -50,3 +50,14 @@ public class MinorMedicalExpenseReport2DTO : Document
     }
 
 }
+public class MinorMedicalExpenseValidatorReportDTO
+{
+    public string Nombre { get; set; }
+    public string Fecha { get; set; }
+    public decimal Importe { get; set; }
+    public MinorMedicalExpenseValidatorReportDTO()
+    {
+
+
+    }
+}

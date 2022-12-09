@@ -181,11 +181,14 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
                     BindPackageInfo();
+                   
                     upPackage.Visible = roles.Min(x => x.Key) == level;
                     //BindGridView();
                     if (!IsPostBack)
                     {
                         BindEmpleados();
+                        BindStatus();
+                        BindType();
                     }
                    
                     pVendKey = 0;                   
@@ -249,9 +252,8 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         eventName = "OnPreInit";
     }
 
-    private void BindGridView(int user_id, int? status_id)
-    {
-        var paquete = get_Package(pUserKey);
+    private void BindGridView(int user_id, int? status_id, int? type)
+    {        
         gvAnticipos.DataSource = null;
         gvAnticipos.Visible = true;        
         DateTime? final = !string.IsNullOrEmpty(tbx_fecha_fin.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_fin.Text) : null;
@@ -259,20 +261,26 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
-        List<AdvanceDTO> anticipos = ReadFromDb(user_id, level).ToList();
+        List<AdvanceDTO> anticipos = ReadFromDb(user_id, level);
+        if(status_id!=0)
+        {
+            anticipos = anticipos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d => d.Key == status_id).Value).ToList();
+        }  
+        if(type!=0)
+        {
+            anticipos = anticipos.Where(x => x.AdvanceType == Dict_type().FirstOrDefault(d => d.Key == type).Value).ToList();
+        }
         if (inicio!=null)
         {
-            anticipos = anticipos.Where(x => x.CreateDate >= inicio.Value).ToList();
+            anticipos = anticipos.Where(x => x.CheckDate >= inicio).ToList();
         }
         if(final!=null)
         {
-            anticipos = anticipos.Where(x => x.CreateDate <= final.Value).ToList();
+            anticipos = anticipos.Where(x => x.CheckDate <= final).ToList();
         }
-        if(status_id!=0)
-        {
-            anticipos = anticipos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d=> d.Key == status_id).Value).ToList();
-        }
-        gvAnticipos.DataSource = anticipos;
+
+        
+        gvAnticipos.DataSource = anticipos.OrderByDescending(x => x.CheckDate).ToList();
         gvAnticipos.DataBind();
     }
 
@@ -292,12 +300,33 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         drop_empleados.SelectedIndex = -1;
     }
 
+    private void BindStatus()
+    {      
+        var estados = Doc_Tools.Dict_status().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
+        estados.Add(new { Id=0, Nombre="Todos" });
+        drop_status.DataSource = estados.OrderBy(o => o.Id).ToList();
+        drop_status.DataTextField = "Nombre";
+        drop_status.DataValueField = "Id";
+        drop_status.DataBind();
+        drop_status.SelectedIndex = -1;
+    }
+
+    private void BindType()
+    {
+        var tipos = Dict_type().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
+        tipos.Add(new { Id = 0, Nombre = "Todos" });
+        drop_tipo.DataSource = tipos.OrderBy(o => o.Id).ToList();
+        drop_tipo.DataTextField = "Nombre";
+        drop_tipo.DataValueField = "Id";
+        drop_tipo.DataBind();
+        drop_tipo.SelectedIndex = -1;
+    }
+
     private void BindPackageInfo()
     {        
         var paquete = get_Package(pUserKey);
         tbx_no_paquete.Text = paquete.PackageId.ToString();
-        tbx_cant_reembolsos.Text = get_expenses_package(paquete.PackageId).ToString();
-        
+        tbx_cant_reembolsos.Text = get_expenses_package(paquete.PackageId).ToString();        
     }            
 
     public Dictionary<int, string> Dict_type()
@@ -367,18 +396,22 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
         int user_id = 0;
+        int type = 0;
         if (drop_empleados.SelectedItem != null)
         {
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
         }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
-
+        if(drop_tipo.SelectedItem != null)
+        {
+            type = int.Parse(drop_tipo.SelectedItem.Value);
+        }
         if (level_validador == 1)
         {
             if (paquete.PackageId == 0)
             {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B34").Value;
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B53").Value;
                 ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
@@ -390,7 +423,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
             Update_Advance(advance_id, paquete.PackageId, status, string.Empty, level: level_validador);
             EnviarCorreo(true);
             BindPackageInfo();
-            BindGridView(user_id, status_id);
+            BindGridView(user_id, status_id, type);
         }
 
         if (e.CommandName == "Deny")
@@ -408,7 +441,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
             Update_Advance(advance_id, paquete.PackageId, status, motivo.Text, level: level_validador);
             EnviarCorreo(false);
             BindPackageInfo();
-            BindGridView(user_id, status_id);
+            BindGridView(user_id, status_id, type);
         }
 
         if (e.CommandName == "Coment")
@@ -434,7 +467,8 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                         user_id = int.Parse(drop_empleados.SelectedItem.Value);
                     }
                     status_id = int.Parse(drop_status.SelectedItem.Value);
-                    BindGridView(user_id, status_id);
+
+                    BindGridView(user_id, status_id, type);
 
                     tipo = "success";
                     Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B32").Value;
@@ -457,7 +491,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 return;
             }            
         }
-        BindGridView(user_id, status_id);
+        BindGridView(user_id, status_id, type);
         BindPackageInfo();
     }
 
@@ -567,6 +601,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     protected void drop_empleados_SelectedIndexChanged(object sender, EventArgs e)
     {    
         int user_id = 0;
+        int type = 0;
         if (drop_empleados.SelectedItem != null)
         {
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
@@ -578,8 +613,12 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
             ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }
+        if(drop_tipo.SelectedItem!=null)
+        {
+            type = int.Parse(drop_tipo.SelectedItem.Value);
+        }       
         int status_id = int.Parse(drop_status.SelectedItem.Value);
-        BindGridView(user_id, status_id);
+        BindGridView(user_id, status_id, type);
     }
 
     protected void btn_filtrar_Click(object sender, EventArgs e)
@@ -588,34 +627,45 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         tbx_fecha_inicio.Text = string.Empty;
         drop_empleados.SelectedIndex = -1;
         int user_id = 0;
+        int type = 0;
         if (drop_empleados.SelectedItem != null)
         {
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
         }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
-        BindGridView(user_id, status_id);
+        BindGridView(user_id, status_id,type);
     }
 
     protected void tbx_fecha_inicio_TextChanged(object sender, EventArgs e)
     {
         int user_id = 0;
+        int type = 0;
         if (drop_empleados.SelectedItem != null)
         {
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
         }
+        if (drop_tipo.SelectedItem != null)
+        {
+            type = int.Parse(drop_tipo.SelectedItem.Value);
+        }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
-        BindGridView(user_id, status_id);
+        BindGridView(user_id, status_id, type);
     }
 
     protected void tbx_fecha_fin_TextChanged(object sender, EventArgs e)
     {
         int user_id = 0;
+        int type = 0;
         if (drop_empleados.SelectedItem != null)
         {
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
         }
+        if (drop_tipo.SelectedItem != null)
+        {
+            type = int.Parse(drop_tipo.SelectedItem.Value);
+        }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
-        BindGridView(user_id, status_id);
+        BindGridView(user_id, status_id, type);
     }
 
     protected int get_expenses_package(int PackageId)
@@ -684,13 +734,36 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     protected void drop_status_SelectedIndexChanged(object sender, EventArgs e)
     {
         int user_id = 0;
+        int type = 0;
         if (drop_empleados.SelectedItem != null)
         {
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
         }
+        if (drop_tipo.SelectedItem != null)
+        {
+            type = int.Parse(drop_tipo.SelectedItem.Value);
+        }
         int status_id = int.Parse(drop_status.SelectedItem.Value);
-        BindGridView(user_id, status_id);
-    }        
+        
+        BindGridView(user_id, status_id, type);
+    }
+
+    protected void drop_tipo_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        int type = 0;
+        int user_id = 0;
+        if (drop_empleados.SelectedItem != null)
+        {
+            user_id = int.Parse(drop_empleados.SelectedItem.Value);
+        }
+        if (drop_tipo.SelectedItem != null)
+        {
+            type = int.Parse(drop_tipo.SelectedItem.Value);
+        }
+        int status_id = int.Parse(drop_status.SelectedItem.Value);
+      
+        BindGridView(user_id, status_id, type);
+    }
 
     protected void gvAnticipos_RowDataBound(object sender, GridViewRowEventArgs e)
     {        
@@ -711,73 +784,106 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
             TextBox tbx_motivo = (TextBox)e.Row.Cells[11].Controls[1];
             Button btn_comentar = (Button)e.Row.Cells[12].Controls[1];
             Button btn_integrar = (Button)e.Row.Cells[13].Controls[1];
-
-            if (level - anticipo.ApprovalLevel == 1)
+            
+            switch (e.Row.Cells[8].Text)
             {
-                //partimos con la premisa de que solo vamos a ver anticipos de niveles de aprobacion = (nuestro - 1)
-                if (e.Row.Cells[8].Text == "Pendiente")
-                {
-                    btn_aprobar.Visible = true;    
-                    btn_denegar.Visible = true;
-                    tbx_motivo.Visible = true;
-                    tbx_motivo.ReadOnly = false;
-                    btn_integrar.Visible = false;
-                }
-                if (e.Row.Cells[8].Text == "Aprobado")
-                {
-                    if (anticipo.ApprovalLevel == level)
-                    {
-                        btn_aprobar.Visible = false;
-                        btn_denegar.Visible = false;
-                        tbx_motivo.Visible = true;
-                        tbx_motivo.ReadOnly = true;
-                        btn_integrar.Visible = false;
-                    }
-                    else
+                case "Pendiente":
+                    if (level - anticipo.ApprovalLevel == 1)
                     {
                         btn_aprobar.Visible = true;
                         btn_denegar.Visible = true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;
                         btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
                     }
-                }
-                if (e.Row.Cells[8].Text == "Denegado")
-                {
+                    else
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    break;
+                case "Aprobado":
+                    if (level - anticipo.ApprovalLevel == 1)
+                    {
+                        btn_aprobar.Visible = true;
+                        btn_denegar.Visible = true;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = false;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
+                    }
+                    else if(anticipo.ApprovalLevel == level)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = false;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
+                    }
+                    else 
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_comentar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.ReadOnly = true;
+                        tbx_motivo.Visible = false;
+                        btn_integrar.Visible = anticipo.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
+                    }
+                    break;
+                case "Denegado":
+                    if(level - anticipo.ApprovalLevel == 1)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    else if (anticipo.ApprovalLevel == level)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
+                    }
+                    else
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    break;
+                case "Vencido":
                     btn_aprobar.Visible = false;
                     btn_denegar.Visible = false;
-                    tbx_motivo.Visible = true;
+                    tbx_motivo.Visible = false;
                     tbx_motivo.ReadOnly = true;
                     btn_integrar.Visible = false;
-                }
-                if (e.Row.Cells[8].Text == "Integrado")
-                {
-                    btn_integrar.Visible = false;
-                    btn_aprobar.Visible = false;
-                    btn_denegar.Visible = false;
                     btn_comentar.Visible = false;
-                    tbx_motivo.Visible = true;
-                    tbx_motivo.ReadOnly = true;
-                }
-            }
-            else
-            {
-                btn_aprobar.Visible = false;
-                btn_comentar.Visible = false;
-                btn_denegar.Visible = false;              
-                tbx_motivo.ReadOnly = true;
-                btn_integrar.Visible = anticipo.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
-
-                if (e.Row.Cells[8].Text == "Integrado")
-                {
-                    btn_integrar.Visible = false;
+                    break;
+                case "Integrado":
                     btn_aprobar.Visible = false;
                     btn_denegar.Visible = false;
-                    btn_comentar.Visible = false;
-                    tbx_motivo.Visible = true;
+                    tbx_motivo.Visible = false;
                     tbx_motivo.ReadOnly = true;
-                }
-            }
+                    btn_integrar.Visible = false;
+                    btn_comentar.Visible = false;
+                    break;
+                default:
+                    break;
+            }  
 
         }
     }
@@ -831,4 +937,6 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         bool is_text_html = false;
         email.Enviar(from, to, subject, text, is_text_html);
     }
+
+   
 }

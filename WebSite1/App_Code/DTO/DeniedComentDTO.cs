@@ -11,6 +11,7 @@ public class DeniedComentDTO
     public int UserKey { get; set; }
     public DateTime CreateDate { get; set; }
     public int ApprovalLevel { get; set; }
+    public string Role { get; set; }
     public string CompanyId { get; set; }
 
 

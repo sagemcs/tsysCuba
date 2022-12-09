@@ -263,8 +263,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             err = ex.Message;
             HttpContext.Current.Session["Error"] = err;        
         }
-    }
-   
+    }   
     private void Load_Articles_By_Expense(int expense_id, int user_id, string company_id)
     {
         var lista = (List<ItemDTO>)HttpContext.Current.Session["Items"];
@@ -297,12 +296,15 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                 article.STaxCodeID = taxes.FirstOrDefault(x => x.STaxCodeKey == article.STaxCodeKey).STaxCodeID;
                 article.Type = dataReader.GetInt32(7);
                 article.TipoGasto = Doc_Tools.Dict_tipos_gastos().FirstOrDefault(x => x.Key == article.Type).Value;
-                articles.Add(article);
-               
+                article.Accion = ExpenseDetailDTO.Action.None;
+                if (!articles.Any(x => x.DetailId == article.DetailId))
+                {
+                    articles.Add(article);
+                }
             }
         }
         GvItems.DataSource = null;
-        GvItems.DataSource = articles;
+        GvItems.DataSource = articles.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
         HttpContext.Current.Session["GridList"] = articles;
         GvItems.DataBind();
     }
@@ -464,7 +466,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                 var modified = cmd.ExecuteScalar();
                 foreach (ExpenseDetailDTO detail in expenseDetails)
                 {
-                    if (detail.DetailId == null)
+                    if (detail.Accion == ExpenseDetailDTO.Action.Insert)
                     {                        
                         cmd.Parameters.Clear();
                         cmd.CommandText = "INSERT INTO CorporateCardDetail (CorporateCardId,ItemKey,Type,Qty,UnitCost,Amount,CreateDate,UpdateDate,CreateUser,CompanyId, STaxCodeKey,TaxAmount) VALUES (@_CorporateCardId,@_ItemKey,@_Type,@_Qty,@_UnitCost,@_Amount,@_CreateDate,@_UpdateDate,@_CreateUser,@_CompanyId, @_STaxCodeKey, @_TaxAmount);";
@@ -482,6 +484,13 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                         cmd.Parameters.Add("@_TaxAmount", SqlDbType.Decimal).Value = detail.TaxAmount;
                         var inserted = cmd.ExecuteScalar();
                         cmd.Parameters.Clear();
+                    }
+                    if (detail.Accion == ExpenseDetailDTO.Action.Delete)
+                    {
+                        if (detail.DetailId != null)
+                        {
+                            delete_article(detail.DetailId.Value);
+                        }
                     }
                 }              
                 cmd.Connection.Close();
@@ -552,7 +561,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         {
             int itemKey = int.Parse(row.Cells[0].Text);
             var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
-            if (lista.Count == 1)
+            if (lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Count() == 1)
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB50").Value;
@@ -560,18 +569,12 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                 return;
             }
             var detail = lista.FirstOrDefault(x => x.ItemKey == itemKey);
-            lista.Remove(detail);
-            if (detail.DetailId != null)
-            {
-                if (check_article(detail.DetailId.Value))
-                {
-                    delete_article(detail.DetailId.Value);
-                }
-            }
+            detail.Accion = ExpenseDetailDTO.Action.Delete;
+          
             HttpContext.Current.Session["GridList"] = lista;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
     }
 
@@ -675,19 +678,20 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             detalle.STaxCodeID = drop_taxes.SelectedItem.Text;
             detalle.TaxAmount = taxes.FirstOrDefault(x => x.STaxCodeKey == detalle.STaxCodeKey).Rate * detalle.Amount;
         }
+        detalle.Accion = ExpenseDetailDTO.Action.Insert;
 
         if (HttpContext.Current.Session["GridList"] != null)
         {
             var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
             if (!lista.Any(x => x.ItemKey == detalle.ItemKey))
-            {
+            {                
                 lista.Add(detalle);
             }
             HttpContext.Current.Session["GridList"] = lista;
             GvItems.DataSource = null;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
         else
         {
@@ -697,9 +701,9 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             };
             HttpContext.Current.Session["GridList"] = lista;
             GvItems.DataSource = null;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
 
         //Limpiar controles
@@ -946,9 +950,9 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             }
         }
         else { if (card.FileNamePdfVoucher.Count == 0) { voucher = true; } }
-
         
-        var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];       
+        var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
+        lista_detalles = lista_detalles.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).ToList();
 
         if (lista_detalles == null || lista_detalles.Count == 0)
         {

@@ -853,7 +853,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = true;
                         btn_integrar.Visible = false;
-                        btn_comentar.Visible = false;
+                        btn_comentar.Visible = true;
                     }
                     else
                     {

@@ -213,12 +213,8 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             }
             if (HttpContext.Current.Session["MinorMedicalExpense"] != null)
             {
-                var expense = (MinorMedicalExpenseDTO)HttpContext.Current.Session["MinorMedicalExpense"];
-                //tbx_importe.Text = expense.Amount.ToString();
-                //tbx_fechagasto.Text = expense.Date.ToString("yyyy-MM-dd");                
-                Load_Articles_By_Expense(expense.MinorMedicalExpenseId, pUserKey, pCompanyID);
-                //tbx_pdf.Text = expense.FileNamePdf;
-                //tbx_xml.Text = expense.FileNameXml;
+                var expense = (MinorMedicalExpenseDTO)HttpContext.Current.Session["MinorMedicalExpense"];                   
+                Load_Articles_By_Expense(expense.MinorMedicalExpenseId, pUserKey, pCompanyID);               
             }
         }
         catch (Exception ex)
@@ -261,15 +257,16 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
                 article.STaxCodeKey = dataReader.GetInt32(5);
                 article.TaxAmount = dataReader.GetDecimal(6);
                 article.STaxCodeID = taxes.FirstOrDefault(x => x.STaxCodeKey == article.STaxCodeKey).STaxCodeID;
-                if (!articles.Any(x=> x.ItemKey == article.ItemKey))
+                article.Accion = ExpenseDetailDTO.Action.None;   
+                if(!articles.Any(x=> x.DetailId== article.DetailId))
                 {
                     articles.Add(article);
-                }       
+                }                      
                 
             }
         }
         GvItems.DataSource = null;
-        GvItems.DataSource = articles;
+        GvItems.DataSource = articles.Where(x=> x.Accion != ExpenseDetailDTO.Action.Delete);
         HttpContext.Current.Session["GridList"] = articles;
         GvItems.DataBind();
     }
@@ -299,97 +296,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         HttpContext.Current.Session["Items"] = lista;
 
 
-    }   
-
-    private bool CompruebaMontoFactura(MemoryStream fs, decimal importe)
-    {
-        try
-        {
-            StreamReader streamReader = null;
-            TextReader reader = null;
-            XmlSerializer Xmls = null;
-
-            uCFDsLib.v33.Comprobante Factura = new uCFDsLib.v33.Comprobante();
-            uCFDsLib.v40.Comprobante Facturas = new uCFDsLib.v40.Comprobante();
-
-            try
-            {
-
-                string xmlOutput = string.Empty;
-                fs.Position = 0;
-                streamReader = new StreamReader(fs);
-                xmlOutput = streamReader.ReadToEnd();
-                streamReader.Close();
-                reader = new StringReader(xmlOutput);
-
-                try
-                {
-                    Xmls = new XmlSerializer(Facturas.GetType());
-                    Facturas = (uCFDsLib.v40.Comprobante)Xmls.Deserialize(reader);
-                    if (Facturas.Total == importe)
-                    {
-                        return true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    try
-                    {
-                        reader = new StringReader(xmlOutput);
-                        Xmls = new XmlSerializer(Factura.GetType());
-                        Factura = (uCFDsLib.v33.Comprobante)Xmls.Deserialize(reader);
-                        if (Factura.Total == importe)
-                        {
-                            return true;
-                        }
-                    }
-                    catch (Exception exs)
-                    {
-                        //LOG Err
-                        HttpContext.Current.Session["Error"] = "Tu archivo no tiene la estructura valida por el SAT.";
-                        string Mensaje = "Error al Deserializar el Archivo ";
-                        Mensaje = Mensaje + exs.Message;
-                        if (exs.InnerException != null)
-                        {
-                            Mensaje = Mensaje + " || " + exs.InnerException;
-                        }
-                        LogError(iLogKey, iUserKey, "Carga de Factura_CargarXML()", Mensaje, iCompanyID);
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //LOG Err
-                HttpContext.Current.Session["Error"] = "Tu archivo no tiene la estructura valida por el SAT.";
-                string Mensaje = "Error al Deserializar el Archivo ";
-                Mensaje = Mensaje + ex.Message;
-                if (ex.InnerException != null)
-                {
-                    Mensaje = Mensaje + " || " + ex.InnerException;
-                }
-                LogError(iLogKey, iUserKey, "Carga de Factura_CargarXML()", Mensaje, iCompanyID);
-                return false;
-            }
-        }
-        catch (Exception ex)
-        {
-            string err;
-            err = ex.Message;
-            if (HttpContext.Current.Session["Error"].ToString() == "")
-            {
-                err = err + HttpContext.Current.Session["Error"].ToString();
-            }
-            LogError(pLogKey, pUserKey, "Carga-Factura:btnSage_Click", err, pCompanyID);
-
-            if (HttpContext.Current.Session["Error"].ToString() == "")
-            {
-                HttpContext.Current.Session["Error"] = err;
-            }
-            return false;
-        }
-        return false;
-    }
+    }      
 
     protected void btnSage_Click(object sender, EventArgs e)
     {
@@ -488,7 +395,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
 
                 foreach (ExpenseDetailDTO detail in expenseDetails)
                 {
-                    if (detail.DetailId == null)
+                    if (detail.Accion == ExpenseDetailDTO.Action.Insert)
                     {                        
                         cmd.Parameters.Clear();
                         cmd.CommandText = "INSERT INTO MinorMedicalExpenseDetail (MinorMedicalExpenseId,ItemKey,Qty,UnitCost,Amount,CreateDate,UpdateDate,CreateUser,CompanyId, STaxCodeKey,TaxAmount) VALUES (@_ExpenseId,@_ItemKey,@_Qty,@_UnitCost,@_Amount,@_CreateDate,@_UpdateDate,@_CreateUser,@_CompanyId, @_STaxCodeKey, @_TaxAmount);";
@@ -504,6 +411,13 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
                         cmd.Parameters.Add("@_STaxCodeKey", SqlDbType.Decimal).Value = detail.STaxCodeKey;
                         cmd.Parameters.Add("@_TaxAmount", SqlDbType.Decimal).Value = detail.TaxAmount;
                         var inserted = cmd.ExecuteScalar();                        
+                    }
+                    if(detail.Accion == ExpenseDetailDTO.Action.Delete)
+                    {
+                        if(detail.DetailId!=null)
+                        {
+                            delete_article(detail.DetailId.Value);
+                        }                        
                     }
                 }
                 
@@ -524,6 +438,9 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
 
     protected void GvItems_RowCommand(object sender, GridViewCommandEventArgs e)
     {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
         //Borrar articulo del grid   
         int rowIndex = int.Parse(e.CommandArgument.ToString());
         GridViewRow row = GvItems.Rows[rowIndex];
@@ -543,15 +460,18 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             lista.Remove(detail);
             if(detail.DetailId!=null)
             {
-                if(check_article(detail.DetailId.Value))
-                {
-                    delete_article(detail.DetailId.Value);
-                }
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB50").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
             }
+            var detail = lista.FirstOrDefault(x => x.ItemKey == itemKey);
+            detail.Accion = ExpenseDetailDTO.Action.Delete;    
+            
             HttpContext.Current.Session["GridList"] = lista;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x=> x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
     }
 
@@ -643,13 +563,14 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
             if (!lista.Any(x => x.ItemKey == detalle.ItemKey))
             {
+                detalle.Accion = ExpenseDetailDTO.Action.Insert;
                 lista.Add(detalle);
             }
             HttpContext.Current.Session["GridList"] = lista;
             GvItems.DataSource = null;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x=> x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
         else
         {
@@ -657,11 +578,11 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             {
                 detalle
             };
-            HttpContext.Current.Session["GridList"] = lista;
+            HttpContext.Current.Session["GridList"] = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataSource = null;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
 
         //Limpiar controles
@@ -900,7 +821,8 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         
         fill_fileUploads();
         
-        var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];       
+        var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
+        lista_detalles = lista_detalles.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).ToList();
 
         if (lista_detalles == null || lista_detalles.Count == 0)
         {          
@@ -956,6 +878,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         HttpContext.Current.Session["xml_files"] = null;
         HttpContext.Current.Session["pdf_files"] = null;
         HttpContext.Current.Session["motivo"] = null;
+        HttpContext.Current.Session["GridList"] = null;
         if (fu_pdf != null)
         {
             fu_pdf.Attributes.Clear();

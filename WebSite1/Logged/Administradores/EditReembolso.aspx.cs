@@ -277,13 +277,16 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                 article.STaxCodeID = taxes.FirstOrDefault(x => x.STaxCodeKey == article.STaxCodeKey).STaxCodeID;
                 article.Type = dataReader.GetInt32(7);
                 article.TipoGasto = Doc_Tools.Dict_tipos_gastos().FirstOrDefault(x => x.Key == article.Type).Value;
-                
+                article.Accion = ExpenseDetailDTO.Action.None;
                 articles.Add(article);
-               
+                if (!articles.Any(x => x.DetailId == article.DetailId))
+                {
+                    articles.Add(article);
+                }
             }
         }
         GvItems.DataSource = null;
-        GvItems.DataSource = articles;
+        GvItems.DataSource = articles.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
         HttpContext.Current.Session["GridItems"] = articles;
         GvItems.DataBind();
     }
@@ -369,7 +372,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
 
                 foreach (ExpenseDetailDTO detail in expenseDetails)
                 {
-                    if(detail.DetailId == null)
+                    if(detail.Accion == ExpenseDetailDTO.Action.Insert)
                     {                        
                         cmd.Parameters.Clear();
                         cmd.CommandText = "INSERT INTO ExpenseDetail (ExpenseId,ItemKey,Qty,UnitCost,Amount,CreateDate,UpdateDate,CreateUser,CompanyId, STaxCodeKey,TaxAmount ,Type) VALUES (@_ExpenseId,@_ItemKey,@_Qty,@_UnitCost,@_Amount,@_CreateDate,@_UpdateDate,@_CreateUser, @_CompanyId, @_STaxCodeKey, @_TaxAmount, @_Type);";
@@ -387,7 +390,14 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                         cmd.Parameters.Add("@_TaxAmount", SqlDbType.Decimal).Value = detail.TaxAmount;
                         var inserted = cmd.ExecuteScalar();
                         cmd.Parameters.Clear();
-                    }                   
+                    }
+                    if (detail.Accion == ExpenseDetailDTO.Action.Delete)
+                    {
+                        if (detail.DetailId != null)
+                        {
+                            delete_article(detail.DetailId.Value);
+                        }
+                    }
                 }                
                 cmd.Connection.Close();
                 
@@ -576,7 +586,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         {
             int itemKey = int.Parse(row.Cells[0].Text);
             var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridItems"];
-            if (lista.Count == 1)
+            if (lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Count() == 1)
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB50").Value;
@@ -584,18 +594,12 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                 return;
             }
             var detail = lista.FirstOrDefault(x => x.ItemKey == itemKey);
-            lista.Remove(detail);
-            if (detail.DetailId != null)
-            {
-                if (check_article(detail.DetailId.Value))
-                {
-                    delete_article(detail.DetailId.Value);
-                }
-            }
+            detail.Accion = ExpenseDetailDTO.Action.Delete;  
+            
             HttpContext.Current.Session["GridItems"] = lista;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
     }
 
@@ -692,16 +696,16 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             detalle.STaxCodeID = drop_taxes.SelectedItem.Text;
             detalle.TaxAmount = taxes.FirstOrDefault(x => x.STaxCodeKey == detalle.STaxCodeKey).Rate * detalle.Amount;
         }
-
+        detalle.Accion = ExpenseDetailDTO.Action.Insert;
         if (HttpContext.Current.Session["GridItems"] != null)
         {
-            var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridItems"];
+            var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridItems"];           
             lista.Add(detalle);
             HttpContext.Current.Session["GridItems"] = lista;
             GvItems.DataSource = null;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
         else
         {
@@ -711,9 +715,9 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             };
             HttpContext.Current.Session["GridItems"] = lista;
             GvItems.DataSource = null;
-            GvItems.DataSource = lista;
+            GvItems.DataSource = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
             GvItems.DataBind();
-            tbx_importe.Text = lista.Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
+            tbx_importe.Text = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Sum(x => x.Amount + x.TaxAmount).ToString("0.00");
         }
 
         //Limpiar controles
@@ -917,7 +921,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         decimal importe_gasto = decimal.Parse(tbx_importe.Text);        
 
         var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridItems"];
-      
+        lista_detalles = lista_detalles.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).ToList();
         if (lista_detalles == null || lista_detalles.Count == 0)
         {          
             tipo = "error";

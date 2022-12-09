@@ -28,6 +28,7 @@ public class ExpenseDetailDTO
     public decimal TaxAmount { get; set; }
     public DateTime CreateDate { get; set; }
     public int CreateUser { get; set; }
+    public Action Accion { get; set; }
    
     public ExpenseDetailDTO()
     {
@@ -35,4 +36,5 @@ public class ExpenseDetailDTO
         // TODO: Add constructor logic here
         //
     }
+    public enum Action { Insert, Delete, None}
 }

@@ -795,132 +795,56 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
             Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
             Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
-           
-            //3 escenarios a plantear  (CXP) (Tesoreria) (Finanzas)
-            switch (level)
+
+            switch (e.Row.Cells[5].Text)
             {
-                case 2:  //CXP
-                    if (level - card.ApprovalLevel == 0 || card.ApprovalLevel == 0)
+                case "Pendiente":
+                    if (level - card.ApprovalLevel == 2)
                     {
-                        if (e.Row.Cells[5].Text == "Pendiente")
-                        {
-                            btn_aprobar.Visible = true;
-                            btn_denegar.Visible = true;
-                            tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = false;
-                            btn_integrar.Visible = false;
-
-                        }
-                        if (e.Row.Cells[5].Text == "Aprobado")
-                        {
-                            if (card.ApprovalLevel == level)
-                            {
-                                btn_aprobar.Visible = false;
-                                btn_denegar.Visible = false;
-                                tbx_motivo.Visible = true;
-                                tbx_motivo.ReadOnly = true;
-                                btn_integrar.Visible = false;
-                            }
-                            else
-                            {
-                                btn_aprobar.Visible = true;
-                                btn_denegar.Visible = true;
-                                tbx_motivo.Visible = true;
-                                tbx_motivo.ReadOnly = false;
-                                btn_integrar.Visible = card.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
-                            }
-
-                        }
-                        if (e.Row.Cells[5].Text == "Denegado")
-                        {
-                            btn_aprobar.Visible = false;
-                            btn_denegar.Visible = false;
-                            tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = true;
-                            btn_integrar.Visible = false;
-
-                        }
-                        if (e.Row.Cells[5].Text == "Integrado")
-                        {
-                            btn_aprobar.Visible = false;
-                            btn_denegar.Visible = false;
-                            btn_comentar.Visible = false;
-                            tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = true;
-                            btn_integrar.Visible = false;
-                        }
+                        btn_aprobar.Visible = true;
+                        btn_denegar.Visible = true;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = false;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
+                    }
+                    else if(level==card.ApprovalLevel)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = false;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
                     }
                     else 
                     {
                         btn_aprobar.Visible = false;
                         btn_denegar.Visible = false;
-                        btn_comentar.Visible = false;
-                        tbx_motivo.Visible = true;
+                        tbx_motivo.Visible = false;
                         tbx_motivo.ReadOnly = true;
                         btn_integrar.Visible = false;
-
-                        if (e.Row.Cells[5].Text == "Aprobado")
-                        {                           
-                            btn_aprobar.Visible = false;
-                            btn_denegar.Visible = false;
-                            btn_comentar.Visible = false;
-                            tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = true;
-                            btn_integrar.Visible = card.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
-                        }                                 
-                                            
-
+                        btn_comentar.Visible = false;
                     }
                     break;
-                case 3: case 4: //Tesoreria//Finanzas
+                case "Aprobado":
                     if (level - card.ApprovalLevel == 1)
                     {
-                        if (e.Row.Cells[5].Text == "Pendiente")
-                        {
-                            btn_aprobar.Visible = true;
-                            btn_denegar.Visible = true;
-                            tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = false;
-                            btn_integrar.Visible = false;
-
-                        }
-                        if (e.Row.Cells[5].Text == "Aprobado")
-                        {
-                            if (card.ApprovalLevel == level)
-                            {
-                                btn_aprobar.Visible = false;
-                                btn_denegar.Visible = false;
-                                tbx_motivo.Visible = true;
-                                tbx_motivo.ReadOnly = true;
-                                btn_integrar.Visible = false;
-                            }
-                            else
-                            {
-                                btn_aprobar.Visible = true;
-                                btn_denegar.Visible = true;
-                                tbx_motivo.Visible = true;
-                                tbx_motivo.ReadOnly = false;
-                                btn_integrar.Visible = false;
-                            }
-
-                        }
-                        if (e.Row.Cells[5].Text == "Denegado")
-                        {
-                            btn_aprobar.Visible = false;
-                            btn_denegar.Visible = false;
-                            tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = true;
-                            btn_integrar.Visible = false;
-                        }
-                        if (e.Row.Cells[5].Text == "Integrado")
-                        {
-                            btn_aprobar.Visible = false;
-                            btn_denegar.Visible = false;
-                            btn_comentar.Visible = false;
-                            tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = true;
-                            btn_integrar.Visible = false;
-                        }
+                        btn_aprobar.Visible = true;
+                        btn_denegar.Visible = true;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = false;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
+                    }
+                    else if (card.ApprovalLevel == level)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = false;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
                     }
                     else
                     {
@@ -928,21 +852,59 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                         btn_comentar.Visible = false;
                         btn_denegar.Visible = false;
                         tbx_motivo.ReadOnly = true;
-                        btn_integrar.Visible = false;
-
-                        if (e.Row.Cells[5].Text == "Integrado")
-                        {                          
-                            btn_aprobar.Visible = false;
-                            btn_denegar.Visible = false;
-                            btn_comentar.Visible = false;
-                            tbx_motivo.Visible = true;
-                            tbx_motivo.ReadOnly = true;
-                            btn_integrar.Visible = false;
-                        }
+                        tbx_motivo.Visible = false;
+                        btn_integrar.Visible = card.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
                     }
-                    break;              
-            }                 
-            
+                    break;
+                case "Denegado":
+                    if (level - card.ApprovalLevel == 1)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    else if (card.ApprovalLevel == level)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    else
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    break;
+                case "Vencido":
+                    btn_aprobar.Visible = false;
+                    btn_denegar.Visible = false;
+                    tbx_motivo.Visible = false;
+                    tbx_motivo.ReadOnly = true;
+                    btn_integrar.Visible = false;
+                    btn_comentar.Visible = false;
+                    break;
+                case "Integrado":
+                    btn_aprobar.Visible = false;
+                    btn_denegar.Visible = false;
+                    tbx_motivo.Visible = false;
+                    tbx_motivo.ReadOnly = true;
+                    btn_integrar.Visible = false;
+                    btn_comentar.Visible = false;
+                    break;
+                default:
+                    break;
+            }
+
         }
     }
 }

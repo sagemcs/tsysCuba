@@ -24,7 +24,6 @@ using JWT.Serializers;
 public static class Doc_Tools
 {
     //Api Sage-Portal
-
     public static void Insert_tapApiLogErrorCgGst(int Batchkey, int vKey, int i_dtlkey, string errores)
     {
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
@@ -312,7 +311,6 @@ public static class Doc_Tools
         }
         return RetVal;
     }
-
     public static int ExecuteVoucherApi(string username, Document document, List<ExpenseDetailDTO> items, DocumentType type)
     {
         int iLote;

@@ -369,8 +369,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 expense.DeniedReason = dataReader.GetString(5);
                 expense.PackageId = dataReader.GetInt32(6);
-                expense.ApprovalLevel = dataReader.GetInt32(7);   
-                
+                expense.ApprovalLevel = dataReader.GetInt32(7);                  
                 gastos.Add(expense);
                           
             }
@@ -459,7 +458,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             if (paquete.PackageId == 0)
             {
                 tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B34").Value;
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B53").Value;
                 ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;              
             }
@@ -475,7 +474,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         if (e.CommandName == "Deny")
         {
             int status = 3;
-            TextBox motivo = (TextBox)(Control)row.Cells[9].Controls[1];
+            TextBox motivo = (TextBox)(Control)row.Cells[8].Controls[1];
             if (string.IsNullOrEmpty(motivo.Text))
             {
                 tipo = "error";
@@ -761,88 +760,107 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             Button btn_denegar = (Button)e.Row.Cells[7].Controls[1];
             Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
             TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];         
-                       
-            if (level - gasto.ApprovalLevel == 1)        
+            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
+
+            switch (e.Row.Cells[5].Text)
             {
-                //partimos con la premisa de que solo vamos a ver anticipos de reembolsos de aprobacion = (nuestro - 1)
-                if (e.Row.Cells[5].Text == "Pendiente")
-                {
-                    btn_aprobar.Visible = true;
-                    btn_denegar.Visible = true;
-                    btn_comentar.Visible = false;
-                    tbx_motivo.Visible = true;
-                    tbx_motivo.ReadOnly = false;
-                    btn_integrar.Visible = false;
-                }
-                if (e.Row.Cells[5].Text == "Aprobado")
-                {
-                    if (gasto.ApprovalLevel == level)
-                    {
-                        btn_aprobar.Visible = false;
-                        btn_denegar.Visible = false;
-                        tbx_motivo.Visible = true;
-                        tbx_motivo.ReadOnly = true;
-                        btn_integrar.Visible = false;
-                    }
-                    else
+                case "Pendiente":
+                    if (level - gasto.ApprovalLevel == 1)
                     {
                         btn_aprobar.Visible = true;
                         btn_denegar.Visible = true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;
                         btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
                     }
-                }
-                if (e.Row.Cells[5].Text == "Denegado")
-                {
+                    else
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    break;
+                case "Aprobado":
+                    if (level - gasto.ApprovalLevel == 1)
+                    {
+                        btn_aprobar.Visible = true;
+                        btn_denegar.Visible = true;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = false;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
+                    }
+                    else if (gasto.ApprovalLevel == level)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = false;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = false;
+                    }
+                    else
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_comentar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.ReadOnly = true;
+                        tbx_motivo.Visible = false;
+                        btn_integrar.Visible = gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
+                    }
+                    break;
+                case "Denegado":
+                    if (level - gasto.ApprovalLevel == 1)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    else if (gasto.ApprovalLevel == level)
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    else
+                    {
+                        btn_aprobar.Visible = false;
+                        btn_denegar.Visible = false;
+                        tbx_motivo.Visible = true;
+                        tbx_motivo.ReadOnly = true;
+                        btn_integrar.Visible = false;
+                        btn_comentar.Visible = true;
+                    }
+                    break;
+                case "Vencido":
                     btn_aprobar.Visible = false;
                     btn_denegar.Visible = false;
-                    tbx_motivo.Visible = true;
+                    tbx_motivo.Visible = false;
                     tbx_motivo.ReadOnly = true;
                     btn_integrar.Visible = false;
-                }
-                if (e.Row.Cells[5].Text == "Integrado")
-                {
-                    btn_integrar.Visible = false;
-                    btn_aprobar.Visible = false;
-                    btn_denegar.Visible = false;
-                    btn_comentar.Visible = false;                    
-                    tbx_motivo.Visible = true;
-                    tbx_motivo.ReadOnly = true;
-                }
-            }
-            else
-            {
-                btn_integrar.Visible = false;
-                btn_aprobar.Visible = false;
-                btn_denegar.Visible = false;
-                btn_comentar.Visible = false;
-                tbx_motivo.Visible = true;
-                tbx_motivo.ReadOnly = true;
-
-                if (e.Row.Cells[5].Text == "Aprobado")
-                {
-                    btn_aprobar.Visible = false;
                     btn_comentar.Visible = false;
-                    btn_denegar.Visible = false;
-                    tbx_motivo.ReadOnly = true;
-                    btn_integrar.Visible = gasto.ApprovalLevel == roles.Max(x => x.Key) && level == 2;
-                }               
-
-                if (e.Row.Cells[5].Text == "Integrado")
-                {
-                    btn_integrar.Visible = false;
+                    break;
+                case "Integrado":
                     btn_aprobar.Visible = false;
                     btn_denegar.Visible = false;
-                    btn_comentar.Visible = false;
-                    tbx_motivo.Visible = true;
+                    tbx_motivo.Visible = false;
                     tbx_motivo.ReadOnly = true;
-                }
-               
-                
-
-            }
+                    btn_integrar.Visible = false;
+                    btn_comentar.Visible = false;
+                    break;
+                default:
+                    break;
+            }        
 
         }
     }

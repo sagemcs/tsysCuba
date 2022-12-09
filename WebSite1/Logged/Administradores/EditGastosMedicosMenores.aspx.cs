@@ -592,24 +592,27 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
 
         //Solo se admiten gastos del mes en curso
-        DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
-        if (DateTime.Today.Year == fecha_gasto.Year)
+        if(string.IsNullOrEmpty(tbx_fechagasto.Text))
         {
-            if (DateTime.Today.Month != fecha_gasto.Month)
+            DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
+            if (DateTime.Today.Year == fecha_gasto.Year)
+            {
+                if (DateTime.Today.Month != fecha_gasto.Month)
+                {
+                    tbx_fechagasto.Text = string.Empty;
+                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B17);", true);
+                    System.Threading.Thread.Sleep(5000);
+                    return;
+                }
+            }
+            else
             {
                 tbx_fechagasto.Text = string.Empty;
                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B17);", true);
                 System.Threading.Thread.Sleep(5000);
                 return;
             }
-        }
-        else
-        {
-            tbx_fechagasto.Text = string.Empty;
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B17);", true);
-            System.Threading.Thread.Sleep(5000);
-            return;
-        }
+        }       
     }   
 
     protected void btn_new_article_Click(object sender, EventArgs e)
@@ -660,6 +663,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
     {
         //Limpiar controles
         drop_articulos.ClearSelection();
+        drop_taxes.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importegasto.Text = string.Empty;
         MultiView1.SetActiveView(View_General);
@@ -761,6 +765,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             MultiView1.SetActiveView(View_General);
             return;
         }
+       
         //Si el archivo tiene XMLs    
         if (HttpContext.Current.Session["xml_files"] != null)
         {
@@ -807,9 +812,31 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         else { if (medical_expense.FileNamePdf.Count == 0) { pdf = true; } }
 
         //Escribir info en BD
-
-        DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
-        decimal importe_gasto = decimal.Parse(tbx_importe.Text);
+        try
+        {
+            DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);           
+        }
+        catch (Exception)
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB24").Value;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
+            return;
+        }
+        try
+        {
+            decimal importe_gasto = decimal.Parse(tbx_importe.Text);
+        }
+        catch (Exception)
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB22").Value;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
+            return;
+        }
+        
         
         fill_fileUploads();
         
@@ -823,17 +850,7 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_General);
             return;
-        }
-
-        ////Validaciones del Importe y Articulos - Impuestos
-        //if (importe_gasto != lista_detalles.Sum(x => x.Amount + x.TaxAmount))
-        //{          
-        //    tipo = "error";
-        //    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;         
-        //    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-        //    MultiView1.SetActiveView(View_General);
-        //    return;
-        //}
+        }       
 
         //Solo alertas sin retorno
         is_valid = true;             

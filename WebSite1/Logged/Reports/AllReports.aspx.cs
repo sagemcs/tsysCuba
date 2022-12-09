@@ -127,32 +127,30 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select e.Type as 'Tipo',e.Amount as 'Importe', e.Status as 'Estado', e.Currency as 'Moneda', ISNULL(convert(varchar, e.Date, 3) , '') as 'Fecha', e.UpdateUserKey, UserName from Expense e inner join Users u on e.UpdateUserKey = u.UserKey";
+            cmd.CommandText = "select e.Amount as 'Importe', e.Status as 'Estado', e.Currency as 'Moneda', ISNULL(convert(varchar, e.Date, 3) , '') as 'Fecha', e.UpdateUserKey, UserName from Expense e inner join Users u on e.UpdateUserKey = u.UserKey";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
             {
 
-                if (user_id != 0 && dataReader.GetInt32(5) == user_id)
+                if (user_id != 0 && dataReader.GetInt32(4) == user_id)
                 {
-                    var expense = new ExpenseReport2DTO();
-                    expense.Tipo = Doc_Tools.Dict_tipos_gastos().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                    expense.Importe = dataReader.GetDecimal(1);
-                    expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(2)).Value;
-                    expense.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(3)).Value;
-                    expense.FechaCreado = dataReader.GetString(4);
-                    expense.Username = dataReader.GetString(6);
+                    var expense = new ExpenseReport2DTO();                 
+                    expense.Importe = dataReader.GetDecimal(0);
+                    expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(1)).Value;
+                    expense.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                    expense.FechaCreado = dataReader.GetString(3);
+                    expense.Username = dataReader.GetString(4);
                     gastos.Add(expense);
                 }
                 else
                 {
-                    var expense = new ExpenseReport2DTO();
-                    expense.Tipo = Doc_Tools.Dict_tipos_gastos().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                    expense.Importe = dataReader.GetDecimal(1);
-                    expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(2)).Value;
-                    expense.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(3)).Value;
-                    expense.FechaCreado = dataReader.GetString(4);
-                    expense.Username = dataReader.GetString(6);
+                    var expense = new ExpenseReport2DTO();                   
+                    expense.Importe = dataReader.GetDecimal(0);
+                    expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(1)).Value;
+                    expense.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                    expense.FechaCreado = dataReader.GetString(3);
+                    expense.Username = dataReader.GetString(4);
                     gastos.Add(expense);
                 }
                 
@@ -304,6 +302,7 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
         if (!IsPostBack)
         {
             BindEmpleados();
+            BindStatus();
         }
     }
     //private void Page_Unload(object sender, EventArgs e)
@@ -332,6 +331,16 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
         reportDocument.Close();
     }
 
+    private void BindStatus()
+    {
+        var estados = Doc_Tools.Dict_status().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
+        estados.Add(new { Id = 0, Nombre = "Todos" });
+        drop_status.DataSource = estados.OrderBy(o => o.Id).ToList();
+        drop_status.DataTextField = "Nombre";
+        drop_status.DataValueField = "Id";
+        drop_status.DataBind();
+        drop_status.SelectedIndex = -1;
+    }
     protected void btn_back_Click(object sender, EventArgs e)
     {
         Response.Redirect("~/Logged/Administradores/AnticipoEmpleados");

@@ -212,7 +212,7 @@
                 <div class="col-lg-2 col-sm-2 col-xs-2">
                     <h4>Cantidad:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
-                        <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_cantidad" MaxLength="15" class="form-control"></asp:TextBox>
+                        <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_cantidad" MaxLength="11" class="form-control"></asp:TextBox>
                     </div>
                 </div>
                 <%--Impuestos--%>

@@ -528,6 +528,24 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         }
     }
 
+    private void ClearControls()
+    {
+        tbx_fechagasto.Text = string.Empty;
+        tbx_importe.Text = string.Empty;
+        STipoGasto.ClearSelection();    
+        HttpContext.Current.Session["fu_xml"] = null;
+        HttpContext.Current.Session["fu_pdf"] = null;
+        HttpContext.Current.Session["fu_voucher"] = null;
+        HttpContext.Current.Session["xml_files"] = null;
+        HttpContext.Current.Session["pdf_files"] = null;
+        HttpContext.Current.Session["voucher_files"] = null;
+        tbx_voucher.Text = string.Empty;
+        tbx_xml.Text = string.Empty;
+        tbx_pdf.Text = string.Empty;
+        btnSage.Enabled = false;
+        tbx_motivo.Text = string.Empty;
+    }
+
     protected void btnSage_Click(object sender, EventArgs e)
     {   
         //Escribir info en BD
@@ -547,7 +565,12 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_General);      
             return;
-        }        
+        }
+        ClearControls();
+        HttpContext.Current.Session["xml_files"] = null;
+        HttpContext.Current.Session["pdf_files"] = null;
+        HttpContext.Current.Session["voucher_files"] = null;
+
         Response.Redirect("TarjetaEmpleado");
     }
 

@@ -663,7 +663,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         {
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
         }
-        int status_id = int.Parse(drop_empleados.SelectedItem.Value);
+        int status_id = int.Parse(drop_status.SelectedItem.Value);
         BindGridView(user_id, status_id);
     }
 

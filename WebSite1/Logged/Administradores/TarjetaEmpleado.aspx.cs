@@ -538,18 +538,18 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         tbx_pdf.Text = string.Empty;
         tbx_voucher.Text = string.Empty;
         tbx_xml.Text = string.Empty;
-        if (fu_xml!=null)
-        {
-            fu_xml.Attributes.Clear();
-        }
-        if(fu_pdf!=null)
-        {
-            fu_pdf.Attributes.Clear();
-        }
-        if(fu_voucher!=null)
-        {
-            fu_voucher.Attributes.Clear();
-        }          
+        //if (fu_xml!=null)
+        //{
+        //    fu_xml.Attributes.Clear();
+        //}
+        //if(fu_pdf!=null)
+        //{
+        //    fu_pdf.Attributes.Clear();
+        //}
+        //if(fu_voucher!=null)
+        //{
+        //    fu_voucher.Attributes.Clear();
+        //}          
         
         btnSage.Enabled = false;
         tbx_motivo.Text = string.Empty;
@@ -961,8 +961,17 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
+        //validacion texto en importe
+        if (tbx_importegasto.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B16").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
         //validacion del importe del articulo
-        if (tbx_importegasto.Text == string.Empty || int.Parse(tbx_importegasto.Text) <= 0)
+        if (tbx_importegasto.Text == string.Empty || decimal.Parse(tbx_importegasto.Text) <= 0)
         {
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B41").Value;
@@ -1264,14 +1273,14 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             return;
         }
 
-        //Validaciones del Importe y Articulos - Impuestos
-        if (importe_gasto != lista_detalles.Sum(x => x.Amount + x.TaxAmount))
-        {          
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;          
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            return;
-        }
+        ////Validaciones del Importe y Articulos - Impuestos
+        //if (importe_gasto != lista_detalles.Sum(x => x.Amount + x.TaxAmount))
+        //{          
+        //    tipo = "error";
+        //    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;          
+        //    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+        //    return;
+        //}
 
         //Solo alertas sin retorno
         is_valid = true;            

@@ -603,8 +603,17 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
+        //validacion texto en importe
+        if (tbx_importegasto.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B16").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
         //validacion del importe del articulo
-        if (tbx_importegasto.Text == string.Empty || int.Parse(tbx_importegasto.Text) <= 0)
+        if (tbx_importegasto.Text == string.Empty || decimal.Parse(tbx_importegasto.Text) <= 0)
         {
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B41").Value;
@@ -709,30 +718,34 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
     protected void tbx_fechagasto_TextChanged(object sender, EventArgs e)
     {
-        //Solo se admiten gastos del mes en curso
-        DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
-        if (DateTime.Today.Year == fecha_gasto.Year)
+        if (!String.IsNullOrEmpty(tbx_fechagasto.Text))
         {
-            if (DateTime.Today.Month != fecha_gasto.Month)
+            //Solo se admiten gastos del mes en curso
+            DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
+            if (DateTime.Today.Year == fecha_gasto.Year)
+            {
+                if (DateTime.Today.Month != fecha_gasto.Month)
+                {
+                    tbx_fechagasto.Text = string.Empty;
+                    tipo = "error";
+                    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B14").Value;
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                    MultiView1.SetActiveView(View_General);
+                    return;
+                }
+            }
+            else
             {
                 tbx_fechagasto.Text = string.Empty;
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B14").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 MultiView1.SetActiveView(View_General);
-                return;               
+                return;
             }
+            HttpContext.Current.Session["fecha_gasto"] = DateTime.Parse(tbx_fechagasto.Text);
         }
-        else
-        {
-            tbx_fechagasto.Text = string.Empty;
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B14").Value;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            MultiView1.SetActiveView(View_General);
-            return;
-        }
-        HttpContext.Current.Session["fecha_gasto"] = DateTime.Parse(tbx_fechagasto.Text);
+        
     }
 
     protected void tbx_importegasto_TextChanged(object sender, EventArgs e)
@@ -951,16 +964,16 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             return;
         }
 
-        //Validaciones del Importe y Articulos - Impuestos
-        if (importe_gasto != lista_detalles.Sum(x => x.Amount + x.TaxAmount))
-        {
-            string titulo, Msj, tipo;
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;
-            titulo = "T|SYS|";
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            return;
-        }
+        ////Validaciones del Importe y Articulos - Impuestos
+        //if (importe_gasto != lista_detalles.Sum(x => x.Amount + x.TaxAmount))
+        //{
+        //    string titulo, Msj, tipo;
+        //    tipo = "error";
+        //    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB40").Value;
+        //    titulo = "T|SYS|";
+        //    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+        //    return;
+        //}
 
         //Solo alertas sin retorno
         is_valid = true;            

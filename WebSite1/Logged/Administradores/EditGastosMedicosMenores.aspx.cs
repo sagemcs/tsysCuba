@@ -456,16 +456,8 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
-            var detail = lista.FirstOrDefault(x => x.ItemKey == itemKey);
-            lista.Remove(detail);
-            if(detail.DetailId!=null)
-            {
-                tipo = "error";
-                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB50").Value;
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-                return;
-            }
-            var detail = lista.FirstOrDefault(x => x.ItemKey == itemKey);
+            var detail = lista.FirstOrDefault(x => x.ItemKey == itemKey);          
+           
             detail.Accion = ExpenseDetailDTO.Action.Delete;    
             
             HttpContext.Current.Session["GridList"] = lista;

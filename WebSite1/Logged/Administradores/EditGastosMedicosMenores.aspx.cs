@@ -449,7 +449,16 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         {
             int itemKey = int.Parse(row.Cells[0].Text);
             var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
-            if (lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete).Count() == 1)
+            if (lista.Count == 1)
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB50").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
+            }
+            var detail = lista.FirstOrDefault(x => x.ItemKey == itemKey);
+            lista.Remove(detail);
+            if(detail.DetailId!=null)
             {
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB50").Value;

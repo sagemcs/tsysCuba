@@ -713,6 +713,13 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         {
             int itemKey = int.Parse(row.Cells[0].Text);
             var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
+            if (lista.Count == 1)
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB50").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
+            }
             var detail = lista.FirstOrDefault(x => x.ItemKey == itemKey);
             lista.Remove(detail);
             HttpContext.Current.Session["GridList"] = lista;

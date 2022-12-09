@@ -207,18 +207,16 @@
                     </span>
                 </div>               
             </div>
-
+            <br />
             <div class="row">
                 <%--Agregar articulo--%>
                 <div class="col-lg-2 col-sm-2 col-xs-2">
-                    <h4>Finalizar:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:Button ID="btn_additem" runat="server" Class="btn btn-tsys cargar" title="Agregar Artículo" Text="Guardar Artículo" OnClick="btn_additem_Click" CausesValidation="true" />
                     </div>
                 </div>
                 <%--Cancelar--%>
                 <div class="col-lg-2 col-sm-2 col-xs-2">
-                    <h4>Cancelar</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:Button ID="btn_cancelar_item" runat="server" Class="btn btn-tsys cargar" title="Cancelar" Text="Cancelar" OnClick="btn_cancelar_item_Click" />
                     </div>
@@ -294,7 +292,7 @@
             <br />
         <%--Agregar impuestos o Articulos--%>
         <div class="row">     
-            <h3>Agregar Impuestos o Articulos</h3>
+            <h3>Agregar Articulos</h3>
             <label class="col-form-label col-lg-4 col-sm-4 col-xs-4"></label>
             <div class="col-xs-4 col-md-4 col-xs-3">
                 <asp:Button ID="btn_new_article" runat="server"  Class="btn btn-primary" title="Añadir Articulos" Text="Agregar Articulo" OnClick="btn_new_article_Click"  />

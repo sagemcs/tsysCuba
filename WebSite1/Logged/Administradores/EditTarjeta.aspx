@@ -223,18 +223,16 @@
                 </div>
                
             </div>
-
+            <br />
             <div class="row">
                 <%--Agregar articulo--%>
                 <div class="col-lg-2 col-sm-2 col-xs-2">
-                    <h4>Finalizar:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:Button ID="btn_additem" runat="server" Class="btn btn-tsys cargar" title="Agregar Artículo" Text="Guardar Artículo" OnClick="btn_additem_Click" CausesValidation="true" />
                     </div>
                 </div>
                 <%--Cancelar--%>
                 <div class="col-lg-2 col-sm-2 col-xs-2">
-                    <h4>Cancelar</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:Button ID="btn_cancelar_item" runat="server" Class="btn btn-tsys cargar" title="Cancelar" Text="Cancelar" OnClick="btn_cancelar_item_Click" />
                     </div>

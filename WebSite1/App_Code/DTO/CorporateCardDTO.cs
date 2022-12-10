@@ -45,9 +45,8 @@ public class CorporateCardDTO : Document
         }
     }
 }
-public class CorporateCardReport2DTO : Document
+public class CorporateCardReport2DTO
 {
-    public string Tipo { get; set; }
     public decimal Importe { get; set; }
     public string Estado { get; set; }
     public string Moneda { get; set; }

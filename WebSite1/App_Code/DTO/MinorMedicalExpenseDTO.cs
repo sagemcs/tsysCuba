@@ -36,7 +36,7 @@ using System.Web;
         }
     }
 
-public class MinorMedicalExpenseReport2DTO : Document
+public class MinorMedicalExpenseReport2DTO
 {
     public decimal Importe { get; set; }
     public string Estado { get; set; }

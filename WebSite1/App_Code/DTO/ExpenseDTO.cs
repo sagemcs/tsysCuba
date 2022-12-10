@@ -63,7 +63,6 @@ using System.Web;
     }
     public class ExpenseReport2DTO : Document
     {
-        public string Tipo { get; set; }
         public decimal Importe { get; set; }
         public string Estado { get; set; }
         public string Moneda { get; set; }

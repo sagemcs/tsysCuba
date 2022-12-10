@@ -72,7 +72,7 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select e.AdvanceType as 'Tipo', e.Amount as 'Importe', ISNULL(convert(varchar, e.DepartureDate, 3) , '') as 'FechaSalida', ISNULL(convert(varchar, e.ArrivalDate, 3) , '') as 'FechaLLegada', ISNULL(convert(varchar, e.CheckDate, 3) , '') as 'FechaComprobacion', e.ImmediateBoss as 'JefeInmediato', e.Status as 'Estado', e.Currency as 'Moneda', ISNULL(convert(varchar, e.CreateDate, 3) , '') as 'FechaCreado', e.UpdateUserKey, UserName from Advance e inner join Users u on e.UpdateUserKey = u.UserKey;";
+            cmd.CommandText = "select e.Amount as 'Importe', ISNULL(convert(varchar, e.DepartureDate, 3) , '') as 'FechaSalida', ISNULL(convert(varchar, e.ArrivalDate, 3) , '') as 'FechaLLegada', ISNULL(convert(varchar, e.CheckDate, 3) , '') as 'FechaComprobacion', e.ImmediateBoss as 'JefeInmediato', e.Status as 'Estado', e.Currency as 'Moneda', ISNULL(convert(varchar, e.CreateDate, 3) , '') as 'FechaCreado', e.UpdateUserKey, UserName from Advance e inner join Users u on e.UpdateUserKey = u.UserKey;";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -80,31 +80,29 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
                 if (user_id != 0 && dataReader.GetInt32(9) == user_id)
                 {
                     var advance = new AdvanceReport2DTO();
-                    advance.Tipo = Dict_type_anticipo().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                    advance.Importe = dataReader.GetDecimal(1);
-                    advance.FechaSalida = dataReader.GetString(2);
-                    advance.FechaLLegada = dataReader.GetString(3);
-                    advance.FechaComprobacion = dataReader.GetString(4);
-                    advance.JefeInmediato = dataReader.GetString(5);
-                    advance.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(6)).Value;
-                    advance.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(7)).Value;
-                    advance.FechaCreado = dataReader.GetString(8);
-                    advance.Username = dataReader.GetString(10);
+                    advance.Importe = dataReader.GetDecimal(0);
+                    advance.FechaSalida = dataReader.GetString(1);
+                    advance.FechaLLegada = dataReader.GetString(2);
+                    advance.FechaComprobacion = dataReader.GetString(3);
+                    advance.JefeInmediato = dataReader.GetString(4);
+                    advance.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(5)).Value;
+                    advance.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(6)).Value;
+                    advance.FechaCreado = dataReader.GetString(7);
+                    advance.Username = dataReader.GetString(9);
                     gastos.Add(advance);
                 }
                 else
                 {
                     var advance = new AdvanceReport2DTO();
-                    advance.Tipo = Dict_type_anticipo().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                    advance.Importe = dataReader.GetDecimal(1);
-                    advance.FechaSalida = dataReader.GetString(2);
-                    advance.FechaLLegada = dataReader.GetString(3);
-                    advance.FechaComprobacion = dataReader.GetString(4);
-                    advance.JefeInmediato = dataReader.GetString(5);
-                    advance.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(6)).Value;
-                    advance.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(7)).Value;
-                    advance.FechaCreado = dataReader.GetString(8);
-                    advance.Username = dataReader.GetString(10);
+                    advance.Importe = dataReader.GetDecimal(0);
+                    advance.FechaSalida = dataReader.GetString(1);
+                    advance.FechaLLegada = dataReader.GetString(2);
+                    advance.FechaComprobacion = dataReader.GetString(3);
+                    advance.JefeInmediato = dataReader.GetString(4);
+                    advance.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(5)).Value;
+                    advance.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(6)).Value;
+                    advance.FechaCreado = dataReader.GetString(7);
+                    advance.Username = dataReader.GetString(9);
                     gastos.Add(advance);
                 }
                                    
@@ -127,7 +125,7 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select e.Type as 'Tipo',e.Amount as 'Importe', e.Status as 'Estado', e.Currency as 'Moneda', ISNULL(convert(varchar, e.Date, 3) , '') as 'Fecha', e.UpdateUserKey, UserName from Expense e inner join Users u on e.UpdateUserKey = u.UserKey";
+            cmd.CommandText = "select e.Amount as 'Importe', e.Status as 'Estado', e.Currency as 'Moneda', ISNULL(convert(varchar, e.Date, 3) , '') as 'Fecha', e.UpdateUserKey, UserName from Expense e inner join Users u on e.UpdateUserKey = u.UserKey";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -136,23 +134,21 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
                 if (user_id != 0 && dataReader.GetInt32(5) == user_id)
                 {
                     var expense = new ExpenseReport2DTO();
-                    expense.Tipo = Doc_Tools.Dict_tipos_gastos().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                    expense.Importe = dataReader.GetDecimal(1);
-                    expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(2)).Value;
-                    expense.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(3)).Value;
-                    expense.FechaCreado = dataReader.GetString(4);
-                    expense.Username = dataReader.GetString(6);
+                    expense.Importe = dataReader.GetDecimal(0);
+                    expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(1)).Value;
+                    expense.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                    expense.FechaCreado = dataReader.GetString(3);
+                    expense.Username = dataReader.GetString(5);
                     gastos.Add(expense);
                 }
                 else
                 {
                     var expense = new ExpenseReport2DTO();
-                    expense.Tipo = Doc_Tools.Dict_tipos_gastos().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                    expense.Importe = dataReader.GetDecimal(1);
-                    expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(2)).Value;
-                    expense.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(3)).Value;
-                    expense.FechaCreado = dataReader.GetString(4);
-                    expense.Username = dataReader.GetString(6);
+                    expense.Importe = dataReader.GetDecimal(0);
+                    expense.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(1)).Value;
+                    expense.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                    expense.FechaCreado = dataReader.GetString(3);
+                    expense.Username = dataReader.GetString(5);
                     gastos.Add(expense);
                 }
                 
@@ -218,7 +214,7 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select e.Type as 'Tipo', e.Amount as 'Importe', e.Status as 'Estado', e.Currency as 'Moneda', ISNULL(convert(varchar, e.CreateDate, 3) , '') as 'FechaCreado', e.UpdateUserKey, UserName from CorporateCard  e inner join Users u on e.UpdateUserKey = u.UserKey";
+            cmd.CommandText = "select e.Amount as 'Importe', e.Status as 'Estado', e.Currency as 'Moneda', ISNULL(convert(varchar, e.CreateDate, 3) , '') as 'FechaCreado', e.UpdateUserKey, UserName from CorporateCard  e inner join Users u on e.UpdateUserKey = u.UserKey";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -226,23 +222,21 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
                 if (user_id != 0 && dataReader.GetInt32(5) == user_id)
                 {
                     var corpCard = new CorporateCardReport2DTO();
-                    corpCard.Tipo = Doc_Tools.Dict_tipos_gastos().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                    corpCard.Importe = dataReader.GetDecimal(1);
-                    corpCard.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(2)).Value;
-                    corpCard.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(3)).Value;
-                    corpCard.FechaCreado = dataReader.GetString(4);
-                    corpCard.Username = dataReader.GetString(6);
+                    corpCard.Importe = dataReader.GetDecimal(0);
+                    corpCard.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(1)).Value;
+                    corpCard.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                    corpCard.FechaCreado = dataReader.GetString(3);
+                    corpCard.Username = dataReader.GetString(5);
                     gastos.Add(corpCard);
                 }
                 else
                 {
                     var corpCard = new CorporateCardReport2DTO();
-                    corpCard.Tipo = Doc_Tools.Dict_tipos_gastos().First(x => x.Key == dataReader.GetInt32(0)).Value;
-                    corpCard.Importe = dataReader.GetDecimal(1);
-                    corpCard.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(2)).Value;
-                    corpCard.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(3)).Value;
-                    corpCard.FechaCreado = dataReader.GetString(4);
-                    corpCard.Username = dataReader.GetString(6);
+                    corpCard.Importe = dataReader.GetDecimal(0);
+                    corpCard.Estado = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(1)).Value;
+                    corpCard.Moneda = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                    corpCard.FechaCreado = dataReader.GetString(3);
+                    corpCard.Username = dataReader.GetString(5);
                     gastos.Add(corpCard);
                 }
             }

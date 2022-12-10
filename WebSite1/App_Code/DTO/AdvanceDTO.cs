@@ -44,27 +44,6 @@ public class AdvanceReportDTO
     }
 }
 
-public class AdvanceReport2DTO : Document
-{
-    public string Tipo { get; set; }
-    public decimal Importe { get; set; }
-    public string FechaSalida { get; set; }
-    public string FechaLLegada { get; set; }
-    public string FechaComprobacion { get; set; }
-    public string JefeInmediato { get; set; }
-    public string Estado { get; set; }
-    public string Moneda { get; set; }
-    public string FechaCreado { get; set; }
-    public string Username { get; set; }
-
-    public AdvanceReport2DTO()
-    {
-
-
-    }
-
-}
-
 public class AdvanceReportGroupedDTO
 {
     private decimal _total;
@@ -103,4 +82,24 @@ public class AdvanceValidatorReportDTO
 
 
     }
+}
+
+public class AdvanceReport2DTO
+{
+    public decimal Importe { get; set; }
+    public string FechaSalida { get; set; }
+    public string FechaLLegada { get; set; }
+    public string FechaComprobacion { get; set; }
+    public string JefeInmediato { get; set; }
+    public string Estado { get; set; }
+    public string Moneda { get; set; }
+    public string FechaCreado { get; set; }
+    public string Username { get; set; }
+
+    public AdvanceReport2DTO()
+    {
+
+
+    }
+
 }

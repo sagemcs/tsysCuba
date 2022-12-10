@@ -131,7 +131,7 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
             while (dataReader.Read())
             {
 
-                if (user_id != 0 && dataReader.GetInt32(5) == user_id)
+                if (user_id != 0 && dataReader.GetInt32(4) == user_id)
                 {
                     var expense = new ExpenseReport2DTO();
                     expense.Importe = dataReader.GetDecimal(0);
@@ -298,6 +298,7 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
         if (!IsPostBack)
         {
             BindEmpleados();
+            BindStatus();
         }
     }
     //private void Page_Unload(object sender, EventArgs e)
@@ -326,6 +327,16 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
         reportDocument.Close();
     }
 
+    private void BindStatus()
+    {
+        var estados = Doc_Tools.Dict_status().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
+        estados.Add(new { Id = 0, Nombre = "Todos" });
+        drop_status.DataSource = estados.OrderBy(o => o.Id).ToList();
+        drop_status.DataTextField = "Nombre";
+        drop_status.DataValueField = "Id";
+        drop_status.DataBind();
+        drop_status.SelectedIndex = -1;
+    }
     protected void btn_back_Click(object sender, EventArgs e)
     {
         Response.Redirect("~/Logged/Administradores/AnticipoEmpleados");

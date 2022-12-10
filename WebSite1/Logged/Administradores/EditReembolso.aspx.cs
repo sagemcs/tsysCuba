@@ -431,20 +431,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         HttpContext.Current.Session["voucher_files"] = null;
         tbx_voucher.Text = string.Empty;
         tbx_xml.Text = string.Empty;
-        tbx_pdf.Text = string.Empty;
-        if (fu_pdf != null)
-        {
-            fu_pdf.Attributes.Clear();
-        }
-        if (fu_xml != null)
-        {
-            fu_xml.Attributes.Clear();
-        }
-        if (fu_voucher != null)
-        {
-            fu_voucher.Attributes.Clear();
-        }
-
+        tbx_pdf.Text = string.Empty;       
         btn_Guardar.Enabled = false;
         tbx_motivo.Text = string.Empty;
     }

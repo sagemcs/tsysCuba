@@ -919,7 +919,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
     {
         is_valid = false;
         HttpContext.Current.Session["is_valid"] = is_valid;
-
+        STipoGasto.ClearSelection();
         if(drop_currency.SelectedValue =="")
         {
             tipo = "error";

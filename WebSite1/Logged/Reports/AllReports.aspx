@@ -29,11 +29,7 @@
                 <div class="col-lg-2 col-sm-2 col-xs-2">
                     <h4>Estado:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
-                        <asp:DropDownList ID="drop_status" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="False">
-                            <asp:ListItem Value="0">Todos </asp:ListItem>
-                            <asp:ListItem Value="1">Pendiente</asp:ListItem>
-                            <asp:ListItem Value="2">Aprobado</asp:ListItem>
-                            <asp:ListItem Value="3">Cancelado</asp:ListItem>
+                        <asp:DropDownList ID="drop_status" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="False">                            
                         </asp:DropDownList>
                     </div>
                 </div>

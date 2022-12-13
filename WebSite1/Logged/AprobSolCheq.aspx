@@ -87,7 +87,7 @@
               setTimeout("location.href='AprobSolCheq'", 1);
               return false;
           });
-          
+
           function VariableG()
           {
               var Proce = "/Actualizar_Variable2";
@@ -197,6 +197,22 @@
           $(campo).show("slow").delay(2000).hide("slow");
           return true;
       }
+
+        function showModal() {
+            var inputVal = $("#tokenValue").val();
+            var tokenVal = $("#tbx_token").val();
+            if (inputVal == tokenVal) {
+                $("#Button1").show()
+                $("#validarToken").hide()
+            }
+            else {
+                $("#errorMsj").show()
+                setTimeout(() => {
+                    $("#errorMsj").hide()
+                }, 2000);
+            }
+            return false;
+        }
     </script>
 
     <script>
@@ -513,12 +529,9 @@
                     })
                 }
         }
-
-        //async function update(folio, llave, Fila) {
-        async function update(lista_cheques) {
-            var folio, llave, Fila;
-           
-            console.log(lista_cheques);
+    
+        async function update(lista_cheques) {            
+            var folio, llave, Fila;        
             let variables;
             var i = 1;
             for (const cheque of lista_cheques) {
@@ -531,13 +544,9 @@
                     return e.message;
                 }
                 i++;
-
             }
         
-                try {
-                    //let variables;
-                    //var folio, llave, Fila;
-                    //variables = await actualizarSolicitud(folio, llave, Fila);
+                try {                   
                     if (variables.token == "actualizado") {
                         swal.fire({
                             title: "Confirmacion de Autorizacion",
@@ -644,6 +653,13 @@
     <asp:UpdatePanel runat="server" id="UpdatePanel" updatemode="Conditional">
     <ContentTemplate>   
 
+   
+    <div class="col-xs-12 md-3 col-lg-3">
+        <label>Token Vigente</label>
+        <asp:TextBox runat="server" type="text" AutoComplete = "off" ClientIDMode="Static" AutoCompleteType="Disabled" ID="tbx_token" class="form-control" TabIndex="3"  ReadOnly="true" BackColor="White"/>
+    </div>        
+   
+
     <div class="col-xs-12 md-3 col-lg-3">
     <label>Proveedor</label>
      <asp:TextBox runat="server" type="text" AutoComplete = "off" AutoCompleteType="Disabled" ID="IdProveedor" class="form-control" TabIndex="3" />
@@ -691,8 +707,8 @@
                 <asp:Button ID="Button2" runat="server" Text="Limpiar" OnClick="Limpiar_Click1" CssClass="btn btn-tsys" title="Limpiar Busqueda" />
             </div>
 
-            <div class="col-xs-4 col-sm-2 col-md-1">
-                <asp:Button ID="btn_carga_masiva" runat="server" Text="Carga Masiva" OnClick="btn_carga_masiva_Click" CssClass="btn btn-tsys" title="Carga Masiva" />
+            <div class="col-xs-4 col-sm-2 col-md-1">                
+                <asp:Button ID="btn_carga_masiva" runat="server" Text="Carga Masiva" OnClientClick="$('#tokenValue').val(''); $('#myModal_Aprobar').modal(); $('#validarToken').show(); $('#Button1').hide();" CssClass="btn btn-tsys" title="Carga Masiva" />
             </div>
         </div>
     </div>
@@ -782,11 +798,11 @@
             <asp:Button ID="Documento_3" CssClass="btn btn-default" runat="server" CommandName="Documento_3" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" Text="Anexo PDF" />
           </ItemTemplate>
          </asp:TemplateField>
-                 <asp:TemplateField>
+         <%-- <asp:TemplateField>
           <ItemTemplate>
             <asp:Button ID="Aprobar" CssClass="btn btn-default cargar" runat="server" CommandName="Aprobar" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" Text="Aprobar" />
           </ItemTemplate>
-         </asp:TemplateField>
+         </asp:TemplateField>--%>
              <asp:TemplateField>
           <ItemTemplate>
             <asp:Button ID="Cancelar" CssClass="btn btn-default" runat="server" CommandName="Cancelar" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" Text="Rechazar" />
@@ -847,7 +863,7 @@
             </div>
 
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-            <div class="modal-dialog" role="document">
+                <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -883,7 +899,42 @@
                         </div>
                 </div>
             </div>
-        </div>
+            </div>
+            <div class="modal fade" id="myModal_Aprobar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title"
+                            id="myModalLabel1">Captura de token</h4>
+                    </div>
+                    <div class="modal-body">
+
+                            <div class="container-fluid">
+                                <div class="row">
+                                    Inserte el token:
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <asp:TextBox runat="server" type="text" AutoComplete = "off" ClientIDMode="Static" AutoCompleteType="Disabled" ID="tokenValue" class="form-control" TabIndex="3" />
+                                            <p id="errorMsj" style="color: red;" hidden>El token no es v&aacute;lido</p>                                              
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button id="btn_No_Send1" type="button" title="No Enviar" class="btn btn-tsys pull-left" data-dismiss="modal">Cancelar
+                            </button>
+                           
+                            <asp:Button ID="validarToken" runat="server" Text="Validar token" ClientIDMode="Static" OnClientClick="return showModal()" CssClass="btn btn-primary" title="validar Token" />
+                            <asp:Button ID="Button1" runat="server" Text="Aprobar" ClientIDMode="Static" OnClick="btn_carga_masiva_Click" CssClass="btn btn-primary cargaMasiva" title="Aprobar" data-toggle="tooltip"/>
+                        </div>
+                </div>
+            </div>
+            </div>
+        
 
             
 

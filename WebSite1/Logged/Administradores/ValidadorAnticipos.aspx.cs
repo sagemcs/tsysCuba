@@ -790,7 +790,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 case "Pendiente":
                     if (level - anticipo.ApprovalLevel == 1)
                     {
-                        btn_aprobar.Visible = true;
+                        btn_aprobar.Visible = true; 
                         btn_denegar.Visible = true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;

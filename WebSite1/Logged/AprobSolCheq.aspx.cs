@@ -230,6 +230,7 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
                             }
                         }
                     }
+                    ResolveToken();
                     int chek_masiva = 0;
                     foreach (GridViewRow row in gvFacturas.Rows)
                     {
@@ -239,7 +240,8 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
                             chek_masiva++;
                         }
                     }
-                    btn_carga_masiva.Visible = chek_masiva > 1;
+                    btn_carga_masiva.Visible = chek_masiva >= 1;
+                    btn_carga_masiva.Text = string.Format("Aprobar ({0}) Solicitudes", chek_masiva.ToString());
 
                 }
                     else
@@ -481,17 +483,17 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
 
 
             }
-            else if (e.CommandName == "Aprobar")
-            {
-                int Fila = row.RowIndex + 1;
-                //InsertSage(row.Cells[0].Text, row.Cells[1].Text);
-                List<Cheques> lista_valores = new List<Cheques>();                
-                lista_valores.Add(new Cheques { folio = folio, llave = llave, archivo = Fila.ToString() });
-                var json = JsonConvert.SerializeObject(lista_valores, type: typeof(Cheques), settings: null);
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "update(" + json + ");", true);
+            //else if (e.CommandName == "Aprobar")
+            //{
+            //    int Fila = row.RowIndex + 1;
+            //    //InsertSage(row.Cells[0].Text, row.Cells[1].Text);
+            //    List<Cheques> lista_valores = new List<Cheques>();                
+            //    lista_valores.Add(new Cheques { folio = folio, llave = llave, archivo = Fila.ToString() });
+            //    var json = JsonConvert.SerializeObject(lista_valores, type: typeof(Cheques), settings: null);
+            //    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "update(" + json + ");", true);
                 
-                //ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "update('" + folio + "','" + llave + "','" + Fila + "');", true);
-            }
+            //    //ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "update('" + folio + "','" + llave + "','" + Fila + "');", true);
+            //}
             else if (e.CommandName == "Cancelar")
             {
                 int Fila = row.RowIndex + 1;
@@ -1299,6 +1301,44 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
         }      
 
     }
+
+    private void ResolveToken()
+    {        
+        Contrarecibos.CrearToken();
+        string token_vigente = Get_token_from_db(pUserKey);            
+        tbx_token.Text = token_vigente;             
+    }
+    
+    private string Get_token_from_db(int userkey)
+    {
+        string token = string.Empty;
+        SqlConnection sqlConnection1 = new SqlConnection();
+
+        //DESACTIVA TOKENS ANTERIOES
+        try
+        {
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+            sqlConnection1.Open();
+            using (var sqlQuery = new SqlCommand("", sqlConnection1))
+            {
+                sqlQuery.CommandText = "select token from SecurityToken Where Userkey = @userkey and Activo = 1;";
+                sqlQuery.Parameters.AddWithValue("@Userkey", SqlDbType.Int).Value = userkey;
+                var reader = sqlQuery.ExecuteReader();
+                while (reader.Read())
+                {
+                    token = reader.GetString(0);
+                }
+            }
+            sqlConnection1.Close();
+        }
+        catch (Exception exp)
+        {
+            
+        }
+        return token;
+    }
+
+  
 }
 
 

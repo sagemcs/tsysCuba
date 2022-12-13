@@ -710,7 +710,7 @@ public class Contrarecibos
             string usker = HttpContext.Current.Session["UserKey"].ToString();
             string roles = HttpContext.Current.Session["RolUser"].ToString();
             string SQL = " ";
-            SQL += " Select token From [SecurityToken] Where Userkey = " + usker + " AND CreationDate >= dateadd(minute,-15,getdate()) And Activo = 1";
+            SQL += " Select token From [SecurityToken] Where Userkey = " + usker + " AND CreationDate >= dateadd(minute,-30,getdate()) And Activo = 1";
 
             SqlConnection sqlConnection1 = new SqlConnection();
             sqlConnection1 = SqlConnectionDB("PortalConnection");
@@ -810,29 +810,29 @@ public class Contrarecibos
              }
 
             //ENVIA POR CORREO NUEVO TOKEN
-            if (token == "enviado")
-            {
-                string Body;
-                bool SendEmail;
-                string correo = HttpContext.Current.User.Identity.Name.ToString();
-                using (StreamReader reader = new StreamReader(System.Web.Hosting.HostingEnvironment.MapPath("~/Account/Templates Email/GetTokenSolCh.html")))
-                {
-                    Body = reader.ReadToEnd();
-                    Body = Body.Replace("{PassTemp}", PassNew);
-                    Body = Body.Replace("{Time}", "15");                    
-                }
+            //if (token == "enviado")
+            //{
+            //    string Body;
+            //    bool SendEmail;
+            //    string correo = HttpContext.Current.User.Identity.Name.ToString();
+            //    using (StreamReader reader = new StreamReader(System.Web.Hosting.HostingEnvironment.MapPath("~/Account/Templates Email/GetTokenSolCh.html")))
+            //    {
+            //        Body = reader.ReadToEnd();
+            //        Body = Body.Replace("{PassTemp}", PassNew);
+            //        Body = Body.Replace("{Time}", "15");                    
+            //    }
 
-                //correo = "luis.ang.b1one@gmail.com";
-                SendEmail = Global.EmailGlobal(correo, Body, "Tu token de Seguridad Solicitud de Cheque");
-                if (SendEmail == true)
-                {
-                    token = "enviado";
-                }
-                else
-                {
-                    token = "error envio";
-                }
-            }
+            //    //correo = "luis.ang.b1one@gmail.com";
+            //    SendEmail = Global.EmailGlobal(correo, Body, "Tu token de Seguridad Solicitud de Cheque");
+            //    if (SendEmail == true)
+            //    {
+            //        token = "enviado";
+            //    }
+            //    else
+            //    {
+            //        token = "error envio";
+            //    }
+            //}
         }
         catch (Exception exp)
         {

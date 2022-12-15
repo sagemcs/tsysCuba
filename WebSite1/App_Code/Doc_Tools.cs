@@ -17,6 +17,7 @@ using Proveedores_Model;
 using JWT;
 using JWT.Algorithms;
 using JWT.Serializers;
+using static ExpenseFilesDTO;
 
 /// <summary>
 /// Summary description for Doc_Tools
@@ -311,6 +312,7 @@ public static class Doc_Tools
         }
         return RetVal;
     }
+
     public static int ExecuteVoucherApi(string username, Document document, List<ExpenseDetailDTO> items, DocumentType type)
     {
         int iLote;
@@ -337,16 +339,16 @@ public static class Doc_Tools
         tapVoucherCExGst tapVoucher = new tapVoucherCExGst
         {
             iLote = iLote,
-            iRemitToVendAddrKey = 48,
-            iRemitToCopyKey = 48,
+            iRemitToVendAddrKey = 144830,
+            iRemitToCopyKey = 144830,
             iCurrID = "MXN", //Moneda del gasto
             iHoldPmt = 0,
-            iVendKey = 27,
-            iVendID = "Hellman",
-            iPmtTermsKey = 10,
+            iVendKey = 1652,
+            iVendID = "G778",
+            iPmtTermsKey = 2,
             iSeparateCheck = 0,
-            iPurchFromVendAddrKey = 48,
-            iPurchToCopyKey = 48,
+            iPurchFromVendAddrKey = 144830,
+            iPurchToCopyKey = 144830,
             iTranDate = document.GetDate(type),
             iTranNo = iLote.ToString(),
             iTranType = 401,
@@ -373,16 +375,16 @@ public static class Doc_Tools
                 iTargetCompanyID = document.CompanyId,
                 iCmntOnly = 0,
                 iExtAmt = item.Amount,
-                iItemKey = item.ItemKey,
+                iItemKey = 7229,
                 iQuantity = item.Qty,
-                iGLAcctKey = 926,
+                iGLAcctKey = 7813,
                 iSTaxClassKey = taxes.FirstOrDefault(x => x.STaxCodeKey == item.STaxCodeKey).STaxClassKey,
                 iSTaxClassID = taxes.FirstOrDefault(x => x.STaxCodeKey == item.STaxCodeKey).STaxClassID,
                 iUnitCost = item.UnitCost,
-                iUnitMeasID = "Unidad",
+                iUnitMeasID = "Serv",
                 iFreightAmt = 0,
-                iSTaxSchdKey = 4,
-                iSTaxSchdID = "IEPS Import",
+                iSTaxSchdKey = 2,
+                iSTaxSchdID = "IVA 16",
                 iDefaultIfNull = 1,
                 iMatchStatus = 1,
                 iReturnType = 1,
@@ -787,7 +789,6 @@ public static class Doc_Tools
     {
         Advance = 1, Expense = 2, CorporateCard = 3, MinorMedicalExpense = 4
     }
-
     public  class Paquete
     {
         public int PackageId { get; set; }
@@ -971,28 +972,35 @@ public static class Doc_Tools
         };
         return dict;
     }
+   
 
-    public static List<string> LoadFilesbyExpense(DocumentType type, ExpenseFilesDTO.FileType fileType, int expense_id)
+    public static ExpenseFilesDTO LoadFilesbyExpense(DocumentType type, ExpenseFilesDTO.FileType fileType, int expense_id, int detail_id)
     {
-        var file_names = new List<string>();
+        var file = new ExpenseFilesDTO();
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select FileName  from Files Where FileType = @FileType and ExpenseId = @ExpenseId and ExpenseType = @ExpenseType";
+            cmd.CommandText = "select Id,ExpenseType,ExpenseId,ExpenseDetailId,FileName,FileType,FileBinary  from Files Where FileType = @FileType and ExpenseId = @ExpenseId  and ExpenseDetailId = @ExpenseDetailId and ExpenseType = @ExpenseType";
             cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = expense_id;
+            cmd.Parameters.Add("@ExpenseDetailId", SqlDbType.Int).Value = detail_id;
             cmd.Parameters.Add("@ExpenseType", SqlDbType.Int).Value = type;
             cmd.Parameters.Add("@FileType", SqlDbType.Int).Value = fileType;
             cmd.Connection.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
-            {
-                string name = reader.GetString(0);
-                file_names.Add(name);
+            {               
+                file.Id = reader.GetInt32(0);
+                file.ExpenseType = (DocumentType)reader.GetInt32(1);
+                file.ExpenseId = reader.GetInt32(2);
+                file.ExpenseDetailId = reader.GetInt32(3);
+                file.FileName = reader.GetString(4);
+                file.Type = (FileType)reader.GetInt32(5);
+                file.FileBinary = (byte[])reader.GetSqlBinary(6);               
             }
             
             cmd.Connection.Close();
         }
-        return file_names;
+        return file.Id != 0 ? file :null ;
     }
 
     public static bool CheckFileExist(ExpenseFilesDTO file)
@@ -1022,9 +1030,10 @@ public static class Doc_Tools
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "INSERT INTO Files (ExpenseType,ExpenseId,FileName,FileType,FileBinary) VALUES (@ExpenseType,@ExpenseId,@FileName,@FileType,@FileBinary); SELECT SCOPE_IDENTITY();";
+            cmd.CommandText = "INSERT INTO Files (ExpenseType,ExpenseId,ExpenseDetailId,FileName,FileType,FileBinary) VALUES (@ExpenseType,@ExpenseId,@ExpenseDetailId,@FileName,@FileType,@FileBinary); SELECT SCOPE_IDENTITY();";
             cmd.Parameters.Add("@ExpenseType", SqlDbType.Int).Value = file.ExpenseType;
             cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = file.ExpenseId;
+            cmd.Parameters.Add("@ExpenseDetailId", SqlDbType.Int).Value = file.ExpenseDetailId;
             cmd.Parameters.Add("@FileName", SqlDbType.NVarChar).Value = file.FileName;
             cmd.Parameters.Add("@FileType", SqlDbType.Int).Value = file.Type;
             cmd.Parameters.Add("@FileBinary", SqlDbType.VarBinary, file.FileLength).Value = file.FileBinary;            

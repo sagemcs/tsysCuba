@@ -5,18 +5,16 @@
 
 //REFERENCIAS UTILIZADAS
 using Proveedores_Model;
-using SAGE_Model;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using SAGE_Model;
 using System.Web;
-using System.Web.Script.Serialization;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Diagnostics;
 
 public class FacturaDTO
 {
@@ -53,8 +51,8 @@ public class FacturaDTO
     public string Orden_de_Compra { get; set; }
 
     public List<NotaDTO> Notas { get; set; }
-
-    public int VendKey { get; set; }
+    
+    public int VendKey { get; set; } 
     public string Contrarecibo_Folio { get; set; }
 
     public string Solicitud_Folio { get; set; }
@@ -66,7 +64,7 @@ public class FacturaDTO
     {
         PortalProveedoresEntities db = new PortalProveedoresEntities();
         Invoice factura = db.Invoice.Where(f => f.InvoiceKey == Key).FirstOrDefault();
-        if (factura != null)
+        if(factura != null)
         {
             this.Key = Key;
             this.Compania = factura.CompanyID;
@@ -85,7 +83,7 @@ public class FacturaDTO
             this.VendKey = factura.Vendors != null ? factura.Vendors.VendorKey : -1;
             this.Subtotal = Math.Round(Convert.ToDecimal(factura.Subtotal), 2).ToString();
             this.Retenciones = factura.ImpuestoImporteRtn != null ? Math.Round(Convert.ToDecimal(factura.ImpuestoImporteRtn), 2).ToString() : "0";
-            this.Traslados = factura.ImpuestoImporteTrs != null ? Math.Round(Convert.ToDecimal(factura.ImpuestoImporteTrs), 2).ToString() : "0";
+            this.Traslados = factura.ImpuestoImporteTrs != null ? Math.Round(Convert.ToDecimal(factura.ImpuestoImporteTrs), 2).ToString() : "0";                
             this.Descuento = factura.Descuento != null ? Math.Round(Convert.ToDecimal(factura.Descuento), 2).ToString() : "0";
             this.Total = Math.Round(Convert.ToDecimal(factura.Total), 2).ToString();
             this.Subtotal_In_Double = Convert.ToDouble(factura.Subtotal);
@@ -93,7 +91,7 @@ public class FacturaDTO
             this.Retenciones_In_Double = Convert.ToDouble(factura.ImpuestoImporteRtn);
             this.Total_In_Double = Convert.ToDouble(factura.Total);
             this.UUID = factura.UUID;
-
+            
             Int32 AprovUserKey = Convert.ToInt32(factura.AprovUserKey);
             Users user = db.Users.Where(u => u.UserKey == AprovUserKey).FirstOrDefault();
             //this.Usuario = user != null ? user.UserID : string.Empty;
@@ -118,8 +116,7 @@ public class FacturaDTO
                     invoiceReceipt = invcRcptDetails.InvoiceReceipt;
                 }
                 this.Contrarecibo_Folio = invoiceReceipt != null ? invoiceReceipt.Folio : "";
-                if (invoiceReceipt != null && invoiceReceipt.ChkReqDetail != null && invoiceReceipt.ChkReqDetail.Count > 0)
-                {
+                if (invoiceReceipt != null && invoiceReceipt.ChkReqDetail != null && invoiceReceipt.ChkReqDetail.Count > 0) {
                     ChkReqDetail chkReqDetail = invoiceReceipt.ChkReqDetail.FirstOrDefault();
                     CheckRequest checkRequest = null;
                     if (chkReqDetail != null)
@@ -128,7 +125,7 @@ public class FacturaDTO
                     }
                     this.Solicitud_Folio = checkRequest != null ? checkRequest.Serie : "";
                 }
-
+                   
                 else
                     this.Solicitud_Folio = "-";
             }
@@ -308,7 +305,7 @@ public class NotaDTO : FacturaDTO
     public NotaDTO()
     { }
 
-    public NotaDTO(int Key, int ApplyToInvcKey) : base(Key)
+    public NotaDTO(int Key, int ApplyToInvcKey) :base(Key)
     {
         this.ApplyToInvcKey = ApplyToInvcKey;
     }
@@ -318,10 +315,10 @@ public class NotaDTO : FacturaDTO
 
 public class Facturas
 {
-
+ 
     public Facturas()
     {
-
+        
 
     }
 
@@ -360,7 +357,7 @@ public class Facturas
                 sqlConnection1 = SqlConnectionDB("PortalConnection");
                 sqlConnection1.Open();
 
-                if (VendorId == "[-Seleccione proveedor-]") { VendorId = ""; }
+                if (VendorId == "[-Seleccione proveedor-]") { VendorId = "";}
                 if (Estado == "0") { Estado = ""; }
 
                 string sSQL = "spSelectInv2020";
@@ -424,7 +421,7 @@ public class Facturas
                 Msj = Msj + " || Metodo : FacturaDTOs.cs_" + nombreMetodo + " Linea " + Convert.ToString(linea);
                 throw new MulticonsultingException(Msj);
             }
-
+            
             return facturas;
         }
         catch
@@ -483,7 +480,7 @@ public class Facturas
                 List<int> VendorsIds = user.Vendors.Select(v => v.VendorKey).ToList();
                 predicate = (a => a.TranType == document_type && VendorsIds.Contains(a.VendorKey));
             }
-
+            
             return ObtenerDeTablaInvoice(predicate);
         }
         catch (Exception exp)
@@ -494,7 +491,7 @@ public class Facturas
         }
     }
 
-    private static List<FacturaDTOs> Obtener20(string order_col, string order_dir, string VendorId, string Folio, string Serie, string Fecha, string FechaR, string Total, string UUID, string Estado, string document_type, bool directo_en_vista = false)
+    private static List<FacturaDTOs> Obtener20(string order_col, string order_dir,string VendorId, string Folio, string Serie, string Fecha, string FechaR, string Total, string UUID, string Estado,string document_type, bool directo_en_vista = false)
     {
         try
         {
@@ -515,7 +512,7 @@ public class Facturas
                 predicate = (a => a.TranType == document_type && VendorsIds.Contains(a.VendorKey));
             }
 
-            return ObtenerDeTablaInvoice20(VendorId, Folio, Serie, Fecha, FechaR, Total, UUID, Estado, "IN", predicate, order_col, order_dir);
+            return ObtenerDeTablaInvoice20(VendorId, Folio, Serie, Fecha, FechaR, Total, UUID, Estado, "IN",predicate, order_col, order_dir);
         }
         catch (Exception exp)
         {
@@ -531,7 +528,7 @@ public class Facturas
 
     public static List<FacturaDTOs> ObtenerFacturas20(string VendorId, string Folio, string Serie, string Fecha, string FechaR, string Total, string UUID, string Estado, string order_col, string order_dir)
     {
-        return Obtener20(order_col, order_dir, VendorId, Folio, Serie, Fecha, FechaR, Total, UUID, Estado, "IN");
+        return Obtener20(order_col, order_dir,VendorId, Folio, Serie, Fecha, FechaR, Total, UUID, Estado,"IN");
     }
     public static List<FacturaDTO> ObtenerNotasDeCredito()
     {
@@ -585,9 +582,7 @@ public class Facturas
             Expression<Func<Invoice, bool>> predicate;
             bool is_tsys_user = user.UsersInRoles.Where(r => r.Roles.RoleID.Contains("T|SYS|")).FirstOrDefault() != null;
             if (is_tsys_user)
-                //predicate = (a => a.TranType == "IN" && a.InvcRcptDetails.Count == 0);
-                //La siguiente linea fue modificada por: Cesilio Hernández
-                predicate = (a => a.TranType == "IN" && a.InvcRcptDetails.Count == 0 && a.Status == 4);
+                predicate = (a => a.TranType == "IN" && a.InvcRcptDetails.Count == 0);
             else
             {
                 List<int> VendorsIds = user.Vendors.Select(v => v.VendorKey).ToList();
@@ -606,14 +601,14 @@ public class Facturas
                     facturas.Add(factura);
             return facturas;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             string exstring = ex.ToString();
             return new List<FacturaDTO>();
         }
     }
-
-    public static List<FacturaDTO> ObtenerFacturasSinContrarecibo(string VendorId, string Folio, string Serie, string Fecha, string FechaAp, string Total, string UUID, string Estado)
+    
+    public static List<FacturaDTO> ObtenerFacturasSinContrarecibo(string VendorId, string Folio, string Serie, string Fecha, string FechaAp,string Total, string UUID, string Estado)
     {
         try
         {
@@ -668,7 +663,7 @@ public class Facturas
 
             if (!string.IsNullOrWhiteSpace(VendorId) && VendorId != "null")
                 facturas = facturas.Where(f => f.Proveedor_Nombre.ToUpper().Contains(VendorId.ToUpper())).ToList();
-            if (!string.IsNullOrWhiteSpace(Folio) && Folio != "null")
+            if (!string.IsNullOrWhiteSpace(Folio) && Folio!= "null")
                 facturas = facturas.Where(f => f.Folio.ToUpper().Contains(Folio.ToUpper())).ToList();
             if (!string.IsNullOrWhiteSpace(contrarecibo) && contrarecibo != "null")
                 facturas = facturas.Where(f => f.Contrarecibo_Folio.ToUpper().Contains(contrarecibo.ToUpper())).ToList();
@@ -709,7 +704,7 @@ public class Facturas
                 facturas = facturas.Where(f => f.Proveedor_Nombre.ToUpper().Contains(VendorId.ToUpper())).ToList();
             if (!string.IsNullOrWhiteSpace(Folio) && Folio != "null")
                 facturas = facturas.Where(f => f.Folio.ToUpper().Contains(Folio.ToUpper())).ToList();
-            if (!string.IsNullOrWhiteSpace(Serie) && Serie != "null")
+            if (!string.IsNullOrWhiteSpace(Serie) && Serie!= "null")
                 facturas = facturas.Where(f => f.Serie.ToUpper().Contains(Serie.ToUpper())).ToList();
             if (!string.IsNullOrWhiteSpace(Fecha) && Fecha != "null")
                 facturas = facturas.Where(f => f.Fecha == Fecha).ToList();
@@ -841,15 +836,14 @@ public class Facturas
             }
             db.SaveChanges();
         }
-        catch (Exception exp)
-        {
+        catch(Exception exp) {
             if (directo_en_vista)
                 throw new MulticonsultingException(exp.ToString());
         }
     }
 
 
-
+    
     public static void ActualizarEstadoFacturasSql(bool directo_en_vista = false)
     {
         try
@@ -958,469 +952,6 @@ public class Facturas
             return null;
             throw new MulticonsultingException(ex.Message);
 
-        }
-    }
-
-    //Empieza codigo de pago de luis
-    public static string ActualizarPagoFacturas(string bytes1, string Cont, bool directo_en_vista = false)
-    {
-        try
-        {
-            int Filas = 0;
-            try
-            {
-                var js = new JavaScriptSerializer();
-                var UUIDs_obj = (IEnumerable<object>)js.DeserializeObject(Cont);
-                string Dats = "";
-
-                foreach (var item in UUIDs_obj)
-                {
-                    if (Dats == "")
-                    {
-                        Dats = item.ToString();
-                    }
-                    else
-                    {
-                        Dats = Dats + "," + item.ToString();
-                    }
-
-                }
-
-                SqlConnection sqlConnection1 = new SqlConnection();
-                sqlConnection1 = SqlConnectionDB("PortalConnection");
-                if (sqlConnection1.State == ConnectionState.Open) { sqlConnection1.Close(); }
-                sqlConnection1.Open();
-
-                using (var sqlQuery = new SqlCommand("", sqlConnection1))
-                {
-                    sqlQuery.CommandText = "Select distinct VendorKey From invoice Where InvoiceKey IN ( " + Dats.ToString() + ")";
-                    sqlQuery.CommandType = CommandType.Text;
-                    SqlDataReader rdr = sqlQuery.ExecuteReader();
-                    DataTable Registros = new DataTable();
-                    Registros.Load(rdr);
-                    Filas = Registros.Rows.Count;
-                }
-                sqlConnection1.Close();
-            }
-            catch (Exception exp)
-            {
-                //token = "error al actualizar contrarrecibo";
-            }
-
-            if (Filas > 1)
-            {
-                return "Ha seleccionado facturas que son de diferentes proveedores.";
-            }
-
-
-            //byte[] fileByte = Convert.FromBase64String(bytes1);
-            string encodedStr = Convert.ToBase64String(Encoding.UTF8.GetBytes(bytes1));
-            byte[] fileByte = Convert.FromBase64String(encodedStr);
-
-
-
-            Company company = Tools.EmpresaAutenticada();
-            if (company == null) { return "Usuario no Autentificado"; }
-
-            string Respuesta = "";
-            try
-            {
-                var js = new JavaScriptSerializer();
-                var UUIDs_obj = (IEnumerable<object>)js.DeserializeObject(Cont);
-
-                foreach (var item in UUIDs_obj)
-                {
-
-                    SqlConnection sqlConnection1 = new SqlConnection();
-                    sqlConnection1 = SqlConnectionDB("PortalConnection");
-                    if (sqlConnection1.State == ConnectionState.Open) { sqlConnection1.Close(); }
-                    sqlConnection1.Open();
-                    using (var sqlQuery = new SqlCommand("", sqlConnection1))
-                    {
-                        sqlQuery.CommandText = "Select VendorKey as VK,Folio,ISNULL(NodeOC,'') as OC,GETDATE() as Fecha,Total from invoice where invoicekey = " + item.ToString() + " ";
-                        sqlQuery.CommandType = CommandType.Text;
-                        //sqlQuery.ExecuteNonQuery();
-                        SqlDataReader rdr = sqlQuery.ExecuteReader();
-                        while (rdr.Read())
-                        {
-                            try
-                            {
-                                string Vendor = rdr["VK"].ToString();
-                                string Folio = rdr["Folio"].ToString();
-                                string OCom = rdr["OC"].ToString();
-                                string fec1 = rdr["Fecha"].ToString();
-                                string fec2 = rdr["Fecha"].ToString();
-                                string Totsl = rdr["Total"].ToString();
-
-                                Folio = Folio.TrimEnd(' ');
-                                string UUID = Folio + "-" + OCom;
-                                string UUIDF = GETUUID(Folio, OCom, Vendor);
-
-                                //Sube Archivos al Portal
-                                string Respues = Execute(fileByte, Vendor, UUID, Folio, "", fec1, fec2, "4.0", Totsl).ToString();
-                                if (Respues != "1")
-                                {
-                                    ResetPago(UUID);
-                                    Respuesta = "Se encontrarón problemas al cargar los datos generales del comprobante, Verifica que estén correctos y/o que no se haya cargado anteriormente este documento ";
-                                    return Respuesta;
-                                }
-
-                                if (Desglose(UUID, UUIDF, Totsl, Totsl, Totsl, Totsl, Folio, "MXN", "PUE") == false)
-                                {
-                                    ResetPago(UUID);
-                                    Respuesta = "Se encontrarón problemas al cargar el desglose del comprobante, Verifica que los datos estén correctos";
-                                    return Respuesta;
-                                }
-                                ActualizaStado2(UUIDF);
-                                Respuesta = "Ok";
-                            }
-                            catch (Exception exp)
-                            {
-
-                            }
-                        }
-                    }
-                    sqlConnection1.Close();
-
-                }
-
-            }
-            catch (Exception exp)
-            {
-                //token = "error al actualizar contrarrecibo";
-            }
-
-            return Respuesta;
-
-        }
-        catch (Exception exp)
-        {
-            if (directo_en_vista)
-            {
-                throw new MulticonsultingException(exp.ToString());
-            }
-            return "Error al intentar Actualizar";
-        }
-    }
-
-    private static bool ActualizaStado2(string UUID)
-    {
-        try
-        {
-            SqlConnection sqlConnection1 = new SqlConnection();
-            sqlConnection1 = SqlConnectionDB("PortalConnection");
-            sqlConnection1.Open();
-            string compant = HttpContext.Current.Session["IDCompany"].ToString();
-            using (var sqlQuery = new SqlCommand("", sqlConnection1))
-            {
-                sqlQuery.CommandText = "Update Invoice Set Status = 8 Where UUID ='" + UUID + "' AND CompanyID = '" + compant + "'";
-                sqlQuery.CommandType = CommandType.Text;
-                sqlQuery.ExecuteNonQuery();
-            }
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
-
-    }
-
-    protected static void ResetPago(string UU)
-    {
-        try
-        {
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-            {
-                string Caden = "spResetPay";
-                SqlCommand cmd1 = new SqlCommand(Caden, conn);
-                cmd1.CommandType = CommandType.StoredProcedure;
-
-                cmd1.Parameters.Add(new SqlParameter()
-                { ParameterName = "@UUID", Value = UU });
-
-                if (conn.State == ConnectionState.Open)
-                {
-                    conn.Close();
-                }
-
-                conn.Open();
-                SqlDataReader rdr1 = cmd1.ExecuteReader();
-            }
-        }
-        catch (Exception ex)
-        {
-
-        }
-
-    }
-
-    protected static string GETUUID(string Fecha, string OC, string Vendor)
-    {
-        string Cuenta = "";
-        try
-        {
-            string sql;
-
-
-            SqlConnection sqlConnection1 = new SqlConnection();
-            sqlConnection1 = SqlConnectionDB("PortalConnection");
-            sqlConnection1.Open();
-
-            sql = @"SELECT top 1 UUID From Invoice a inner join Vendors b on a.VendorKey = b.vendorkey Where Folio ='" + Fecha + "' And b.VendName = '" + Vendor + "' AND NodeOC = '" + OC + "'";
-
-            using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
-            {
-                sqlQuery.CommandType = CommandType.Text;
-                sqlQuery.CommandText = sql;
-                Cuenta = sqlQuery.ExecuteScalar().ToString();
-            }
-
-            sqlConnection1.Close();
-        }
-        catch (Exception ex)
-        {
-            int iLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
-            int iUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
-            string CompanyID = HttpContext.Current.Session["IDCompany"].ToString();
-            //LogError(iLogKey, iUserKey, "Carga de Complemento de Pagos_VerFechaP", ex.Message, CompanyID);
-            Cuenta = "";
-        }
-        //return Rest;
-        return Cuenta;
-    }
-
-    private static bool Desglose(string UUIDP, string Fac, string pago, string Parcial, string SalT, string SAlN, string FolP, string Mon, string Meto)
-    {
-        bool Res = false;
-        int key = 0;
-        int UUID = 0;
-        string Fk = string.Empty;
-        string Pk = string.Empty;
-
-        try
-        {
-            // foreach (GridViewRow gvr in GridView2.Rows)
-            //{
-            SalT = SalT.Replace(",", ".");
-            SAlN = SAlN.Replace(",", ".");
-            pago = pago.Replace(",", ".");
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-            {
-                string Caden = "spGetPayAppl";
-                SqlCommand cmd1 = new SqlCommand(Caden, conn);
-                cmd1.CommandType = CommandType.StoredProcedure;
-
-                cmd1.Parameters.Add(new SqlParameter()
-                { ParameterName = "@UPago", Value = Fac });
-
-                cmd1.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Factura", Value = UUIDP });
-
-                if (conn.State == ConnectionState.Open)
-                {
-                    conn.Close();
-                }
-
-                conn.Open();
-                SqlDataReader rdr1 = cmd1.ExecuteReader();
-
-                while (rdr1.Read())
-                {
-                    Pk = rdr1["PKey"].ToString();
-                    Fk = rdr1["FKey"].ToString();
-                }
-
-                key = int.Parse(Pk.ToString());
-                UUID = int.Parse(Fk.ToString());
-
-
-                if (UUID != 0)
-                {
-                    /////////////////////////////////////////////////////////////////////////////////
-
-                    string Cades = "spInsertPayAppl";
-                    string Result = string.Empty;
-                    SqlCommand cmd = new SqlCommand(Cades, conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@PaymentKey", Value = key });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@ApplUUID", Value = UUIDP });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@ApplFolio", Value = FolP });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@PaymtApplied", Value = pago });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@PartialNumber", Value = 1 });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@BalanceAnt", Value = SalT });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@BalanceOut", Value = "0.00" });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@Moneda", Value = Mon });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@MetodoPago", Value = Meto });
-
-                    cmd.Parameters.Add(new SqlParameter()
-                    { ParameterName = "@Folio", Value = UUID });
-
-                    if (conn.State == ConnectionState.Open)
-                    {
-                        conn.Close();
-                    }
-
-                    conn.Open();
-                    SqlDataReader rdr = cmd.ExecuteReader();
-
-                    while (rdr.Read())
-                    {
-                        if (rdr["Resultado"].ToString() == "1")
-                        {
-                            Res = true;
-                        }
-                        else
-                        {
-                            Res = false;
-                        }
-                    }
-                }
-            }
-            //}
-        }
-        catch (Exception ex)
-        {
-            string Error = ex.Message;
-            Res = false;
-        }
-        return Res;
-    }
-
-    public static string Execute(Byte[] bytes1, string VendKey, string UUID, string Folio, string Serie, string F1, string F2, string Version, string Total)
-    {
-        string res;
-
-        try
-        {
-            string Filename = "Archivo de PAgo TSYS";
-
-            //Fabian
-            //Byte[] bytes1 = FileUpload2.FileBytes;
-            //Byte[] bytes2 = FileUpload1.FileBytes;
-            //}
-            string Ext = ".XML";
-            string Ext2 = ".pdf";
-            string Var1 = HttpContext.Current.Session["IDComTran"].ToString();
-            string Var2 = HttpContext.Current.Session["VendKey"].ToString();
-            string Var3 = HttpContext.Current.Session["UserKey"].ToString();
-            //int VendKey = GetVkey();
-            int UserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
-
-            Total = Total.Replace(",", ".");
-
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-            {
-                string Cades = "spInsertPay";
-                string Result = string.Empty;
-                SqlCommand cmd = new SqlCommand(Cades, conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@File", Value = bytes1 });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@File2", Value = bytes1 });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Vendedor", Value = VendKey });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Company", Value = HttpContext.Current.Session["IDCompany"].ToString() });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@UserKey", Value = UserKey });
-
-                //cmd.Parameters.Add(new SqlParameter()
-                //{ ParameterName = "@F1", Value = F1 });
-
-                //cmd.Parameters.Add(new SqlParameter()
-                //{ ParameterName = "@F2", Value = F2 });
-
-                DateTime Fe1 = Convert.ToDateTime(F1);
-                DateTime Fe2 = Convert.ToDateTime(F2);
-
-                String Fe1w = String.Format(Fe1.ToShortDateString(), "dd/mm/aaaa");
-                String Fe2w = String.Format(Fe2.ToShortDateString(), "dd/mm/aaaa");
-
-                //DateTime Fe1 = DateTime.ParseExact(F1, "dd/MM/yyyy", null);
-                //DateTime Fe2 = DateTime.ParseExact(F2, "dd/MM/yyyy", null);
-
-                cmd.Parameters.Add(new SqlParameter("@F1", SqlDbType.DateTime) { Value = Fe1w });
-                cmd.Parameters.Add(new SqlParameter("@F2", SqlDbType.DateTime) { Value = Fe2w });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@UUID", Value = UUID });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Serie", Value = Serie });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Folio", Value = Folio });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Version", Value = Version });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Total", Value = Total });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Ext", Value = Ext });
-
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Ext2", Value = Ext2 });
-
-                if (conn.State == ConnectionState.Open)
-                {
-                    conn.Close();
-                }
-
-                conn.Open();
-                SqlDataReader rdr = cmd.ExecuteReader();
-
-                while (rdr.Read())
-                {
-                    if (rdr["Resultado"].ToString() == "1")
-                    {
-                        Result = rdr["Resultado"].ToString();
-                    }
-                    else
-                    {
-                        Result = rdr["Resultado"].ToString();
-                        throw new Exception(Result);
-                    }
-                }
-                res = Result;
-                if (conn.State == ConnectionState.Open)
-                {
-                    conn.Close();
-                }
-            }
-            return res;
-        }
-        catch (Exception Rt)
-        {
-            res = Rt.Message;
-            return res;
         }
     }
 }

@@ -5,7 +5,7 @@
 var table;
 $(document).ready(function () {
     hide_combo_proveedores(ContrarecibosWebService.get_path());
-    var url_list = ContrarecibosWebService.get_path() + "/listar";
+    var url_list = ContrarecibosWebService.get_path() + "/listar3";
    
     table = $('#list').DataTable({
         language: window.datatableLang,
@@ -79,7 +79,9 @@ $(document).ready(function () {
     });
 
     function getSelected() {
+        debugger;
         var rows_selected = table.column(0).checkboxes.selected();
+        console.log(rows_selected);
         var ids = [];
         $.each(rows_selected, function (index, id) {
             ids.push(id);

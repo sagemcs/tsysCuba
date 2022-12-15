@@ -1012,9 +1012,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         {
             int expense_id = int.Parse(row.Cells[0].Text);
             var expense = LoadExpenseById(expense_id, pUserKey);
-            expense.FileNameXml = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Xml, expense_id);
-            expense.FileNamePdf = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Pdf, expense_id);
-            expense.FileNamePdfVoucher = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Voucher, expense_id);
+           
             HttpContext.Current.Session["Expense"] = expense;
             ClearControls();
             Response.Redirect("EditReembolso");

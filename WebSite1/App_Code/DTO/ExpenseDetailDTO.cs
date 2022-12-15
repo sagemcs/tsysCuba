@@ -26,6 +26,9 @@ public class ExpenseDetailDTO
     public string STaxCodeID { get; set; }
     public string Description { get; set; }
     public decimal TaxAmount { get; set; }
+    public ExpenseFilesDTO FileXml { get; set; }
+    public ExpenseFilesDTO FilePdf { get; set; }
+    public ExpenseFilesDTO FilePdfVoucher { get; set; }
     public DateTime CreateDate { get; set; }
     public int CreateUser { get; set; }
     public Action Accion { get; set; }

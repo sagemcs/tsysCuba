@@ -69,7 +69,7 @@
             };
 
             function keyup(e) {
-                // Key up Ctrl
+                // Key up Ctrlupdate
                 if ((e.which || e.keyCode) == 17)
                     ctrlKeyDown = false;
             };

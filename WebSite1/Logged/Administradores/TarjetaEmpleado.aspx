@@ -126,6 +126,7 @@
             swal(titulo, mesaje, Tipo);
             unblockUI();
         }
+        
     </script>
 
     <script>
@@ -158,16 +159,13 @@
         }
     </script>
     <asp:MultiView ID="MultiView1" runat="server">       
+
         <%--Vista de Articulos--%>
-        <asp:View ID="View_Articulos" runat="server">
-            <br />
-            <br />
-            <br />
-            <br />
+        <asp:View ID="View_Articulos" runat="server">                
             <br />
             <br />
             <div class="col-lg-12 col-sm-12 col-12" id="M4">
-                <h3>Insertar Articulos</h3>
+                <h3>Insertar Gastos</h3>
             </div>
             <br />
 
@@ -191,10 +189,11 @@
                     </span>
                 </div>               
              </div>
-             <div class="row">
+            <br />
+            <div class="row">
                 <%--Articulos--%>
                 <div class="col-lg-3 col-sm-3 col-xs-3">
-                    <h4>Articulos:</h4>
+                    <h4>Gastos:</h4>
                     <span class="dropdown-header">
                         <asp:DropDownList ID="drop_articulos" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server">
                         </asp:DropDownList>
@@ -225,6 +224,50 @@
             </div>
             <br />
             <div class="row">
+                <%--Carga de XML--%>
+                <div class="col-lg-3 col-sm-3 col-xs-3">
+                    <h4>XML Factura:</h4>
+                    <div class="input-group col-lg-12 col-sm-12 col-xs-12">
+                        <label class="input-group-btn">
+                            <span class="btn btn-primary">Seleccionar&hellip;
+                                <asp:FileUpload  type="file" ID="fu_xml" ClientIDMode="Static" runat="server" Style="display: none;" accept="application/xml" AllowMultiple="false"/>                    
+                            </span>
+                        </label>
+                        <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_xml" ReadOnly="true" />
+                    </div>
+                    <small class="form-text text-muted">Archivo Max 15 Mb.</small>
+                </div>
+
+                <%--Carga de PDF--%>
+                <div class="col-lg-3 col-sm-3 col-xs-3">
+                        <h4>PDF Anexo:</h4>
+                        <div class="input-group col-lg-12 col-sm-12 col-xs-12">
+                            <label class="input-group-btn">
+                                <span class="btn btn-primary">Seleccionar&hellip;
+                                <asp:FileUpload type="file" ID="fu_pdf" runat="server" Style="display: none;" accept="application/pdf" AllowMultiple="false" />
+                                </span>
+                            </label>
+                            <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_pdf" ReadOnly="true" />
+                        </div>
+                        <small class="form-text text-muted">Archivo Max 15 Mb.</small>
+                    </div>
+
+                <%--Carga de Voucher--%>
+                <div class="col-lg-3 col-sm-3 col-xs-3">
+                    <h4>Voucher Anexo:</h4>
+                    <div class="input-group col-lg-12 col-sm-12 col-xs-12">
+                        <label class="input-group-btn">
+                            <span class="btn btn-primary">Seleccionar&hellip;
+                            <asp:FileUpload type="file" ID="fu_voucher" runat="server" Style="display: none;" accept="application/pdf" AllowMultiple="false"/>
+                            </span>
+                        </label>
+                        <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_voucher" ReadOnly="true" />
+                    </div>
+                    <small class="form-text text-muted">Archivo Max 15 Mb.</small>
+               </div>
+            </div>   
+            <br />
+            <div class="row">
                 <%--Agregar articulo--%>
                 <div class="col-lg-2 col-sm-2 col-xs-2">
                     <div class="col-lg-12 col-sm-12 col-xs-12">
@@ -241,10 +284,11 @@
 
          
         </asp:View>
+
         <%--Vista General--%>
         <asp:View ID="View_General" runat="server" OnActivate="View_General_Activate" OnDeactivate="View_General_Deactivate">
             <div class="col-lg-12 col-sm-12 col-12" id="M1">
-                <h3>Captura de Tarjeta Corporativa</h3>        
+                <h3>Captura de Tarjeta Corporativa</h3>       
                             
                 <br />
                 </div>
@@ -288,50 +332,7 @@
 
           <br />
              <div class="row">
-                 </div>
-          <div class="row">
-                <%--Carga de XML--%>
-                <div class="col-lg-3 col-sm-3 col-xs-3">
-                    <h4>XML Factura:</h4>
-                    <div class="input-group col-lg-12 col-sm-12 col-xs-12">
-                        <label class="input-group-btn">
-                            <span class="btn btn-primary">Seleccionar&hellip;
-                                <asp:FileUpload  type="file" ID="fu_xml" ClientIDMode="Static" runat="server" Style="display: none;" accept="application/xml" AllowMultiple="true"/>                    
-                            </span>
-                        </label>
-                        <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_xml" ReadOnly="true" />
-                    </div>
-                    <small class="form-text text-muted">Archivo Max 15 Mb.</small>
-                </div>
-
-                <%--Carga de PDF--%>
-                <div class="col-lg-3 col-sm-3 col-xs-3">
-                        <h4>PDF Anexo:</h4>
-                        <div class="input-group col-lg-12 col-sm-12 col-xs-12">
-                            <label class="input-group-btn">
-                                <span class="btn btn-primary">Seleccionar&hellip;
-                                <asp:FileUpload type="file" ID="fu_pdf" runat="server" Style="display: none;" accept="application/pdf" AllowMultiple="true" />
-                                </span>
-                            </label>
-                            <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_pdf" ReadOnly="true" />
-                        </div>
-                        <small class="form-text text-muted">Archivo Max 15 Mb.</small>
-                    </div>
-
-                <%--Carga de Voucher--%>
-                <div class="col-lg-3 col-sm-3 col-xs-3">
-                    <h4>Voucher Anexo:</h4>
-                    <div class="input-group col-lg-12 col-sm-12 col-xs-12">
-                        <label class="input-group-btn">
-                            <span class="btn btn-primary">Seleccionar&hellip;
-                            <asp:FileUpload type="file" ID="fu_voucher" runat="server" Style="display: none;" accept="application/pdf" AllowMultiple="true"/>
-                            </span>
-                        </label>
-                        <asp:TextBox type="text" runat="server" class="form-control" ID="tbx_voucher" ReadOnly="true" />
-                    </div>
-                    <small class="form-text text-muted">Archivo Max 15 Mb.</small>
-               </div>
-            </div>     
+                 </div>  
 
             <%--Motivo del gasto--%>
            <div class ="row">
@@ -342,10 +343,10 @@
                     </div>
                 </div>
              <%--Agregar impuestos o Articulos--%>
-               <h3>Agregar Articulos</h3>
+               <h3>Agregar Gastos</h3>
                 <label class="col-form-label col-lg-4 col-sm-4 col-xs-4"></label>
                 <div class="col-xs-4 col-md-4 col-xs-3">
-                    <asp:Button ID="btn_new_article" runat="server"  Class="btn btn-primary" title="Añadir Articulos" Text="Agregar Articulo" OnClick="btn_new_article_Click"  />
+                    <asp:Button ID="btn_new_article" runat="server"  Class="btn btn-primary" title="Añadir Articulos" Text="Agregar Gastos" OnClick="btn_new_article_Click"  />
                 </div>  
             </div>
             <br />      
@@ -376,10 +377,25 @@
                             <asp:BoundField DataField="Amount" HeaderText="Importe" ReadOnly="True" SortExpression="Amount" DataFormatString="{0:c}"/>
                             <asp:BoundField DataField="TipoGasto" HeaderText="Tipo de Gasto" ReadOnly="True" SortExpression="TipoGasto" />
                             <asp:BoundField DataField="STaxCodeID" HeaderText="Descripcion" ReadOnly="True" SortExpression="STaxCodeID" />                            
-                            <asp:BoundField DataField="TaxAmount" HeaderText="Importe" ReadOnly="True" SortExpression="TaxAmount" DataFormatString="{0:c}"/>        
+                            <asp:BoundField DataField="TaxAmount" HeaderText="Importe" ReadOnly="True" SortExpression="TaxAmount" DataFormatString="{0:c}"/>     
+                            <asp:TemplateField HeaderText="Xml">
+                                <ItemTemplate>
+                                    <asp:Image ID="img_xml" runat="server" Width="10px" Height="10px" />
+                                </ItemTemplate>
+                            </asp:TemplateField>                           
+                             <asp:TemplateField HeaderText="Pdf">
+                                <ItemTemplate>
+                                    <asp:Image ID="img_pdf" runat="server" Width="10px" Height="10px" />
+                                </ItemTemplate>
+                            </asp:TemplateField>    
+                            <asp:TemplateField HeaderText="Voucher">
+                                <ItemTemplate>
+                                    <asp:Image ID="img_voucher" runat="server" Width="10px" Height="10px" />
+                                </ItemTemplate>
+                            </asp:TemplateField>    
                             <asp:CommandField ShowSelectButton="True" ControlStyle-CssClass="btn-success" ButtonType="Button" SelectText="Eliminar" ShowCancelButton="False">
                                 <ControlStyle CssClass="btn-warning"></ControlStyle>
-                            </asp:CommandField>
+                            </asp:CommandField>           
                         </Columns>
                         <EditRowStyle BackColor="#999999" />
                         <FooterStyle BackColor="#5D7B9D" ForeColor="White" Font-Bold="True" />
@@ -396,13 +412,10 @@
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="GvItems" EventName="RowCommand"/>
                 </Triggers>
-            </asp:UpdatePanel>
-
-            <%-- Grid Impuestos--%>
+            </asp:UpdatePanel>         
 
             <br />
-            <br />
-                
+            <br />                
 
             <div class="row">               
                 <div class="col-xs-4 col-md-3 col-xs-3">
@@ -425,7 +438,7 @@
                 margin-left="auto" margin-right="auto"
                 AutoGenerateColumns="False"
                 OnRowCommand="gvGastos_RowCommand"
-                OnRowDataBound="gvGastos_RowDataBound"
+                OnRowDataBound="gvGastos_RowDataBound"               
                 CellPadding="4"
                 ForeColor="#333333" GridLines="None">
 
@@ -436,16 +449,16 @@
                     <asp:BoundField DataField="Date" HeaderText="Fecha del Gasto" ReadOnly="True" SortExpression="Date" />
                     <asp:BoundField DataField="Currency" HeaderText="Tipo de Moneda" ReadOnly="True" SortExpression="Currency" />
                     <asp:BoundField DataField="Amount" HeaderText="Importe del Gasto" ReadOnly="True" SortExpression="Amount" DataFormatString="{0:c}"/>
-                    <asp:BoundField DataField="Status" HeaderText="Estado del Gasto" ReadOnly="True" SortExpression="Status" />
-                    <asp:CommandField ShowSelectButton="True" ControlStyle-CssClass="btn-success" ButtonType="Button" SelectText="Editar" ShowCancelButton="False">
+                    <asp:BoundField DataField="Status" HeaderText="Estado del Gasto" ReadOnly="True" SortExpression="Status" />        
+                     <asp:CommandField ShowSelectButton="True" ControlStyle-CssClass="btn-success" ButtonType="Button" SelectText="Editar" ShowCancelButton="False">
                         <ControlStyle CssClass="btn-success"></ControlStyle>
                     </asp:CommandField>
-                    <asp:TemplateField >
+                   <asp:TemplateField >
                    <ItemTemplate>
                       <asp:Button ID="btnDelete" runat="server" CssClass="btn-warning" CommandName="Delete" Text="Eliminar"  OnCommand="btnDelete_Command"></asp:Button>
                    </ItemTemplate>
-                 </asp:TemplateField>  
-                </Columns>
+                 </asp:TemplateField>                      
+                </Columns>                
                 <EditRowStyle BackColor="#999999" />
                 <FooterStyle BackColor="#5D7B9D" ForeColor="White" Font-Bold="True" />
                 <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />

@@ -12,6 +12,7 @@ public class ExpenseFilesDTO
 	public int Id { get; set; }
 	public DocumentType ExpenseType { get; set; }
 	public int ExpenseId { get; set; }
+	public int ExpenseDetailId { get; set; }
 	public string FileName { get; set; }
 	public FileType Type { get; set; }
 	public string ContentType { get; set; }

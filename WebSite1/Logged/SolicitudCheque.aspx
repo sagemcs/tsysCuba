@@ -10,7 +10,6 @@
     <META HTTP-EQUIV="Cache-Control" CONTENT ="no-cache">
     <meta http-equiv="Expires" content="0" />
     <meta http-equiv="Pragma" content="no-cache" />
-    <meta charset="utf-8">
 <%--    <link href="../Css/reports-filter.css" rel="stylesheet" />--%>
 </asp:Content>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
@@ -26,8 +25,7 @@
             <asp:ScriptReference  Path="~/Scripts/crypto-js.js" />
             <asp:ScriptReference  Path="~/Scripts/sha256.js" />
             <asp:ScriptReference  Path="~/Scripts/custom.js" />
-            <asp:ScriptReference  Path="~/Css/sweetalert2.all.min.js" />
-            <asp:ScriptReference  Path="~/Scripts/data-tables-solicitudcheque-contrarecibos2.js" />
+            <asp:ScriptReference  Path="~/Scripts/data-tables-solicitudcheque-contrarecibos.js" />
         </Scripts>
       
     </asp:ScriptManagerProxy>
@@ -121,7 +119,6 @@
                         <th>Fecha de Aprobacion</th>
                         <th>Fecha Programada de Pago</th>
                         <th>Total</th>
-                        <th>Aprobado</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -147,8 +144,10 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Comentario</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title"
+                            id="myModalLabel">Comentario</h4>
                     </div>
                     <div class="modal-body">
 
@@ -164,8 +163,13 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-tsys pull-left" data-dismiss="modal"></i>Cancelar</button>
-                            <button class="btn btn-primary" title="Generar solicitud de cheque" data-toggle="tooltip">Aceptar</button>
+                            <button type="button" class="btn btn-tsys pull-left" data-dismiss="modal"></i>Cancelar
+                            </button>
+                           
+
+                            <button class="btn btn-primary" title="Generar solicitud de cheque" data-toggle="tooltip">
+                                Aceptar
+                            </button>
                         </div>
                 </div>
             </div>

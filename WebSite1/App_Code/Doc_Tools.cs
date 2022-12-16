@@ -901,7 +901,7 @@ public static class Doc_Tools
         {           
             { "B20", "El importe supera el máximo permitido segun los datos facilitados." },
             { "B19", "La fecha de salida no puede ser anterior a la fecha actual, favor de verificar e intentar nuevamente." },
-            { "B18", "El usuario cuenta con más de un anticipo pendiente, favor de verificar e intentar nuevamente." },
+            { "B18", "El usuario cuenta con dos anticipos pendientes, favor de verificar e intentar nuevamente." },
             { "B17", "Jefe Inmediato requerido, favor de verificar e intentar nuevamente." },
             { "B16", "El importe solo debe contener números, punto o coma, favor de verificar e intentar nuevamente." },
             { "B15", "Importe del gasto requerido, favor de verificar e intentar nuevamente." },
@@ -928,11 +928,11 @@ public static class Doc_Tools
             { "B37", "El gasto se ha integrado previamente en Sage." },
             { "B38", "El gasto se ha integrado previamente en Sage." },
             { "B39", "La cantidad solo debe contener números y ser superior a cero, favor de verificar e intentar nuevamente." },
-            { "B40", "Debe especificar el articulo, favor de verificar e intentar nuevamente." },
+            { "B40", "Debe especificar el gasto, favor de verificar e intentar nuevamente." },
             { "B41", "El importe debe ser superior a cero, favor de verificar e intentar nuevamente." },
-            { "B42", "Debe especificar el anticipo, favor de verificar e intentar nuevamente." },
+            { "B42", "Está introduciendo un reembolso sin anticipo." },
             { "MB42", "Uno de los archivos PDF VOUCHER supera el tamaño máximo permitido (15 MB)." },
-            { "MB41", "La lista de artículos esta vacía, por favor inserte al menos uno." },
+            { "MB41", "La lista de gastos esta vacía, por favor inserte al menos uno." },
             { "MB40", "No coincide el importe total del gasto con los artículos e impuestos declarados." },
             { "MB39", "Ya existe una tarjeta con ese monto el dia actual." },
             { "MB38", "Solo se admiten gastos del mes actual." },
@@ -971,8 +971,7 @@ public static class Doc_Tools
 
         };
         return dict;
-    }
-   
+    }   
 
     public static ExpenseFilesDTO LoadFilesbyExpense(DocumentType type, ExpenseFilesDTO.FileType fileType, int expense_id, int detail_id)
     {

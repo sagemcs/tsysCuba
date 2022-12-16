@@ -652,6 +652,9 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
     {
         //logica para enviar los correos
         //Logica para lanzar Reporte de Reembolsos
+        HttpContext.Current.Session["voucher_file"] = null;
+        HttpContext.Current.Session["pdf_file"] = null;
+        HttpContext.Current.Session["xml_file"] = null;
         Response.Redirect("~/Logged/Reports/TarjetaEmpleado");
     }    
 

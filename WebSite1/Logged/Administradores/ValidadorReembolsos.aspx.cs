@@ -189,13 +189,14 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
                     BindPackageInfo();
-                    
+                   
                     upPackage.Visible = level <= 1;
                     //BindGridView();
                     if (!IsPostBack)
                     {
                         BindEmpleados();
-                        BindStatus();                        
+                        BindStatus();
+                        BindGridView(0, 0);
                     }
                    
                     pVendKey = 0;
@@ -276,7 +277,11 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         var roles = Doc_Tools.get_RolesValidadores();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
-        List<ExpenseDTO> gastos = ReadFromDb(user_id, level).ToList();
+        List<ExpenseDTO> gastos = ReadFromDb().ToList();
+        if(user_id != 0)
+        {
+            gastos = gastos.Where(x => x.UpdateUserKey == user_id).ToList();
+        }
         if (status_id != 0)
         {
             gastos = gastos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d => d.Key == status_id).Value).ToList();
@@ -302,7 +307,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.Expense);
 
-        empleados.Add(new EmpleadoDTO() { UserKey = 0, Nombre = "" });
+        empleados.Add(new EmpleadoDTO() { UserKey = 0, Nombre = "Todos" });
         drop_empleados.DataSource = empleados.Select(x => new { Id = x.UserKey, Nombre = x.Nombre }).OrderBy(o => o.Id).ToList();
         drop_empleados.DataTextField = "Nombre";
         drop_empleados.DataValueField = "Id";
@@ -329,34 +334,16 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         tbx_cant_reembolsos.Text = get_expenses_package(paquete.PackageId).ToString();
         
     }
+   
 
-    private string get_user_mail(int userkey)
-    {
-        string email = "";
-        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-        {
-            SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT UserName FROM AspNetUsers where UserKey = @UserKey;";
-            cmd.Parameters.Add("@UserKey", SqlDbType.Int).Value = userkey;
-            cmd.Connection.Open();
-            SqlDataReader dataReader = cmd.ExecuteReader();
-            while (dataReader.Read())
-            {
-                email = dataReader.GetString(0);
-            }
-        }
-        return email;
-    }     
-
-    private List<ExpenseDTO> ReadFromDb(int user_id, int level)
+    private List<ExpenseDTO> ReadFromDb()
     {
         List<ExpenseDTO> gastos = new List<ExpenseDTO>();
        
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();            
-            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel, 0) FROM Expense where UpdateUserKey = @UpdateUserKey ;";
-            cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
+            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel, 0) FROM Expense ;";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -773,15 +760,15 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                         tbx_motivo.ReadOnly = false;
                         btn_integrar.Visible = false;
                         btn_comentar.Visible = false;
-                    }
+                    }                    
                     else
                     {
                         btn_aprobar.Visible = false;
                         btn_denegar.Visible = false;
-                        tbx_motivo.Visible = true;
+                        tbx_motivo.Visible = false;
                         tbx_motivo.ReadOnly = true;
                         btn_integrar.Visible = false;
-                        btn_comentar.Visible = true;
+                        btn_comentar.Visible = false;
                     }
                     break;
                 case "Aprobado":

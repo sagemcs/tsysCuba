@@ -224,9 +224,9 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                         HttpContext.Current.Session["is_valid"] = false;
                     }
                     btnSage.Enabled = is_valid;
-                    BindGridView();
-                    fill_filelists();
                     fill_fileUploads();
+                    BindGridView();                   
+                  
                     pVendKey = 0;
                     //pLogKey = 0;
                     //pUserKey = 0;
@@ -657,7 +657,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
     {
         HttpContext.Current.Session["is_valid"] = false;
         btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
-        bool xml = false, voucher = false, pdf = false;
+        bool xml = false, pdf = false;
         fill_filelists();
 
         //validacion texto en importe
@@ -970,7 +970,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             var xml_file = new ExpenseFilesDTO
             {
                 Type = ExpenseFilesDTO.FileType.Xml,
-                ExpenseType = Doc_Tools.DocumentType.CorporateCard
+                ExpenseType = Doc_Tools.DocumentType.MinorMedicalExpense
             };
             byte[] byte_array = new byte[fu_xml.PostedFile.ContentLength];
             fu_xml.PostedFile.InputStream.Read(byte_array, 0, byte_array.Length);
@@ -984,7 +984,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             var pdf_file = new ExpenseFilesDTO
             {
                 Type = ExpenseFilesDTO.FileType.Pdf,
-                ExpenseType = Doc_Tools.DocumentType.CorporateCard
+                ExpenseType = Doc_Tools.DocumentType.MinorMedicalExpense
             };
             byte[] byte_array = new byte[fu_pdf.PostedFile.ContentLength];
             fu_pdf.PostedFile.InputStream.Read(byte_array, 0, byte_array.Length);
@@ -998,9 +998,8 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
     protected void btn_validar_Click(object sender, EventArgs e)
     {
         btnSage.Enabled = false;
-        is_valid = false;
-        bool xml = false, pdf = false;
-        fill_filelists();
+        is_valid = false;      
+        //fill_filelists();
 
         //validacion de fecha
         if (string.IsNullOrEmpty(tbx_fechagasto.Text))
@@ -1064,12 +1063,12 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
 
     protected void View_General_Activate(object sender, EventArgs e)
     {
-        fill_fileUploads();
+      //  fill_fileUploads();
     }
 
     protected void View_General_Deactivate(object sender, EventArgs e)
     {
-        fill_filelists();
+        //fill_filelists();
     }
 
     protected void btnDelete_Command(object sender, CommandEventArgs e)

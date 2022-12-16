@@ -224,19 +224,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                    // STipoGasto.SelectedValue = Dict_tipos_gastos().FirstOrDefault(x => x.Value == card.Type).Key.ToString();
                   
                     Load_Articles_By_Expense(card.CorporateCardId, pUserKey, pCompanyID);
-                    //if (card.FileNamePdf != null)
-                    //{
-                    //    card.FileNamePdf.ForEach(x => tbx_pdf.Text += x.ToString());
-                    //}
-                    //if (card.FileNameXml != null)
-                    //{
-                    //    card.FileNameXml.ForEach(x => tbx_xml.Text += x.ToString());
-                    //}
-                    //if (card.FileNamePdfVoucher != null)
-                    //{
-                    //    card.FileNamePdfVoucher.ForEach(x => tbx_voucher.Text += x.ToString());
-                    //}
-
+                   
                     tbx_motivo.Text = card.ExpenseReason;
                 }
             }
@@ -886,6 +874,8 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
     protected void btn_Cancelar_Click(object sender, EventArgs e)
     {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
         Response.Redirect("TarjetaEmpleado");
     }
 

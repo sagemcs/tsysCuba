@@ -193,7 +193,8 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                     if (!IsPostBack)
                     {
                         BindEmpleados();
-                        BindStatus();                       
+                        BindStatus();
+                        BindGridView(0, 0);
                     }
                    
                     pVendKey = 0;
@@ -274,7 +275,11 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 1).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
-        List<CorporateCardDTO> gastos = ReadFromDb(user_id, level).ToList();
+        List<CorporateCardDTO> gastos = ReadFromDb().ToList();
+        if(user_id != 0)
+        {
+            gastos = gastos.Where(x => x.UpdateUserKey == user_id).ToList();
+        }
         if (status_id != 0)
         {
             gastos = gastos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d => d.Key == status_id).Value).ToList();
@@ -343,16 +348,14 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         return dict;
     }
 
-    private List<CorporateCardDTO> ReadFromDb(int user_id, int level)
+    private List<CorporateCardDTO> ReadFromDb()
     {
         List<CorporateCardDTO> gastos = new List<CorporateCardDTO>();
 
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, CreateDate, Isnull(DeniedReason,''), Isnull(PackageId,0) , Isnull(ApprovalLevel,0) FROM CorporateCard where UpdateUserKey = @UpdateUserKey;";
-                      
-            cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
+            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, CreateDate, Isnull(DeniedReason,''), Isnull(PackageId,0) , Isnull(ApprovalLevel,0) FROM CorporateCard;";                
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())

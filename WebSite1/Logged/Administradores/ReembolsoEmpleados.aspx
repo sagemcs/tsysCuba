@@ -172,7 +172,7 @@
             <br />
             <br />
             <div class="col-lg-12 col-sm-12 col-12" id="M4">
-                <h3>Insertar Articulos</h3>
+                <h3>Insertar Gastos</h3>
             </div>
             <br />
             <%--Bloque encabezado Reembolso--%>          
@@ -196,11 +196,12 @@
                         </div>                              
                         
                     </div>
-                    <%--Bloque Articulos al Grid--%>
+
+           <%--Bloque Articulos al Grid--%>
                     <div class="row">
                         <%--Articulos--%>
                         <div class="col-lg-3 col-sm-3 col-xs-3">
-                            <h4>Articulos:</h4>
+                            <h4>Gastos:</h4>
                             <span class="dropdown-header">
                                 <asp:DropDownList ID="drop_articulos" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server">
                                 </asp:DropDownList>
@@ -228,70 +229,10 @@
                                 </asp:DropDownList>
                             </span>
                         </div>
-                    </div>            
+                    </div>    
             
-            <br />
-            <div class="row" style="align-items:center" >
-                <%--Agregar articulo--%>
-                <div class="col-lg-2 col-sm-2 col-xs-2">
-                    <div class="col-lg-12 col-sm-12 col-xs-12">
-                        <asp:Button ID="btn_additem" runat="server" Class="btn btn-tsys cargar" title="Agregar Artículo" Text="Guardar Artículo" OnClick="btn_additem_Click" CausesValidation="true" />
-                    </div>
-                </div>
-                <%--Cancelar--%>
-                <div class="col-lg-2 col-sm-2 col-xs-2">
-                    <div class="col-lg-12 col-sm-12 col-xs-12">
-                        <asp:Button ID="btn_cancelar_item" runat="server" Class="btn btn-tsys cargar" title="Cancelar" Text="Cancelar" OnClick="btn_cancelar_item_Click" />
-                    </div>
-                </div>
-            </div>
-
-
-        </asp:View>
-        <%--Vista General--%>
-        <asp:View ID="View_General" runat="server" OnActivate="View_General_Activate" OnDeactivate="View_General_Deactivate">
-            <div class="col-lg-12 col-sm-12 col-12" id="M1">
-                <h3>Captura de Reembolso de gastos</h3>
-            </div>
-
-            <asp:UpdatePanel runat="server" ID="UpdatePanel4" UpdateMode="Always">
-                <ContentTemplate>
-                    <div class="row">
-                        <%-- Anticipos--%>
-                        <div class="col-lg-3 col-sm-3 col-xs-3">
-                            <h4>Anticipos:</h4>
-                            <div class="col-lg-12 col-sm-12 col-xs-12">                               
-                                <asp:DropDownList ID="drop_anticipos" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="True" OnSelectedIndexChanged="drop_anticipos_SelectedIndexChanged">
-                                </asp:DropDownList>                               
-                            </div>
-                        </div>
-                        <%--Fecha del gasto--%>
-                        <div class="col-lg-3 col-sm-3 col-xs-3">
-                            <h4>Fecha del gasto:</h4>
-                            <div class="col-lg-12 col-sm-12 col-xs-12">
-                                <asp:TextBox type="date" name="fecha" ID="tbx_fechagasto" AutoComplete="off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" step="1" class="form-control" runat="server" OnTextChanged="tbx_fechagasto_TextChanged" AutoPostBack="true" />
-                            </div>
-                        </div>
-                        <%--   Tipo de moneda--%>
-                        <div class="col-lg-3 col-sm-3 col-xs-3">
-                            <h4>Tipo de moneda:</h4>
-                            <span class="dropdown-header">                              
-                                <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_currency" class="form-control" BackColor="White" ReadOnly="True"></asp:TextBox>                                                        
-                            </span>
-                        </div>
-                         <%--Importe del gasto--%>
-                        <div class="col-lg-3 col-sm-3 col-xs-3">
-                            <h4>Importe del Gasto:</h4>                          
-                            <div class="col-lg-12 col-sm-12 col-xs-12">
-                                <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_importe" MaxLength="15" class="form-control" ReadOnly="True" AutoPostBack="true"></asp:TextBox>
-                            </div>                        
-                        </div>                                    
-                    </div>                 
-
-                    <br />                
-
-
-                    <div class="row">
+           <%-- Bloque archivos--%>
+             <div class="row">
                         <%--Carga de XML--%>
                         <div class="col-lg-4 col-sm-4 col-xs-4">
                             <h4>XML Factura:</h4>
@@ -334,6 +275,71 @@
                             <small class="form-text text-muted">Archivo Max 15 Mb.</small>
                         </div>
                     </div>
+            
+            <br />
+            <div class="row" style="align-items:center" >
+                <%--Agregar articulo--%>
+                <div class="col-lg-2 col-sm-2 col-xs-2">
+                    <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <asp:Button ID="btn_additem" runat="server" Class="btn btn-tsys cargar" title="Agregar Artículo" Text="Guardar Gasto" OnClick="btn_additem_Click" CausesValidation="true" />
+                    </div>
+                </div>
+                <%--Cancelar--%>
+                <div class="col-lg-2 col-sm-2 col-xs-2">
+                    <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <asp:Button ID="btn_cancelar_item" runat="server" Class="btn btn-tsys cargar" title="Cancelar" Text="Cancelar" OnClick="btn_cancelar_item_Click" />
+                    </div>
+                </div>
+            </div>
+
+
+        </asp:View>
+        <%--Vista General--%>
+        <asp:View ID="View_General" runat="server" OnActivate="View_General_Activate" OnDeactivate="View_General_Deactivate">
+            <div class="col-lg-12 col-sm-12 col-12" id="M1">
+                <h3>Captura de Reembolso de gastos</h3>
+            </div>
+
+            <asp:UpdatePanel runat="server" ID="UpdatePanel4" UpdateMode="Always">
+                <ContentTemplate>
+                    <div class="row">
+                        <%-- Anticipos--%>
+                        <div class="col-lg-3 col-sm-3 col-xs-3">
+                            <h4>Anticipos:</h4>
+                            <div class="col-lg-12 col-sm-12 col-xs-12">                               
+                                <asp:DropDownList ID="drop_anticipos" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="true" OnSelectedIndexChanged="drop_anticipos_SelectedIndexChanged">
+                                </asp:DropDownList>                               
+                            </div>
+                        </div>
+                        <%--Fecha del gasto--%>
+                        <div class="col-lg-3 col-sm-3 col-xs-3">
+                            <h4>Fecha del gasto:</h4>
+                            <div class="col-lg-12 col-sm-12 col-xs-12">
+                                <asp:TextBox type="date" name="fecha" ID="tbx_fechagasto" AutoComplete="off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" step="1" class="form-control" runat="server" OnTextChanged="tbx_fechagasto_TextChanged" AutoPostBack="true" />
+                            </div>
+                        </div>
+                        <%--   Tipo de moneda--%>
+                        <div class="col-lg-3 col-sm-6 col-xs-5">
+                            <h4>Tipo de moneda:</h4>                           
+                                <span class="dropdown-header">
+                                    <asp:DropDownList ID="drop_currency" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="true" OnSelectedIndexChanged="drop_currency_SelectedIndexChanged">
+                                        <asp:ListItem> </asp:ListItem>
+                                        <asp:ListItem Value=1>Pesos</asp:ListItem>
+                                        <asp:ListItem Value=2>Dólares</asp:ListItem>
+                                        <asp:ListItem Value=3>Euros</asp:ListItem>   
+                                    </asp:DropDownList>
+                                </span> 
+                        </div> 
+                         <%--Importe del gasto--%>
+                        <div class="col-lg-3 col-sm-3 col-xs-3">
+                            <h4>Importe del Gasto:</h4>                          
+                            <div class="col-lg-12 col-sm-12 col-xs-12">
+                                <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_importe" MaxLength="15" class="form-control" ReadOnly="True" AutoPostBack="true"></asp:TextBox>
+                            </div>                        
+                        </div>                                    
+                    </div>                 
+
+                    <br />   
                    <div class="row">
                        <%--Motivo del gasto--%>
                     <div class="col-lg-8 col-sm-8 col-xs-8">
@@ -346,17 +352,17 @@
                     <br />                   
                      </ContentTemplate>
                 <Triggers>
-                    <asp:AsyncPostBackTrigger ControlID="drop_anticipos" EventName="selectedindexchanged" />                       
+                     <asp:AsyncPostBackTrigger ControlID="drop_anticipos" EventName="selectedindexchanged" />                       
                      <asp:AsyncPostBackTrigger ControlID="tbx_fechagasto" EventName="TextChanged" />     
-                    <asp:AsyncPostBackTrigger ControlID="btnSage" EventName="Click" />                    
+                     <asp:AsyncPostBackTrigger ControlID="btnSage" EventName="Click" />                    
                 </Triggers>
             </asp:UpdatePanel>
 
                <%--Agregar impuestos o Articulos--%>
                 <div class="row" >                    
-                     <h3>Agregar Articulos</h3>                    
+                     <h3>Agregar Gastos</h3>                    
                     <div class="col-lg-1 col-sm-1 col-xs-1" style="align-content:start ">
-                        <asp:Button ID="btn_new_article" runat="server" Class="btn btn-primary" title="Añadir Articulos" Text="Agregar Articulo" OnClick="btn_new_article_Click" />
+                        <asp:Button ID="btn_new_article" runat="server" Class="btn btn-primary" title="Añadir Articulos" Text="Agregar Gasto" OnClick="btn_new_article_Click" />
                     </div>
                 </div>           
                 <br />
@@ -384,6 +390,21 @@
                             <asp:BoundField DataField="TipoGasto" HeaderText="Tipo de Gasto" ReadOnly="True" SortExpression="TipoGasto" />
                             <asp:BoundField DataField="STaxCodeID" HeaderText="Descripcion" ReadOnly="True" SortExpression="STaxCodeID" />
                             <asp:BoundField DataField="TaxAmount" HeaderText="Importe Impuesto" ReadOnly="True" SortExpression="TaxAmount" DataFormatString="{0:c}" />
+                            <asp:TemplateField HeaderText="Xml">
+                                <ItemTemplate>
+                                    <asp:Image ID="img_xml" runat="server" Width="10px" Height="10px" />
+                                </ItemTemplate>
+                            </asp:TemplateField>                           
+                             <asp:TemplateField HeaderText="Pdf">
+                                <ItemTemplate>
+                                    <asp:Image ID="img_pdf" runat="server" Width="10px" Height="10px" />
+                                </ItemTemplate>
+                            </asp:TemplateField>    
+                            <asp:TemplateField HeaderText="Voucher">
+                                <ItemTemplate>
+                                    <asp:Image ID="img_voucher" runat="server" Width="10px" Height="10px" />
+                                </ItemTemplate>
+                            </asp:TemplateField>    
                             <asp:CommandField ShowSelectButton="True" ControlStyle-CssClass="btn-success" ButtonType="Button" SelectText="Eliminar" ShowCancelButton="False">
                                 <ControlStyle CssClass="btn-warning"></ControlStyle>
                             </asp:CommandField>
@@ -416,7 +437,7 @@
                 <asp:UpdatePanel runat="server" ID="upcomands" UpdateMode="Always">
                     <ContentTemplate>
                         <div class="col-xs-3 col-md-3 col-xs-3">
-                            <asp:Button ID="btnSage" runat="server" Class="btn btn-tsys cargar" title="Cargar Documentos" Text="Agregar Gasto" OnClick="btnSage_Click" Enabled="False" />
+                            <asp:Button ID="btnSage" runat="server" Class="btn btn-tsys cargar" title="Cargar Documentos" Text="Guardar" OnClick="btnSage_Click" Enabled="False" />
                         </div>
                     </ContentTemplate>
                     <Triggers>

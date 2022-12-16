@@ -189,6 +189,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                         BindEmpleados();
                         BindStatus();
                         BindType();
+                        BindGridView(0, 0, 0);
                     }
                    
                     pVendKey = 0;                   
@@ -261,7 +262,11 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
-        List<AdvanceDTO> anticipos = ReadFromDb(user_id, level);
+        List<AdvanceDTO> anticipos = ReadFromDb();
+        if(user_id!=0)
+        {
+            anticipos = anticipos.Where(x => x.UpdateUserKey == user_id).ToList();
+        }
         if(status_id!=0)
         {
             anticipos = anticipos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d => d.Key == status_id).Value).ToList();
@@ -292,7 +297,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;       
         empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.Advance);     
 
-        empleados.Add(new EmpleadoDTO() { UserKey = 0, Nombre = "" });
+        empleados.Add(new EmpleadoDTO() { UserKey = 0, Nombre = "Todos" });
         drop_empleados.DataSource = empleados.Select(x => new { Id = x.UserKey, Nombre = x.Nombre }).OrderBy(o => o.Id).ToList();
         drop_empleados.DataTextField = "Nombre";
         drop_empleados.DataValueField = "Id";
@@ -339,16 +344,14 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         return dict;
     }   
 
-    private List<AdvanceDTO> ReadFromDb(int user_id, int level=1)
+    private List<AdvanceDTO> ReadFromDb()
     {
         List<AdvanceDTO> anticipos = new List<AdvanceDTO>();
              
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();    
-            cmd.CommandText = "SELECT AdvanceId, AdvanceType, Folio,Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey, CreateDate, UpdateDate,CompanyId,Status, Isnull(PackageId,0), IsNull(DeniedReason, ''), Isnull(ApprovalLevel , 0) FROM Advance where UpdateUserKey = @UpdateUserKey;";
-            cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
-            
+            cmd.CommandText = "SELECT AdvanceId, AdvanceType, Folio,Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey, CreateDate, UpdateDate,CompanyId,Status, Isnull(PackageId,0), IsNull(DeniedReason, ''), Isnull(ApprovalLevel , 0) FROM Advance;";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -365,8 +368,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 if(!dataReader.IsDBNull(5))
                 {
                     advance.ArrivalDate = dataReader.GetDateTime(5);
-                }
-                
+                }                
                 advance.CheckDate = dataReader.GetDateTime(6);
                 advance.ImmediateBoss = dataReader.GetString(7);
                 advance.UpdateUserKey = dataReader.GetInt32(8);
@@ -376,10 +378,8 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 advance.Status = Doc_Tools.Dict_status().FirstOrDefault(x => x.Key == dataReader.GetInt32(12)).Value;
                 advance.PackageId = dataReader.GetInt32(13);
                 advance.DeniedReason = dataReader.GetString(14);
-                advance.ApprovalLevel = dataReader.GetInt32(15);             
-               
-                anticipos.Add(advance);
-                                                 
+                advance.ApprovalLevel = dataReader.GetInt32(15);                
+                anticipos.Add(advance);                                                
             }
         }
         HttpContext.Current.Session["Anticipos"] = anticipos;

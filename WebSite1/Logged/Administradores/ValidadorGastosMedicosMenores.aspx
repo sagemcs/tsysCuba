@@ -147,11 +147,64 @@
             unblockUI();
         }
     </script>    
-    
+    <%-- Logica del password y Token (Manuel)--%>
+    <script type="text/javascript">
+        function CompararPassword(pass) {
+            try {
+                $.ajax({
+                    type: 'POST',
+                    url: 'ValidadorReembolsos.aspx/ComparePassword',
+                    data: JSON.stringify({ pass: pass }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (msg) {
+                        if (msg.d == "True") {
+                            try {
+                                $.ajax({
+                                    type: 'POST',
+                                    url: 'ValidadorReembolsos.aspx/ResolveToken',
+                                    //data: JSON.stringify({ pass: pass }),
+                                    contentType: 'application/json; charset=utf-8',
+                                    dataType: 'json',
+                                    success: function (msg2) {
+                                        $("#insert").hide()
+                                        $("#showToken").show()
+                                        $("#validarToken").hide()
+                                        $("#TextBox1").val(msg2.d)
+                                        $("#myModalLabel1").text('Token vigente')
+                                        $("#Button1").show()
+                                    }
+                                });
+                            }
+                            catch (err) {
+
+                            }
+                        }
+                    }
+                });
+            }
+            catch (err) {
+                $("#errorMsj").show()
+                setTimeout(() => {
+                    $("#errorMsj").hide()
+                }, 2000);
+            }
+            return false;
+        }
+    </script>   
+    <script>
+
+        function showModal() {
+            var inputVal = $("#passwordValue").val();
+            var result_password = CompararPassword(inputVal);
+            return false;
+        }
+    </script>  
+
     <div class="col-lg-12 col-sm-12 col-12" id="M1" >
        <h3>Validación de Gastos Médicos Menores</h3>
     </div>      
-  
+   <asp:HiddenField runat="server" id="hh1" ClientIDMode="Static"/>
      <asp:Panel runat="server" id="upPackage">        
          <div class="col-lg-12 col-sm-12 col-12" id="M2">
             <h4>Paquete de Gastos Médicos Menores</h4>
@@ -262,11 +315,11 @@
          <asp:BoundField DataField="Date" HeaderText="Fecha del Gasto" ReadOnly="True" SortExpression="Date" DataFormatString="{0:dd/MM/yyyy}" />           
          <asp:BoundField DataField="Amount" HeaderText="Importe del Gasto" ReadOnly="True" SortExpression="Amount" DataFormatString="{0:c}"/>
          <asp:BoundField DataField="Status" HeaderText="Estado del Gasto" ReadOnly="True" SortExpression="Status" />
-         <asp:TemplateField HeaderText="Aprobar">
-           <ItemTemplate>
-              <asp:Button ID="btnSelect" runat="server" CssClass="btn-success" CommandName="Select" Text="Aprobar" ></asp:Button>
-           </ItemTemplate>             
-         </asp:TemplateField>  
+          <asp:TemplateField HeaderText="Aprobar">
+            <ItemTemplate>
+                <asp:Button ID="btnAprobar" runat="server" ClientIDMode="Static" CssClass="btn-success" CommandName="Aprove" Text="Aprobar" OnClientClick="$('#passwordValue').val(''); $('#hh1').val($('#btnAprobar:hover').parent().prev().prev().prev().prev().prev().text()); $('#myModal_Aprobar').modal(); $('#myModalLabel1').text('Teclee el Password para verificar su identidad'); $('#insert').show(); $('#showToken').hide(); $('#TextBox1').val(''); $('#validarToken').show(); $('#Button1').hide()"></asp:Button>
+            </ItemTemplate>
+         </asp:TemplateField>        
          <asp:TemplateField HeaderText="Denegar">
            <ItemTemplate>
               <asp:Button ID="btnDeny" runat="server" CssClass="btn-warning" CommandName="Deny" Text="Denegar" ></asp:Button>
@@ -276,9 +329,9 @@
             <ItemTemplate>
                 <asp:TextBox ID="tbx_motivo" runat="server"  Width="100%" Text='<%# Bind("DeniedReason") %>' ></asp:TextBox>
             </ItemTemplate>
-             <ItemStyle HorizontalAlign="Center" Width="25%" />
+             <ItemStyle HorizontalAlign="Center" Width="300px" />
          </asp:TemplateField>        
-          <asp:TemplateField HeaderText="">
+          <asp:TemplateField HeaderText="Comentarios">
            <ItemTemplate>
               <asp:Button ID="btnComent" runat="server" CssClass="btn-success"  CommandName="Coment" Text="Ver / Comentar" ></asp:Button>
            </ItemTemplate>             
@@ -288,6 +341,11 @@
                 <asp:Button ID="btn_Integrar" runat="server" CssClass="btn-success" CommandName="Integrate" Text="Integrar a Sage"></asp:Button>
             </ItemTemplate>
         </asp:TemplateField>
+             <asp:TemplateField >
+               <ItemTemplate>
+                  <asp:Button ID="btnVisualize" runat="server" CssClass="btn-info" CommandName="Visualize" Text="Visualizar"  OnCommand="btnVisualize_Command"></asp:Button>
+               </ItemTemplate>
+             </asp:TemplateField> 
          </Columns>        
          <EditRowStyle BackColor="#999999" />
         <FooterStyle BackColor="#5D7B9D" ForeColor="White" Font-Bold="True" /> 
@@ -410,5 +468,48 @@
         </div>
     </div>
 
+    <%--  Modal para generar token --%>
+        <div class="modal fade" id="myModal_Aprobar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title"
+                            id="myModalLabel1">Teclee el Password para verificar su identidad</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div id="insert" class="row">
+                                Inserte el password:
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <asp:TextBox runat="server" type="text" AutoComplete="off" ClientIDMode="Static" AutoCompleteType="Disabled"  ID="passwordValue" class="form-control" TabIndex="3" />
+                                    <p id="errorMsj" style="color: red;" hidden>Password Incorrecto</p>
+                                </div>
+                            </div>
+                            </div>
+                            <div id="showToken" class="row">
+                                Token vigente:
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <asp:TextBox runat="server" type="text" ReadOnly="true" AutoComplete="off" ClientIDMode="Static" AutoCompleteType="Disabled" ID="TextBox1" class="form-control" TabIndex="3" />
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="btn_No_Send1" type="button" title="No Enviar" class="btn btn-tsys pull-left" data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <asp:Button ID="validarToken" runat="server" Text="Validar token" ClientIDMode="Static" OnClientClick="return showModal()" CssClass="btn btn-primary" title="validar Token" />
+                        <asp:Button ID="Button1" runat="server" Text="Aprobar" ClientIDMode="Static"  CssClass="btn btn-primary cargaMasiva" title="Aprobar" data-toggle="tooltip" OnCommand="btnAprobar_Command" />                    
+                    </div>
+                </div>
+            </div>
+        </div>
     
 </asp:Content>

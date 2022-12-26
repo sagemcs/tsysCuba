@@ -14,8 +14,8 @@ public static class ConfiguracionCorreoElectronico
 {
     public static string server_address { get { return "smtp.gmail.com"; } }
     public static int server_port { get { return Convert.ToInt16("587"); } }
-    public static string user { get { return "lgarcia@multiconsulting.com"; } }
-    public static string password { get { return "Resistance8"; } }
+    public static string user { get { return "88081208344boza@gmail.com"; } }
+    public static string password { get { return "88081208344"; } }
     public static bool enable_ssl { get { return true; } }
 }
 public class CorreoElectronico
@@ -30,6 +30,9 @@ public class CorreoElectronico
         this.smtpClient.Host = server_address;
         this.smtpClient.Port = server_port;
         this.smtpClient.EnableSsl = enable_ssl;
+        this.smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+        this.smtpClient.UseDefaultCredentials = true;
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
     }
 
     #endregion
@@ -48,8 +51,8 @@ public class CorreoElectronico
             {
                 Attachment attachment_file = new Attachment(attachment_data, attachment_name);
                 message.Attachments.Add(attachment_file);
-            }
-
+            }          
+          
             this.smtpClient.Send(message);
             return true;
         }

@@ -653,11 +653,11 @@
     <asp:UpdatePanel runat="server" id="UpdatePanel" updatemode="Conditional">
     <ContentTemplate>   
 
-   
+  <%-- 
     <div class="col-xs-12 md-3 col-lg-3">
         <label>Token Vigente</label>
         <asp:TextBox runat="server" type="text" AutoComplete = "off" ClientIDMode="Static" AutoCompleteType="Disabled" ID="tbx_token" class="form-control" TabIndex="3"  ReadOnly="true" BackColor="White"/>
-    </div>        
+    </div--%>>        
    
 
     <div class="col-xs-12 md-3 col-lg-3">
@@ -708,7 +708,7 @@
             </div>
 
             <div class="col-xs-4 col-sm-2 col-md-1">                
-                <asp:Button ID="btn_carga_masiva" runat="server" Text="Carga Masiva" OnClientClick="$('#tokenValue').val(''); $('#myModal_Aprobar').modal(); $('#validarToken').show(); $('#Button1').hide();" CssClass="btn btn-tsys" title="Carga Masiva" />
+                <asp:Button ID="btn_carga_masiva" runat="server" Text="Carga Masiva" OnClientClick="$('#passwordValue').val(''); $('#myModal_Aprobar').modal(); $('#validarToken').show(); $('#Button1').hide();" CssClass="btn btn-tsys" title="Carga Masiva" />
             </div>
         </div>
     </div>
@@ -900,6 +900,8 @@
                 </div>
             </div>
             </div>
+
+            <%--  Modal para generar token --%>
             <div class="modal fade" id="myModal_Aprobar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
                 <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -907,17 +909,16 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                     aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title"
-                            id="myModalLabel1">Captura de token</h4>
+                            id="myModalLabel1">Teclee el password para verificar su identidad</h4>
                     </div>
                     <div class="modal-body">
-
                             <div class="container-fluid">
                                 <div class="row">
                                     Inserte el token:
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <asp:TextBox runat="server" type="text" AutoComplete = "off" ClientIDMode="Static" AutoCompleteType="Disabled" ID="tokenValue" class="form-control" TabIndex="3" />
-                                            <p id="errorMsj" style="color: red;" hidden>El token no es v&aacute;lido</p>                                              
+                                            <asp:TextBox runat="server" type="text" AutoComplete = "off" ClientIDMode="Static" AutoCompleteType="Disabled" ID="passwordValue" class="form-control" TabIndex="3" />
+                                            <p id="errorMsj" style="color: red;" hidden>Password Incorrecto</p>                                              
                                         </div>
                                     </div>
                                 </div>
@@ -926,8 +927,7 @@
 
                         <div class="modal-footer">
                             <button id="btn_No_Send1" type="button" title="No Enviar" class="btn btn-tsys pull-left" data-dismiss="modal">Cancelar
-                            </button>
-                           
+                            </button>                           
                             <asp:Button ID="validarToken" runat="server" Text="Validar token" ClientIDMode="Static" OnClientClick="return showModal()" CssClass="btn btn-primary" title="validar Token" />
                             <asp:Button ID="Button1" runat="server" Text="Aprobar" ClientIDMode="Static" OnClick="btn_carga_masiva_Click" CssClass="btn btn-primary cargaMasiva" title="Aprobar" data-toggle="tooltip"/>
                         </div>

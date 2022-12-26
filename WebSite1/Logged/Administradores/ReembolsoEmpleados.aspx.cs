@@ -910,9 +910,9 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         {
             if (e.Row.Cells[4].Text != "Pendiente")
             {
-                Button btnEdit = (Button)e.Row.Cells[5].Controls[0];
-                Button btnDelete = (Button)e.Row.Cells[6].Controls[1];
-                btnEdit.Visible = false;
+                Button btnEdit = (Button)e.Row.Cells[5].Controls[0];           
+                Button btnDelete = (Button)e.Row.Cells[7].Controls[1];
+                btnEdit.Visible = false;              
                 btnDelete.Visible = false;
             }
         }
@@ -1252,6 +1252,9 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }
+        tbx_pdf.Text = string.Empty;
+        tbx_voucher.Text = string.Empty;
+        tbx_xml.Text = string.Empty;
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
@@ -1266,6 +1269,10 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         drop_articulos.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importe_item.Text = string.Empty;
+
+        tbx_pdf.Text = string.Empty;
+        tbx_voucher.Text = string.Empty;
+        tbx_xml.Text = string.Empty;
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
@@ -1490,10 +1497,31 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         }
     }
 
-
     protected void drop_currency_SelectedIndexChanged(object sender, EventArgs e)
     {
         HttpContext.Current.Session["is_valid"] = false;
         btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+    }
+   
+    protected void btnVisualize_Command(object sender, CommandEventArgs e)
+    {
+        BindGridView();
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
+        HttpContext.Current.Session["Advance"] = null;
+
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
+        GridViewRow row = gvGastos.Rows[rowIndex];
+
+        if (e.CommandName == "Visualize")
+        {
+            int expense_id = int.Parse(row.Cells[0].Text);
+            HttpContext.Current.Session["expense_id_visualize"] = expense_id;
+            HttpContext.Current.Session["expense_type_visualize"] = Doc_Tools.DocumentType.Expense;
+            HttpContext.Current.Session["screen_type"] = 0;
+            ClearControls();
+            Response.Redirect("DocumentosGastos");
+        }
     }
 }

@@ -276,9 +276,14 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         var roles = Doc_Tools.get_RolesValidadores();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         List<MinorMedicalExpenseDTO> gastos = ReadFromDb().ToList();
-        if(user_id!=0)
+        if(user_id != 0)
         {
             gastos = gastos.Where(x=> x.UpdateUserKey == user_id).ToList();
+        }
+        else
+        {
+            var empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.MinorMedicalExpense).Select(x => x.UserKey).ToList();
+            gastos = gastos.Where(x => empleados.Contains(x.UpdateUserKey)).ToList();
         }
         if (status_id != 0)
         {
@@ -304,7 +309,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.MinorMedicalExpense);
 
-        empleados.Add(new EmpleadoDTO() { UserKey = 0, Nombre = "" });
+        empleados.Add(new EmpleadoDTO() { UserKey = 0, Nombre = "Todos" });
         drop_empleados.DataSource = empleados.Select(x => new { Id = x.UserKey, Nombre = x.Nombre }).OrderBy(o => o.Id).ToList();
         drop_empleados.DataTextField = "Nombre";
         drop_empleados.DataValueField = "Id";
@@ -316,7 +321,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
     {
         var estados = Doc_Tools.Dict_status().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
         estados.Add(new { Id = 0, Nombre = "Todos" });
-        drop_status.DataSource = estados.OrderBy(o => o.Id).ToList();
+        drop_status.DataSource = estados.Where(x => x.Id != 4).OrderBy(o => o.Id).ToList();
         drop_status.DataTextField = "Nombre";
         drop_status.DataValueField = "Id";
         drop_status.DataBind();
@@ -354,7 +359,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();           
-            cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel , 0) FROM MinorMedicalExpense;";                             
+            cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel , 0) , UpdateUserKey FROM MinorMedicalExpense;";                             
           
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -368,6 +373,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 expense.DeniedReason = dataReader.GetString(4);
                 expense.PackageId = dataReader.GetInt32(5);
                 expense.ApprovalLevel = dataReader.GetInt32(6);
+                expense.UpdateUserKey = dataReader.GetInt32(7);
                 gastos.Add(expense);
             }
         }
@@ -450,13 +456,6 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
             }
         }
 
-        if (e.CommandName == "Select")
-        {
-            int status = 2;
-            Update_Expense(expense_id, paquete.PackageId, status, string.Empty, level:level_validador);
-            EnviarCorreo(true);
-            BindPackageInfo();
-        }
         if (e.CommandName == "Deny")
         {
             int status = 3;
@@ -911,5 +910,41 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         email.Enviar(from, to, subject, text, is_text_html);
     }
 
+    protected void btnVisualize_Command(object sender, CommandEventArgs e)
+    {
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
+        GridViewRow row = gvGastos.Rows[rowIndex];
+
+        if (e.CommandName == "Visualize")
+        {
+            int expense_id = int.Parse(row.Cells[0].Text);
+            HttpContext.Current.Session["expense_id_visualize"] = expense_id;
+            HttpContext.Current.Session["expense_type_visualize"] = Doc_Tools.DocumentType.MinorMedicalExpense;
+            HttpContext.Current.Session["screen_type"] = 1;
+            Response.Redirect("DocumentosGastos");
+        }
+    }
+
+    protected void btnAprobar_Command(object sender, CommandEventArgs e)
+    {
+        int status_id = 0, user_id = 0;
+        int expense_id = int.Parse(hh1.Value);
+        int status = 2;
+        var paquete = get_Package(pUserKey);
+        string rol = HttpContext.Current.Session["RolUser"].ToString();
+        var roles = Doc_Tools.get_RolesValidadores();
+        int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
+        Update_Expense(expense_id, paquete.PackageId, status, string.Empty, level: level_validador);
+        EnviarCorreo(true);
+        BindPackageInfo();
+        if (drop_empleados.SelectedItem != null)
+        {
+            user_id = int.Parse(drop_empleados.SelectedItem.Value);
+        }
+
+        status_id = int.Parse(drop_status.SelectedValue);
+        BindGridView(user_id, status_id);
+
+    }
 
 }

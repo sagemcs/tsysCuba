@@ -579,9 +579,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         if (e.CommandName == "Select")
         {
             int expense_id = int.Parse(row.Cells[0].Text);
-            var expense = LoadMedicalExpenseById(expense_id, pUserKey);
-            //expense.FileNameXml = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.MinorMedicalExpense, ExpenseFilesDTO.FileType.Xml, expense_id);
-            //expense.FileNamePdf = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.MinorMedicalExpense, ExpenseFilesDTO.FileType.Pdf, expense_id);
+            var expense = LoadMedicalExpenseById(expense_id, pUserKey);           
             HttpContext.Current.Session["MinorMedicalExpense"] = expense;
             Response.Redirect("EditGastosMedicosMenores");
         }
@@ -882,7 +880,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             if (e.Row.Cells[3].Text != "Pendiente")
             {
                 Button btnEdit = (Button)e.Row.Cells[4].Controls[0];
-                Button btnDelete = (Button)e.Row.Cells[5].Controls[1];
+                Button btnDelete = (Button)e.Row.Cells[6].Controls[1];
                 btnEdit.Visible = false;
                 btnDelete.Visible = false;
             }
@@ -1085,6 +1083,26 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             int advance_id = int.Parse(row.Cells[0].Text);
             Doc_Tools.DeleteExpense(Doc_Tools.DocumentType.MinorMedicalExpense, advance_id, pUserKey);
             BindGridView();
+        }
+    }
+
+    protected void btnVisualize_Command(object sender, CommandEventArgs e)
+    {
+        BindGridView();
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];      
+
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
+        GridViewRow row = gvGastos.Rows[rowIndex];
+
+        if (e.CommandName == "Visualize")
+        {
+            int expense_id = int.Parse(row.Cells[0].Text);
+            HttpContext.Current.Session["expense_id_visualize"] = expense_id;
+            HttpContext.Current.Session["expense_type_visualize"] = Doc_Tools.DocumentType.MinorMedicalExpense;
+            HttpContext.Current.Session["screen_type"] = 0;
+            ClearControls();
+            Response.Redirect("DocumentosGastos");
         }
     }
 }

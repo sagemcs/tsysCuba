@@ -18,6 +18,8 @@ using JWT;
 using JWT.Algorithms;
 using JWT.Serializers;
 using static ExpenseFilesDTO;
+using Microsoft.AspNet.Identity;
+using WebSite1;
 
 /// <summary>
 /// Summary description for Doc_Tools
@@ -1157,6 +1159,71 @@ public static class Doc_Tools
            
             
         }
+    }
+
+    public static void EnviarCorreo(int pUserKey)
+    {      
+        string server_address = ConfiguracionCorreoElectronico.server_address;
+        int server_port = ConfiguracionCorreoElectronico.server_port;
+        string user = ConfiguracionCorreoElectronico.user;
+        string password = ConfiguracionCorreoElectronico.password;
+        bool enable_ssl = ConfiguracionCorreoElectronico.enable_ssl;
+        CorreoElectronico email = new CorreoElectronico(server_address, server_port, user, password, enable_ssl);
+
+        //Tomar el nivel superior que corresponde
+        string from = Doc_Tools.getUserEmail(pUserKey);
+        string to = "boza32smart@gmail.com";       
+        string subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.Advance.ToString());
+        string text = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.Advance.ToString());
+        bool is_text_html = false;
+        email.Enviar(from, to, subject, text, is_text_html);
+    }
+
+    public static bool CheckPassword(int pUserKey, string password)
+    {
+        string UserName = string.Empty;
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();            
+            cmd.CommandText = "SELECT UserID  FROM Users where UserKey = @UserKey;";                    
+            cmd.Parameters.Add("@UserKey", SqlDbType.Int).Value = pUserKey;          
+            cmd.Connection.Open();
+            var lector = cmd.ExecuteReader();
+            while(lector.Read())
+            {
+                UserName = lector.GetString(0);
+            }
+            cmd.Connection.Close();
+        }
+        var manager = new UserManager();
+        var user = manager.FindByName(UserName);       
+        return manager.CheckPassword(user, password);
+    }
+
+    public static string Get_token_from_db(int userkey)
+    {
+        string token = string.Empty;  
+        try
+        {
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+            {
+                SqlCommand cmd = conn.CreateCommand();
+                cmd.CommandText = "select token from SecurityToken Where Userkey = @userkey and Activo = 1;";
+                cmd.Parameters.AddWithValue("@Userkey", SqlDbType.Int).Value = userkey;
+                cmd.Connection.Open();
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    token = reader.GetString(0);
+                }
+            }
+           
+        }
+        catch (Exception exp)
+        {
+
+        }
+        return token;
     }
 
 

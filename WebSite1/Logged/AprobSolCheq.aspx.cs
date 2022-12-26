@@ -230,7 +230,7 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
                             }
                         }
                     }
-                    ResolveToken();
+                    //ResolveToken();
                     int chek_masiva = 0;
                     foreach (GridViewRow row in gvFacturas.Rows)
                     {
@@ -1305,38 +1305,11 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
     private void ResolveToken()
     {        
         Contrarecibos.CrearToken();
-        string token_vigente = Get_token_from_db(pUserKey);            
-        tbx_token.Text = token_vigente;             
+        string token_vigente = Doc_Tools.Get_token_from_db(pUserKey);            
+                  
     }
     
-    private string Get_token_from_db(int userkey)
-    {
-        string token = string.Empty;
-        SqlConnection sqlConnection1 = new SqlConnection();
-
-        //DESACTIVA TOKENS ANTERIOES
-        try
-        {
-            sqlConnection1 = SqlConnectionDB("PortalConnection");
-            sqlConnection1.Open();
-            using (var sqlQuery = new SqlCommand("", sqlConnection1))
-            {
-                sqlQuery.CommandText = "select token from SecurityToken Where Userkey = @userkey and Activo = 1;";
-                sqlQuery.Parameters.AddWithValue("@Userkey", SqlDbType.Int).Value = userkey;
-                var reader = sqlQuery.ExecuteReader();
-                while (reader.Read())
-                {
-                    token = reader.GetString(0);
-                }
-            }
-            sqlConnection1.Close();
-        }
-        catch (Exception exp)
-        {
-            
-        }
-        return token;
-    }
+    
 
   
 }

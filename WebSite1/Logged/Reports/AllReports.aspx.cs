@@ -77,7 +77,7 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
             {
-                if (user_id != 0 && dataReader.GetInt32(9) == user_id)
+                if (user_id != 0 && dataReader.GetInt32(8) == user_id)
                 {
                     var advance = new AdvanceReport2DTO();
                     advance.Importe = dataReader.GetDecimal(0);
@@ -355,38 +355,39 @@ public partial class Logged_Reports_AllReports : System.Web.UI.Page
     {
         int status_id = int.Parse(drop_status.SelectedItem.Value);
         int user_id = int.Parse(drop_empleados.SelectedItem.Value);
-        int type = int.Parse(drop_docs.SelectedItem.Value);
+        DocumentType type = (DocumentType)int.Parse(drop_docs.SelectedItem.Value);
+
         DateTime? created = !string.IsNullOrEmpty(tbx_fecha_inicio.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_inicio.Text) : null;
         try
         {
-            List<Invoice> list = new List<Invoice>();
-
-            if (type == 0)
+            switch (type)
             {
-                List<ExpenseReport2DTO> list_advance = LoadDataReembolso(status_id, user_id, created);
-                report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "ReembolsosInnerReport.rpt"));
-                report_document.SetDataSource(list_advance);
-                report_document.SetParameterValue("titulo", "Reporte de Reembolso de Gastos");
-            } else if(type == 1)
-            {
-                List<AdvanceReport2DTO> list_advance = LoadDataAdvance(status_id, user_id, created);
-                report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "AnticiposInnerReport.rpt"));
-                report_document.SetDataSource(list_advance);
-                report_document.SetParameterValue("titulo", "Reporte de Anticipo de Gastos");
-            }
-            else if (type == 2)
-            {
-                List<MinorMedicalExpenseReport2DTO> list_advance = LoadDataMedical(status_id, user_id, created);
-                report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "MinorMedicalExpenseInnerReport.rpt"));
-                report_document.SetDataSource(list_advance);
-                report_document.SetParameterValue("titulo", "Reporte de Gastos Médicos Menores");
-            } else if(type == 3)
-            {
-                List<CorporateCardReport2DTO> list_tarjeta = LoadDataTarjeta(status_id, user_id, created);
-                report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "TarjetaEmpleadoInnerReport.rpt"));
-                report_document.SetDataSource(list_tarjeta);
-                report_document.SetParameterValue("titulo", "Reporte de Gastos de Tarjeta Corporativa");
-            }
+                case DocumentType.Advance:
+                    List<AdvanceReport2DTO> list_advance = LoadDataAdvance(status_id, user_id, created);
+                    report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "AnticiposInnerReport.rpt"));
+                    report_document.SetDataSource(list_advance);
+                    report_document.SetParameterValue("titulo", "Reporte de Anticipo de Gastos");
+                    break;
+                case DocumentType.Expense:
+                    List<ExpenseReport2DTO> list_expense = LoadDataReembolso(status_id, user_id, created);
+                    report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "ReembolsosInnerReport.rpt"));
+                    report_document.SetDataSource(list_expense);
+                    report_document.SetParameterValue("titulo", "Reporte de Reembolso de Gastos");
+                    break;
+                case DocumentType.CorporateCard:
+                    List<CorporateCardReport2DTO> list_tarjeta = LoadDataTarjeta(status_id, user_id, created);
+                    report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "TarjetaEmpleadoInnerReport.rpt"));
+                    report_document.SetDataSource(list_tarjeta);
+                    report_document.SetParameterValue("titulo", "Reporte de Gastos de Tarjeta Corporativa");
+                    break;
+                case DocumentType.MinorMedicalExpense:
+                    List<MinorMedicalExpenseReport2DTO> list_medicos = LoadDataMedical(status_id, user_id, created);
+                    report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "MinorMedicalExpenseInnerReport.rpt"));
+                    report_document.SetDataSource(list_medicos);
+                    report_document.SetParameterValue("titulo", "Reporte de Gastos Médicos Menores");
+                    break;
+               
+            }          
             
 
             Company company = Tools.EmpresaAutenticada();

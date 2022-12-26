@@ -715,6 +715,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
 
         //Limpiar controles
         drop_articulos.ClearSelection();
+        STipoGasto.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importegasto.Text = string.Empty;
         drop_taxes.ClearSelection();
@@ -722,6 +723,9 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
+        tbx_pdf.Text = string.Empty;
+        tbx_voucher.Text = string.Empty;
+        tbx_xml.Text = string.Empty;
         MultiView1.SetActiveView(View_General);
 
     }
@@ -749,6 +753,11 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
+        tbx_pdf.Text = string.Empty;
+        tbx_voucher.Text = string.Empty;
+        tbx_xml.Text = string.Empty;
+        drop_articulos.ClearSelection();
+        STipoGasto.ClearSelection();
         MultiView1.SetActiveView(View_Articulos);
     }   
 
@@ -791,11 +800,15 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         //Limpiar controles
         drop_articulos.ClearSelection();
         drop_taxes.ClearSelection();
+        STipoGasto.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importegasto.Text = string.Empty;
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
+        tbx_pdf.Text = string.Empty;
+        tbx_voucher.Text = string.Empty;
+        tbx_xml.Text = string.Empty;
         MultiView1.SetActiveView(View_General);
     }
 
@@ -803,6 +816,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
     {
         HttpContext.Current.Session["is_valid"] = false;
         btn_Guardar.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+      
         ClearControls();
         Response.Redirect("ReembolsoEmpleados");
     }

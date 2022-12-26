@@ -20,6 +20,8 @@ using System.Linq;
 using Proveedores_Model;
 using WebSite1;
 using System.Text;
+using System.Web.Services;
+using System.Diagnostics;
 
 public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.Page
 {
@@ -163,8 +165,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
         Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
         Page.Response.Cache.SetNoStore();
-        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
-
+        Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);      
         List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
 
         try
@@ -327,14 +328,13 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         drop_status.SelectedIndex = -1;
     }
     
-    private void BindPackageInfo()    
+    private void BindPackageInfo()
     {        
         var paquete = get_Package(pUserKey);
         tbx_no_paquete.Text = paquete.PackageId.ToString();
         tbx_cant_reembolsos.Text = get_expenses_package(paquete.PackageId).ToString();
         
-    }
-   
+    }   
 
     private List<ExpenseDTO> ReadFromDb()
     {
@@ -343,7 +343,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();            
-            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel, 0) FROM Expense ;";
+            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel, 0), UpdateUserKey FROM Expense ;";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -356,7 +356,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 expense.DeniedReason = dataReader.GetString(5);
                 expense.PackageId = dataReader.GetInt32(6);
-                expense.ApprovalLevel = dataReader.GetInt32(7);                  
+                expense.ApprovalLevel = dataReader.GetInt32(7);
+                expense.UpdateUserKey = dataReader.GetInt32(8);
                 gastos.Add(expense);
                           
             }
@@ -429,7 +430,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
     }
 
     protected void gvGastos_RowCommand(object sender, GridViewCommandEventArgs e)
-    {
+    {      
         int rowIndex = ((GridViewRow)((Control)e.CommandSource).BindingContainer).RowIndex;
         GridViewRow row = gvGastos.Rows[rowIndex];
         int expense_id = int.Parse(row.Cells[0].Text);
@@ -451,13 +452,14 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             }
         }
         
-        if (e.CommandName == "Select")
-        {
-            int status = 2;
-            Update_Expense(expense_id, paquete.PackageId, status, string.Empty,level: level_validador);
-            EnviarCorreo(true);
-            BindPackageInfo();
-        }
+        //if (e.CommandName == "Select")
+        //{
+        //    int status = 2;           
+        //    Update_Expense(expense_id, paquete.PackageId, status, string.Empty,level: level_validador);
+        //    EnviarCorreo(true);
+        //    BindPackageInfo();
+            
+        //}
         if (e.CommandName == "Deny")
         {
             int status = 3;
@@ -469,9 +471,12 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;              
             }
+           
             Update_Expense(expense_id, paquete.PackageId, status, motivo.Text, level: level_validador);
             EnviarCorreo(false);
             BindPackageInfo();
+            
+           
         }
         if (e.CommandName == "Coment")
         {
@@ -902,5 +907,56 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         email.Enviar(from, to, subject, text, is_text_html);
     }
 
-      
+    protected void btnVisualize_Command(object sender, CommandEventArgs e)
+    {     
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
+        GridViewRow row = gvGastos.Rows[rowIndex];
+
+        if (e.CommandName == "Visualize")
+        {
+            int expense_id = int.Parse(row.Cells[0].Text);
+            HttpContext.Current.Session["expense_id_visualize"] = expense_id;
+            HttpContext.Current.Session["expense_type_visualize"] = Doc_Tools.DocumentType.Expense;
+            HttpContext.Current.Session["screen_type"] = 1;
+            Response.Redirect("DocumentosGastos");
+        }
+    }
+
+    protected void btnAprobar_Command(object sender, CommandEventArgs e)
+    {       
+        int status_id = 0, user_id = 0;       
+        int expense_id = int.Parse(hh1.Value);
+        int status = 2;
+        var paquete = get_Package(pUserKey);
+        string rol = HttpContext.Current.Session["RolUser"].ToString();
+        var roles = Doc_Tools.get_RolesValidadores();
+        int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
+        Update_Expense(expense_id, paquete.PackageId, status, string.Empty, level: level_validador);
+        EnviarCorreo(true);
+        BindPackageInfo();
+        if (drop_empleados.SelectedItem != null)
+        {
+            user_id = int.Parse(drop_empleados.SelectedItem.Value);
+        }
+
+        status_id = int.Parse(drop_status.SelectedValue);
+        BindGridView(user_id, status_id);
+
+    }
+
+    [WebMethod]
+    public static string ResolveToken()
+    {        
+        Contrarecibos.CrearToken();
+        string token_vigente = Doc_Tools.Get_token_from_db(Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString()));
+        return token_vigente;
+    }   
+
+    [WebMethod]
+    public static string ComparePassword(string pass)
+    {
+        int userkey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+        string result = Doc_Tools.CheckPassword(userkey, pass).ToString();
+        return result;
+    }
 }

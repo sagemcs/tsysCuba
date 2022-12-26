@@ -61,7 +61,7 @@ using System.Web;
         }
     
     }
-    public class ExpenseReport2DTO : Document
+    public class ExpenseReport2DTO 
     {
         public decimal Importe { get; set; }
         public string Estado { get; set; }

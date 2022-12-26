@@ -254,18 +254,23 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     }
 
     private void BindGridView(int user_id, int? status_id, int? type)
-    {        
+    {
         gvAnticipos.DataSource = null;
-        gvAnticipos.Visible = true;        
+        gvAnticipos.Visible = true;
         DateTime? final = !string.IsNullOrEmpty(tbx_fecha_fin.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_fin.Text) : null;
         DateTime? inicio = !string.IsNullOrEmpty(tbx_fecha_inicio.Text) ? (DateTime?)DateTime.Parse(tbx_fecha_inicio.Text) : null;
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         var roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         List<AdvanceDTO> anticipos = ReadFromDb();
-        if(user_id!=0)
+        if (user_id != 0)
         {
             anticipos = anticipos.Where(x => x.UpdateUserKey == user_id).ToList();
+        }
+        else
+        {
+            var empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.Advance).Select(x=> x.UserKey).ToList();
+            anticipos = anticipos.Where(x => empleados.Contains(x.UpdateUserKey)).ToList();
         }
         if(status_id!=0)
         {
@@ -415,16 +420,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;
             }
-        }
-
-        if (e.CommandName == "Select")
-        {
-            int status = 2;            
-            Update_Advance(advance_id, paquete.PackageId, status, string.Empty, level: level_validador);
-            EnviarCorreo(true);
-            BindPackageInfo();
-            BindGridView(user_id, status_id, type);
-        }
+        }        
 
         if (e.CommandName == "Deny")
         {
@@ -439,13 +435,16 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
             }
 
             Update_Advance(advance_id, paquete.PackageId, status, motivo.Text, level: level_validador);
-            EnviarCorreo(false);
+            var advance = LoadAdvanceById(advance_id);
+            Doc_Tools.EnviarCorreo(advance.UpdateUserKey);
             BindPackageInfo();
             BindGridView(user_id, status_id, type);
         }
 
         if (e.CommandName == "Coment")
         {
+            var advance = LoadAdvanceById(advance_id);
+            Doc_Tools.EnviarCorreo(advance.UpdateUserKey);
             HttpContext.Current.Session["ExpenseComentId"] = advance_id;
             HttpContext.Current.Session["DocumentType"] = Doc_Tools.DocumentType.Advance;
             Response.Redirect("ComentariosValidador.aspx");
@@ -766,7 +765,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     }
 
     protected void gvAnticipos_RowDataBound(object sender, GridViewRowEventArgs e)
-    {        
+    {       
         List<AdvanceDTO> anticipos = (List<AdvanceDTO>)HttpContext.Current.Session["Anticipos"];
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
@@ -888,55 +887,32 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         }
     }
 
-    public void EnviarCorreo(bool accion)
+    protected void btnAprobar_Command(object sender, CommandEventArgs e)
     {
-        string acction_text = accion ? "Aprobado" : "Denegado";
-        //Segun el nivel del usuario logueado traer la matriz
+        int status_id = 0, user_id = 0, type = 0;
+        int expense_id = int.Parse(hh1.Value);
+        int status = 2;
+        var paquete = get_Package(pUserKey);
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().Where(x => x.Key != 4).ToList();
-        int level = roles.FirstOrDefault(x => x.ID == rol).Key;
-        var matrix = Doc_Tools.get_MatrizValidadores(pUserKey, level);
-        var jerarquia = Doc_Tools.get_JerarquiaValidadores(((int)Doc_Tools.DocumentType.Advance));
-        var orden = jerarquia.Get_Orden(jerarquia);
-        string server_address = ConfiguracionCorreoElectronico.server_address;
-        int server_port = ConfiguracionCorreoElectronico.server_port;
-        string user = ConfiguracionCorreoElectronico.user;
-        string password = ConfiguracionCorreoElectronico.password;
-        bool enable_ssl = ConfiguracionCorreoElectronico.enable_ssl;
-        CorreoElectronico email = new CorreoElectronico(server_address, server_port, user, password, enable_ssl);
+        var roles = Doc_Tools.get_RolesValidadores();
+        int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;        
+        if (drop_tipo.SelectedItem != null)
+        {
+            type = int.Parse(drop_tipo.SelectedItem.Value);
+        }
 
-        //Tomar el nivel superior que corresponde
-        string from = Doc_Tools.getUserEmail(pUserKey);
-        string to = string.Empty;
-        foreach (var item in orden) if (to == string.Empty)
-            {
-                if (item.Value == "RecursosHumanos" && matrix.Rh != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.Rh);
-                }
-                if (item.Value == "GerenciaArea" && matrix.Gerente != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.Rh);
-                }
-                if (item.Value == "CuentasxPagar" && matrix.ValidadorCx != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
-                }
-                if (item.Value == "Tesoreria" && matrix.Tesoreria != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.Tesoreria);
-                }
-                if (item.Value == "Finanzas" && matrix.Finanzas != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.Finanzas);
-                }
+        Update_Advance(expense_id, paquete.PackageId, status, string.Empty, level: level_validador);      
+        BindPackageInfo();
+        if (drop_empleados.SelectedItem != null)
+        {
+            user_id = int.Parse(drop_empleados.SelectedItem.Value);
+        }
 
-            }
-        string subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.Advance.ToString());
-        string text = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.Advance.ToString());
-        bool is_text_html = false;
-        email.Enviar(from, to, subject, text, is_text_html);
+        status_id = int.Parse(drop_status.SelectedValue);
+        BindGridView(user_id, status_id, type);
+
     }
 
-   
+
+
 }

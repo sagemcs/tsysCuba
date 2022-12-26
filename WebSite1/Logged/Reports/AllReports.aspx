@@ -19,7 +19,11 @@
     <script src="../../Scripts/print-report.js" type="text/javascript"></script>
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="MainContent" Runat="Server">
-    <br/> <br/> <br/> <br /> <br/>
+    <br/> <br/> <br/><br/>
+    <div>
+        <h3> Reportes de Validadores</h3>
+    </div>
+     <br /> <br/>
     <asp:UpdatePanel runat="server" ID="UpdatePanel2" UpdateMode="Conditional">
         <ContentTemplate>
             <%--Fila de filtros--%>
@@ -38,10 +42,10 @@
                     <h4>Tipo de documento:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:DropDownList ID="drop_docs" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="False">
-                            <asp:ListItem Value="0">Reembolso de Gastos </asp:ListItem>
                             <asp:ListItem Value="1">Anticipo de Gastos</asp:ListItem>
-                            <asp:ListItem Value="2">Gastos Medicos Menores</asp:ListItem>
+                            <asp:ListItem Value="2">Reembolso de Gastos </asp:ListItem>                           
                             <asp:ListItem Value="3">Gasto Tarjeta Corporativa</asp:ListItem>
+                            <asp:ListItem Value="4">Gastos Medicos Menores</asp:ListItem>
                         </asp:DropDownList>
                     </div>
                 </div>

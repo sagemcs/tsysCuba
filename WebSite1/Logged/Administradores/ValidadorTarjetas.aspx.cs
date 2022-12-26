@@ -20,6 +20,7 @@ using System.Linq;
 using Proveedores_Model;
 using WebSite1;
 using System.Text;
+using System.Web.Services;
 
 public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Page
 {
@@ -280,6 +281,11 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         {
             gastos = gastos.Where(x => x.UpdateUserKey == user_id).ToList();
         }
+        else
+        {
+            var empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.CorporateCard).Select(x => x.UserKey).ToList();
+            gastos = gastos.Where(x => empleados.Contains(x.UpdateUserKey)).ToList();
+        }
         if (status_id != 0)
         {
             gastos = gastos.Where(x => x.Status == Doc_Tools.Dict_status().FirstOrDefault(d => d.Key == status_id).Value).ToList();
@@ -305,7 +311,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
         empleados = Doc_Tools.GetEmpleados(pUserKey, level, Doc_Tools.DocumentType.CorporateCard);
 
-        empleados.Add(new EmpleadoDTO() { UserKey = 0, Nombre = "" });
+        empleados.Add(new EmpleadoDTO() { UserKey = 0, Nombre = "Todos" });
         drop_empleados.DataSource = empleados.Select(x => new { Id = x.UserKey, Nombre = x.Nombre }).OrderBy(o => o.Id).ToList();
         drop_empleados.DataTextField = "Nombre";
         drop_empleados.DataValueField = "Id";
@@ -317,7 +323,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
     {
         var estados = Doc_Tools.Dict_status().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
         estados.Add(new { Id = 0, Nombre = "Todos" });
-        drop_status.DataSource = estados.OrderBy(o => o.Id).ToList();
+        drop_status.DataSource = estados.Where(x => x.Id != 4).OrderBy(o => o.Id).ToList();
         drop_status.DataTextField = "Nombre";
         drop_status.DataValueField = "Id";
         drop_status.DataBind();
@@ -355,7 +361,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, CreateDate, Isnull(DeniedReason,''), Isnull(PackageId,0) , Isnull(ApprovalLevel,0) FROM CorporateCard;";                
+            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, CreateDate, Isnull(DeniedReason,''), Isnull(PackageId,0) , Isnull(ApprovalLevel,0), UpdateUserKey FROM CorporateCard;";                
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -370,6 +376,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                 expense.DeniedReason = dataReader.GetString(6);
                 expense.PackageId = dataReader.GetInt32(7);
                 expense.ApprovalLevel = dataReader.GetInt32(8);
+                expense.UpdateUserKey = dataReader.GetInt32(9);
                 gastos.Add(expense);
             }
         }
@@ -457,15 +464,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }       
-
-        if (e.CommandName == "Select")
-        {
-            int status = 2;
-            Update_Expense(card_id, paquete.PackageId, status, string.Empty, level: level_validador);            
-            EnviarCorreo(true);
-            BindPackageInfo();
-            BindGridView(user_id, status_id);
-        }
+        
         if (e.CommandName == "Deny")
         {
             int status = 3;
@@ -909,5 +908,41 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             }
 
         }
+    }
+
+    protected void btnVisualize_Command(object sender, CommandEventArgs e)
+    {
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
+        GridViewRow row = gvGastos.Rows[rowIndex];
+
+        if (e.CommandName == "Visualize")
+        {
+            int expense_id = int.Parse(row.Cells[0].Text);
+            HttpContext.Current.Session["expense_id_visualize"] = expense_id;
+            HttpContext.Current.Session["expense_type_visualize"] = Doc_Tools.DocumentType.CorporateCard;
+            HttpContext.Current.Session["screen_type"] = 1;
+            Response.Redirect("DocumentosGastos");
+        }
+    }
+      
+
+    protected void btnAprobar_Command(object sender, CommandEventArgs e)
+    {
+        int status_id = 0, user_id = 0;
+        int card_id = int.Parse(hh1.Value);
+        int status = 2;
+        var paquete = get_Package(pUserKey);
+        string rol = HttpContext.Current.Session["RolUser"].ToString();
+        var roles = Doc_Tools.get_RolesValidadores();
+        int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
+        Update_Expense(card_id, paquete.PackageId, status, string.Empty, level: level_validador);
+        EnviarCorreo(true);
+        BindPackageInfo();
+        if (drop_empleados.SelectedItem != null)
+        {
+            user_id = int.Parse(drop_empleados.SelectedItem.Value);
+        }
+        status_id = int.Parse(drop_status.SelectedValue);
+        BindGridView(user_id, status_id);
     }
 }

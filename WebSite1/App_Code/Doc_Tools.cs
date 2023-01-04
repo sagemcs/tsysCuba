@@ -969,6 +969,7 @@ public static class Doc_Tools
             { "B52", "Debe especificar el empleado, favor de verificar e intentar nuevamente." },
             { "B53", "Número de Paquete requerido, favor de verificar e intentar nuevamente." },
             { "B54", "Debe seleccionar el tipo de impuesto, favor de verificar e intentar nuevamente." },
+            { "B55", "La fecha del artículo no debe ser anterior a la fecha del gasto." },
 
 
         };

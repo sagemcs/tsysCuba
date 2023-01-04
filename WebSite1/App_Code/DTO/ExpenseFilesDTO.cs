@@ -18,6 +18,7 @@ public class ExpenseFilesDTO
 	public string ContentType { get; set; }
 	public byte[] FileBinary { get; set; }
 	public int FileLength { get; set; }
+	public DateTime DateCreated { get; set; }
 	public ExpenseFilesDTO()
 	{
 		//

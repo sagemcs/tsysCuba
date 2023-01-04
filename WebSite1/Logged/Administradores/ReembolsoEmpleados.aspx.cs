@@ -651,8 +651,8 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                     cmd.Parameters.Add("@_Qty", SqlDbType.Decimal).Value = detail.Qty;
                     cmd.Parameters.Add("@_UnitCost", SqlDbType.Decimal).Value = detail.UnitCost;
                     cmd.Parameters.Add("@_Amount", SqlDbType.Decimal).Value = detail.Amount;
-                    cmd.Parameters.Add("@_CreateDate", SqlDbType.DateTime).Value = DateTime.Now;
-                    cmd.Parameters.Add("@_UpdateDate", SqlDbType.DateTime).Value = DateTime.Now;
+                    cmd.Parameters.Add("@_CreateDate", SqlDbType.DateTime).Value = detail.CreateDate;
+                    cmd.Parameters.Add("@_UpdateDate", SqlDbType.DateTime).Value = detail.CreateDate;
                     cmd.Parameters.Add("@_CreateUser", SqlDbType.Int).Value = userkey;
                     cmd.Parameters.Add("@_CompanyId", SqlDbType.VarChar).Value = companyId;
                     cmd.Parameters.Add("@_STaxCodeKey", SqlDbType.Decimal).Value = detail.STaxCodeKey;
@@ -666,18 +666,21 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                     {
                         detail.FileXml.ExpenseId = id;
                         detail.FileXml.ExpenseDetailId = detail_id;
+                        detail.FileXml.DateCreated = detail.CreateDate;
                         Doc_Tools.SaveFile(detail.FileXml);
                     }
                     if (detail.FilePdf != null)
                     {
                         detail.FilePdf.ExpenseId = id;
                         detail.FilePdf.ExpenseDetailId = detail_id;
+                        detail.FilePdf.DateCreated = detail.CreateDate;
                         Doc_Tools.SaveFile(detail.FilePdf);
                     }
                     if (detail.FilePdfVoucher != null)
                     {
                         detail.FilePdfVoucher.ExpenseId = id;
                         detail.FilePdfVoucher.ExpenseDetailId = detail_id;
+                        detail.FilePdfVoucher.DateCreated = detail.CreateDate;
                         Doc_Tools.SaveFile(detail.FilePdfVoucher);
                     }
                 }
@@ -776,52 +779,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
     protected void tbx_importe_TextChanged(object sender, EventArgs e)
     {
         HttpContext.Current.Session["is_valid"] = false;
-        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
-
-        //if (tbx_importe.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
-        //{
-        //    tbx_importe.Text = string.Empty;
-        //    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B16);", true);
-        //    System.Threading.Thread.Sleep(5000);
-        //    return;
-        //}
-
-        ////Validar el monto x tipo de Reembolso
-        ////Alimentos, Hospedaje, Gastos Extraordinarios
-        //string tipo_gasto = STipoGasto.SelectedValue;
-        //switch (tipo_gasto)
-        //{
-        //    case "":
-        //        if(tipo_gasto == string.Empty)
-        //        {
-        //            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B13);", true);
-        //            System.Threading.Thread.Sleep(5000);
-        //            return;
-        //        }               
-        //        break;
-        //    case "6": //Alimentos 200
-        //        if(decimal.Parse(tbx_importe.Text) > 200)
-        //        {                    
-        //            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B26);", true);
-        //            System.Threading.Thread.Sleep(5000);                   
-        //        }
-        //        break;
-        //    case "4":  //Gasolina  400
-        //        if (decimal.Parse(tbx_importe.Text) > 400)
-        //        {                    
-        //            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B27);", true);
-        //            System.Threading.Thread.Sleep(5000);                   
-        //        }
-        //        break;
-        //    case "8":  //Gastos Extraordinarios 2000
-        //        if (decimal.Parse(tbx_importe.Text) > 2000)
-        //        {                    
-        //            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B28);", true);
-        //            System.Threading.Thread.Sleep(5000);                    
-        //        }
-        //        break;
-        
-       
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];       
     }
     
     private ExpenseDTO LoadExpenseById(int expense_id, int user_id)
@@ -1040,7 +998,24 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
-
+        //validacion de fecha de articulo
+        if (string.IsNullOrEmpty(tbx_fecha_articulo.Text))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB24").Value;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
+        //validacion de fecha articulo vs fecha del gasto
+        if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB55").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }        
         //validacion texto en importe
         if (tbx_importe_item.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
         {
@@ -1170,6 +1145,9 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         detalle.ItemId = drop_articulos.SelectedItem.Text;
         detalle.Qty = decimal.Parse(tbx_cantidad.Text);    
         detalle.UnitCost = decimal.Parse(tbx_importe_item.Text);
+        DateTime fecha_articulo = DateTime.Parse(tbx_fecha_articulo.Text);
+        detalle.CreateDate = fecha_articulo;
+        
         if (drop_taxes.SelectedValue != "0")
         {
             detalle.STaxCodeKey = int.Parse(drop_taxes.SelectedItem.Value);
@@ -1255,6 +1233,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         tbx_pdf.Text = string.Empty;
         tbx_voucher.Text = string.Empty;
         tbx_xml.Text = string.Empty;
+        tbx_fecha_articulo.Text = string.Empty;
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
@@ -1269,7 +1248,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         drop_articulos.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importe_item.Text = string.Empty;
-
+        tbx_fecha_articulo.Text = string.Empty;
         tbx_pdf.Text = string.Empty;
         tbx_voucher.Text = string.Empty;
         tbx_xml.Text = string.Empty;
@@ -1523,5 +1502,12 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             ClearControls();
             Response.Redirect("DocumentosGastos");
         }
+    }
+
+    protected void tbx_fecha_articulo_TextChanged(object sender, EventArgs e)
+    {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+        MultiView1.SetActiveView(View_Articulos);
     }
 }

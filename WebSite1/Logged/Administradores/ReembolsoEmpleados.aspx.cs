@@ -1007,15 +1007,26 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
+
+        //validacion de fecha de articulo
+        if (string.IsNullOrEmpty(tbx_fecha_articulo.Text))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB24").Value;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
         //validacion de fecha articulo vs fecha del gasto
         if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
         {
             tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB55").Value;
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
-        }        
+        }
+
         //validacion texto en importe
         if (tbx_importe_item.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
         {
@@ -1200,6 +1211,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         STipoGasto.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importe_item.Text = string.Empty;
+        tbx_fecha_articulo.Text = string.Empty;
         drop_taxes.ClearSelection();
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;

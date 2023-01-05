@@ -176,22 +176,31 @@
             <%--Bloque Articulos al Grid--%>
             <div class="row">
                 <%--Articulos--%>
-                <div class="col-lg-3 col-sm-3 col-xs-3">
+                <div class="col-lg-4 col-sm-4 col-xs-4">
                     <h4>Gastos:</h4>
                     <span class="dropdown-header">
                         <asp:DropDownList ID="drop_articulos" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server">
                         </asp:DropDownList>
                     </span>
                 </div>
+                 <%--Fecha del gasto--%>
+                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                        <h4>Fecha del gasto:</h4>
+                        <div class="col-lg-12 col-sm-12 col-xs-12">
+                            <asp:TextBox type="date" name="fecha" ID="tbx_fecha_articulo" AutoComplete="off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" step="1" class="form-control" runat="server" OnTextChanged="tbx_fecha_articulo_TextChanged" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                 <%--Importe del Articulo--%>
-                <div class="col-lg-2 col-sm-2 col-xs-2">
+                <div class="col-lg-3 col-sm-3 col-xs-3">
                     <h4>Coste Unitario:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_importegasto" MaxLength="15" class="form-control"></asp:TextBox>
                     </div>
                 </div>
                 <%--Cantidad--%>
-                <div class="col-lg-2 col-sm-2 col-xs-2">
+                <div class="col-lg-3 col-sm-3 col-xs-3">
                     <h4>Cantidad:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_cantidad" MaxLength="15" class="form-control"></asp:TextBox>

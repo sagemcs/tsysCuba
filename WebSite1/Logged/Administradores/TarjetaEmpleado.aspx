@@ -187,18 +187,26 @@
                             <asp:ListItem Value="8">Gastos Extraordinarios</asp:ListItem>
                         </asp:DropDownList>
                     </span>
-                </div>               
-             </div>
-            <br />
-            <div class="row">
-                <%--Articulos--%>
-                <div class="col-lg-3 col-sm-3 col-xs-3">
+                </div>   
+                 <%--Articulos--%>
+                <div class="col-lg-4 col-sm-4 col-xs-4">
                     <h4>Gastos:</h4>
                     <span class="dropdown-header">
                         <asp:DropDownList ID="drop_articulos" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server">
                         </asp:DropDownList>
                     </span>
                 </div>
+                 <%--Fecha del gasto--%>
+                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                        <h4>Fecha del gasto:</h4>
+                        <div class="col-lg-12 col-sm-12 col-xs-12">
+                            <asp:TextBox type="date" name="fecha" ID="tbx_fecha_articulo" AutoComplete="off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" step="1" class="form-control" runat="server" OnTextChanged="tbx_fecha_articulo_TextChanged" />
+                        </div>
+                    </div>
+             </div>
+            <br />
+            <div class="row">
+               
                 <%--Importe del Articulo--%>
                 <div class="col-lg-2 col-sm-2 col-xs-2">
                     <h4>Coste Unitario:</h4>

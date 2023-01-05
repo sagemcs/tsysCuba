@@ -86,7 +86,7 @@ public partial class SiteMaster : MasterPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        
     }
 
     protected void Unnamed_LoggingOut(object sender, LoginCancelEventArgs e)
@@ -109,20 +109,52 @@ public partial class SiteMaster : MasterPage
         {
             return vermenu(pUserKey, "Facturas");
         }
+        //else if (menuItemName == "Reembolso")
+        //{
+        //    return vermenu(pUserKey, "Reembolso");
+        //}
+        //else if (menuItemName == "Anticipo")
+        //{
+        //    return vermenu(pUserKey, "Anticipo");
+        //}
+        //else if (menuItemName == "Tarjeta")
+        //{
+        //    return vermenu(pUserKey, "Tarjeta");
+        //}
+        //else if (menuItemName == "GMedicos")
+        //{           
+        //    return vermenu(pUserKey, "GMedicos");
+        //}
         else if (menuItemName == "Reembolso")
         {
+            if (rol == "T|SYS| - Gerencia de Capital Humano")
+            {
+                return false;
+            }
             return vermenu(pUserKey, "Reembolso");
         }
         else if (menuItemName == "Anticipo")
         {
+            if (rol == "T|SYS| - Gerencia de Capital Humano" || rol == "T|SYS| - Finanzas")
+            {
+                return false;
+            }
             return vermenu(pUserKey, "Anticipo");
         }
         else if (menuItemName == "Tarjeta")
         {
+            if (rol == "T|SYS| - Gerencia de Capital Humano" || rol == "T|SYS| - Gerente")
+            {
+                return false;
+            }
             return vermenu(pUserKey, "Tarjeta");
         }
         else if (menuItemName == "GMedicos")
-        {           
+        {
+            if (rol == "T|SYS| - Gerente")
+            {
+                return false;
+            }
             return vermenu(pUserKey, "GMedicos");
         }
 

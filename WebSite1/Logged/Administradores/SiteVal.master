@@ -121,33 +121,33 @@
                                 <li>
                                     <a runat="server" href="~/Logged/Administradores/Lector" title="Codigo de Barras">Codigo de Barras</a>
                                 </li>
-                                    <% 
-                                if(HasRightsForSpecifiedMenu("Reembolso")==true){ %>
+                                   <%-- <% 
+                                if(HasRightsForSpecifiedMenu("Reembolso")==true){ %>--%>
                                 <li >
                                     <a runat="server" href="~/Logged/Administradores/ReembolsoEmpleados" title="Reembolso de Gastos">Subir Reembolso de Gastos</a>
                                 </li>
-                                <% } %>
+                                <%--<% } %>--%>
 
-                                <% 
-                                if(HasRightsForSpecifiedMenu("Anticipo")==true){ %>
+                               <%-- <% --%>
+                                <%--if(HasRightsForSpecifiedMenu("Anticipo")==true){ %>--%>
                                 <li>
                                     <a runat="server" href="~/Logged/Administradores/AnticipoEmpleados" title="Anticipo de Gastos">Subir Anticipo de Gastos</a>
                                 </li>
-                                <% } %>                                 
+                              <%--  <% } %>--%>                                 
 
-                                <% 
-                                if(HasRightsForSpecifiedMenu("Tarjeta")==true){ %>
+                                <%--<% --%>
+                                <%--if(HasRightsForSpecifiedMenu("Tarjeta")==true){ %>--%>
                                 <li>
                                     <a runat="server" href="~/Logged/Administradores/TarjetaEmpleado" title="Tarjeta Corporativa">Subir Gasto Tarjeta Corporativa</a>
                                 </li>
-                                <% } %>
+                               <%-- <% } %>--%>
 
-                                <% 
-                                if(HasRightsForSpecifiedMenu("GMedicos")==true){ %>
+                               <%-- <% --%>
+                                <%--if(HasRightsForSpecifiedMenu("GMedicos")==true){ %>--%>
                                 <li>
                                     <a runat="server" href="~/Logged/Administradores/GastosMedicosMenoresEmpleados" title="Gastos Médicos Menores">Subir Gastos Médicos Menores</a>
                                 </li>
-                                <% } %>      
+                                <%--<% } %> --%>     
                                 </ul>
                                 </li>
 

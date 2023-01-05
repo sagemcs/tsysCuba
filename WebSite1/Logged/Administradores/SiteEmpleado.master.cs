@@ -158,7 +158,11 @@ public partial class SiteMaster : MasterPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        
+        if (HttpContext.Current.Session["IDCompany"] == null)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
     }
 
     protected void Unnamed_LoggingOut(object sender, LoginCancelEventArgs e)

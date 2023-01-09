@@ -658,6 +658,24 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         bool xml = false, pdf = false;
         fill_filelists();
 
+        //validacion de fecha de articulo
+        if (string.IsNullOrEmpty(tbx_fecha_articulo.Text))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB24").Value;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
+        //validacion de fecha articulo vs fecha del gasto
+        if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
         //validacion texto en importe
         if (tbx_importegasto.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
         {
@@ -782,6 +800,9 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         detalle.ItemId = drop_articulos.SelectedItem.Text;
         detalle.Qty = decimal.Parse(tbx_cantidad.Text);
         detalle.UnitCost = decimal.Parse(tbx_importegasto.Text);
+        DateTime fecha_articulo = DateTime.Parse(tbx_fecha_articulo.Text);
+        detalle.CreateDate = fecha_articulo;
+
         if (drop_taxes.SelectedValue != "0")
         {
             detalle.STaxCodeKey = int.Parse(drop_taxes.SelectedItem.Value);
@@ -827,6 +848,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         drop_articulos.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importegasto.Text = string.Empty;
+        tbx_fecha_articulo.Text = string.Empty;
         drop_taxes.ClearSelection();
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
@@ -870,6 +892,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         HttpContext.Current.Session["is_valid"] = is_valid;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
+        tbx_fecha_articulo.Text = string.Empty;
         MultiView1.SetActiveView(View_Articulos);
     }    
 
@@ -895,6 +918,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         //Limpiar controles
         drop_articulos.ClearSelection();
         drop_taxes.ClearSelection();
+        tbx_fecha_articulo.Text = string.Empty;
         tbx_cantidad.Text = string.Empty;
         tbx_importegasto.Text = string.Empty;
         MultiView1.SetActiveView(View_General);
@@ -1104,5 +1128,12 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             ClearControls();
             Response.Redirect("DocumentosGastos");
         }
+    }
+
+    protected void tbx_fecha_articulo_TextChanged(object sender, EventArgs e)
+    {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+        MultiView1.SetActiveView(View_Articulos);
     }
 }

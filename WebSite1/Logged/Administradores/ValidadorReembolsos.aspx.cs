@@ -321,7 +321,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
     {
         var estados = Doc_Tools.Dict_status().Select((x) => new { Id = x.Key, Nombre = x.Value }).ToList();
         estados.Add(new { Id = 0, Nombre = "Todos" });
-        drop_status.DataSource = estados.OrderBy(o => o.Id).ToList();
+        drop_status.DataSource = estados.Where(x=> x.Id != 4).OrderBy(o => o.Id).ToList();
         drop_status.DataTextField = "Nombre";
         drop_status.DataValueField = "Id";
         drop_status.DataBind();

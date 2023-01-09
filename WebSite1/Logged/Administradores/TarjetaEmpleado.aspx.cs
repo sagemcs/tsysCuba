@@ -811,6 +811,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         tbx_xml.Text = string.Empty;
         tbx_pdf.Text = string.Empty;
         tbx_voucher.Text = string.Empty;
+        tbx_fecha_articulo.Text = string.Empty;
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
@@ -836,6 +837,24 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         {
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B40").Value;
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
+        //validacion de fecha de articulo
+        if (string.IsNullOrEmpty(tbx_fecha_articulo.Text))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB24").Value;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
+        //validacion de fecha articulo vs fecha del gasto
+        if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
@@ -980,6 +999,9 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         detalle.ItemId = drop_articulos.SelectedItem.Text;
         detalle.Qty = decimal.Parse(tbx_cantidad.Text);
         detalle.UnitCost = decimal.Parse(tbx_importegasto.Text);
+        DateTime fecha_articulo = DateTime.Parse(tbx_fecha_articulo.Text);
+        detalle.CreateDate = fecha_articulo;
+
         if (drop_taxes.SelectedValue != "0")
         {
             detalle.STaxCodeKey = int.Parse(drop_taxes.SelectedItem.Value);
@@ -1030,6 +1052,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         drop_taxes.ClearSelection();
         tbx_importegasto.Text = string.Empty;
         tbx_cantidad.Text = string.Empty;
+        tbx_fecha_articulo.Text = string.Empty;
         drop_taxes.ClearSelection();
         tbx_xml.Text = string.Empty;
         tbx_pdf.Text = string.Empty;
@@ -1050,6 +1073,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         STipoGasto.ClearSelection();
         tbx_cantidad.Text = string.Empty;
         tbx_importegasto.Text = string.Empty;
+        tbx_fecha_articulo.Text = string.Empty;
         tbx_xml.Text = string.Empty;
         tbx_pdf.Text = string.Empty;
         tbx_voucher.Text = string.Empty;
@@ -1248,4 +1272,10 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         }
     }
 
+    protected void tbx_fecha_articulo_TextChanged(object sender, EventArgs e)
+    {
+        HttpContext.Current.Session["is_valid"] = false;
+        btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+        MultiView1.SetActiveView(View_Articulos);
+    }
 }

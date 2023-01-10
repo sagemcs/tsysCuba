@@ -177,6 +177,8 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         Page.Response.Cache.SetNoStore();
         Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
 
+        Doc_Tools.VerificarAnticiposPendientes();
+
         List<RolDTO> roles = Doc_Tools.get_Roles();
         try
         {

@@ -10,8 +10,7 @@ public class AdvanceDTO : Document
 {
     public int AdvanceId { get; set; }
     public string AdvanceType { get; set; }
-    public string Folio { get; set; }
-    public int Currency { get; set; }    
+    public string Folio { get; set; }   
     public DateTime? DepartureDate { get; set; }
     public DateTime? ArrivalDate { get; set; }
     public DateTime CheckDate { get; set; }

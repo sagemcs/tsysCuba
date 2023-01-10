@@ -318,8 +318,8 @@ public static class Doc_Tools
     public static int ExecuteVoucherApi(string username, Document document, List<ExpenseDetailDTO> items, DocumentType type)
     {
         int iLote;
-        int vkey;
-        int dtlKey;
+        int vkey = 0;
+        int dtlKey = 0;
         int RetVal;
         var taxes = get_taxes(document.CompanyId);
 
@@ -343,7 +343,7 @@ public static class Doc_Tools
             iLote = iLote,
             iRemitToVendAddrKey = 144830,
             iRemitToCopyKey = 144830,
-            iCurrID = "MXN", //Moneda del gasto
+            iCurrID =  ((Currencys) document.GetCurrency(type)).ToString(), //"MXN", //Moneda del gasto
             iHoldPmt = 0,
             iVendKey = 1652,
             iVendID = "G778",
@@ -404,7 +404,8 @@ public static class Doc_Tools
         RetVal = Exec_sppaVoucherAPIGst(iLote, vkey, document.CompanyId.Trim());
         if (RetVal != 1)
         {
-            DeleteVoucherOnFail(iLote);
+            Insert_tapApiLogErrorCgGst(iLote, vkey, dtlKey, "Ha ocurrido un error en la ejecucion del procedimiento Sage");
+           // DeleteVoucherOnFail(iLote);
         }
         return RetVal;
 
@@ -616,7 +617,7 @@ public static class Doc_Tools
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT ItemKey, ItemId, CompanyID, PriceUnitMeasId FROM vluItem WITH (NOLOCK) WHERE @CompanyID = CompanyID AND Status = 1 AND (ItemType = 1 OR ItemType = 3 OR ItemType = 4) ORDER BY ItemID ASC,ShortDesc ASC;";
+            cmd.CommandText = "SELECT ItemKey, LongDesc, CompanyID, PriceUnitMeasId FROM vluItem WITH (NOLOCK) WHERE @CompanyID = CompanyID AND Status = 1 AND (ItemType = 1 OR ItemType = 3 OR ItemType = 4) ORDER BY ItemID ASC,ShortDesc ASC;";
             cmd.Parameters.Add("@CompanyID", SqlDbType.VarChar).Value = company_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -719,6 +720,7 @@ public static class Doc_Tools
         }
         return matriz;
     }
+
     public static ValidatingUserDTO get_MatrizValidadores(int pUserKey, int level)
     {
         ValidatingUserDTO matriz = new ValidatingUserDTO();
@@ -791,6 +793,11 @@ public static class Doc_Tools
     {
         Advance = 1, Expense = 2, CorporateCard = 3, MinorMedicalExpense = 4
     }
+
+    public enum Currencys
+    {
+        MNX = 1, USD = 2, EUR = 3
+    }
     public  class Paquete
     {
         public int PackageId { get; set; }
@@ -855,8 +862,36 @@ public static class Doc_Tools
             }
         }
         return roles;
-
     }
+
+    public static List<CurrExchSchdDtlDTO> get_ChangeRates()
+    {
+        List<CurrExchSchdDtlDTO> rates = new List<CurrExchSchdDtlDTO>();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "select * from tmcCurrExchSchdDtl";
+            cmd.Connection.Open();
+            SqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                //[CurrExchSchdKey]     ,[EffectiveDate]      ,[SourceCurrID]      ,[TargetCurrID]      ,[CurrExchRate]      ,[ExpirationDate]
+                var rate = new CurrExchSchdDtlDTO();
+                rate.CurrExchSchdKey = dataReader.GetInt32(0);
+                rate.EffectiveDate = dataReader.GetDateTime(1);
+                rate.SourceCurrID = dataReader.GetString(2);
+                rate.TargetCurrID = dataReader.GetString(3);
+                rate.CurrExchRate = dataReader.GetDouble(4);
+                if(!dataReader.IsDBNull(5))
+                {
+                    rate.ExpirationDate = dataReader.GetDateTime(5);
+                }
+               
+                rates.Add(rate);
+            }
+        }
+        return rates;
+    }     
 
     public static List<RolDTO> get_RolesValidadores()
     {
@@ -974,7 +1009,17 @@ public static class Doc_Tools
 
         };
         return dict;
-    }   
+    }
+
+    public static Dictionary<int, string> Dict_Advancetype()
+    {
+        Dictionary<int, string> dict = new Dictionary<int, string>
+        {
+            { 1, "Viaje" },
+            { 2, "Compra Extraordinaria" }
+        };
+        return dict;
+    }
 
     public static ExpenseFilesDTO LoadFilesbyExpense(DocumentType type, ExpenseFilesDTO.FileType fileType, int expense_id, int detail_id)
     {
@@ -1225,6 +1270,54 @@ public static class Doc_Tools
 
         }
         return token;
+    }
+
+    public static void VerificarAnticiposPendientes()
+    {
+        List<AdvanceDTO> anticipos = new List<AdvanceDTO>();
+
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT AdvanceId,AdvanceType,Folio,Currency, Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey,CreateDate, UpdateDate,CompanyId,Status FROM Advance where Status = @Status;";
+            cmd.Parameters.Add("@Status", SqlDbType.Int).Value = 1;
+            cmd.Connection.Open();
+            SqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                var advance = new AdvanceDTO();
+                advance.AdvanceId = dataReader.GetInt32(0);
+                advance.AdvanceType = Dict_Advancetype().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
+                advance.Folio = dataReader.GetString(2);
+                advance.Currency = dataReader.GetInt32(3);
+                advance.Amount = dataReader.GetDecimal(4);
+                if (!dataReader.IsDBNull(5))
+                {
+                    advance.DepartureDate = dataReader.GetDateTime(5);
+                }
+                if (!dataReader.IsDBNull(6))
+                {
+                    advance.ArrivalDate = dataReader.GetDateTime(6);
+                }
+                advance.CheckDate = dataReader.GetDateTime(7);
+                advance.ImmediateBoss = dataReader.GetString(8);
+                advance.UpdateUserKey = dataReader.GetInt32(9);
+                advance.CreateDate = dataReader.GetDateTime(10);
+                advance.UpdateDate = dataReader.GetDateTime(11);
+                advance.CompanyId = dataReader.GetString(12);
+                advance.Status = Doc_Tools.Dict_status().FirstOrDefault(x => x.Key == dataReader.GetInt32(13)).Value;
+                anticipos.Add(advance);
+            }
+        }
+        var grouped_user = anticipos.GroupBy(x => x.UpdateUserKey);
+        foreach (var user in grouped_user)
+        {
+            foreach (AdvanceDTO anticipo_pendients in user.ToList())
+            {
+
+            }
+        }
+
     }
 
 

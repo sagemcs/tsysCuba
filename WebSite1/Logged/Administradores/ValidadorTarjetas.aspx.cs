@@ -369,7 +369,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                 var expense = new CorporateCardDTO();
                 expense.CorporateCardId = dataReader.GetInt32(0);             
                 expense.Date = dataReader.GetDateTime(1);
-                expense.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                expense.Currency = dataReader.GetInt32(2);
                 expense.Amount = dataReader.GetDecimal(3);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 expense.CreateDate = dataReader.GetDateTime(5);
@@ -398,7 +398,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             {
                 card.CorporateCardId = dataReader.GetInt32(0);              
                 card.Date = dataReader.GetDateTime(1);
-                card.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                card.Currency = dataReader.GetInt32(2);
                 card.Amount = dataReader.GetDecimal(3);
                 card.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;              
                 card.CompanyId = dataReader.GetString(5);

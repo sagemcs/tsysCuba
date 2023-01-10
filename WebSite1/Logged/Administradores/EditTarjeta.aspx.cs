@@ -219,7 +219,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                     var card = (CorporateCardDTO)HttpContext.Current.Session["CorporateCard"];
                     tbx_importe.Text = card.Amount.ToString("0.00");
                     //tbx_policy.Text = Dict_policy().FirstOrDefault(x => x.Key == Dict_tipos_gastos().FirstOrDefault(d => d.Value == card.Type).Key).Value;
-                    drop_currency.SelectedValue = Doc_Tools.Dict_moneda().FirstOrDefault(x => x.Value == card.Currency).Key.ToString();
+                    drop_currency.SelectedValue = card.Currency.ToString();
                     tbx_fechagasto.Text = card.Date.ToString("yyyy-MM-dd");
                    // STipoGasto.SelectedValue = Dict_tipos_gastos().FirstOrDefault(x => x.Value == card.Type).Key.ToString();
                   

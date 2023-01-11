@@ -1207,7 +1207,7 @@ public static class Doc_Tools
         }
     }
 
-    public static void EnviarCorreo(int pUserKey)
+    public static void EnviarCorreo(int pUserKey, Doc_Tools.DocumentType type )
     {      
         string server_address = ConfiguracionCorreoElectronico.server_address;
         int server_port = ConfiguracionCorreoElectronico.server_port;
@@ -1219,10 +1219,28 @@ public static class Doc_Tools
         //Tomar el nivel superior que corresponde
         string from = Doc_Tools.getUserEmail(pUserKey);
         string to = "boza32smart@gmail.com";       
-        string subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.Advance.ToString());
-        string text = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.Advance.ToString());
+        string subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, type.ToString());
+        string text = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, type.ToString());
         bool is_text_html = false;
         email.Enviar(from, to, subject, text, is_text_html);
+    }
+
+    public static int GetGerenteToNotify(int userkey)
+    {
+        int gerente_key = 0;
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = con.CreateCommand();
+            cmd.CommandText = "SELECT Isnull([UserGerente],0) FROM [dbo].[validatingUser] where UserKey = @UserKey";
+            cmd.Parameters.Add("@UserKey", SqlDbType.Int).Value = userkey;
+            cmd.Connection.Open();
+            SqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                gerente_key = dataReader.GetInt32(0);
+            }
+        }
+        return gerente_key;
     }
 
     public static bool CheckPassword(int pUserKey, string password)
@@ -1275,50 +1293,116 @@ public static class Doc_Tools
     public static void VerificarAnticiposPendientes()
     {
         List<AdvanceDTO> anticipos = new List<AdvanceDTO>();
-
-        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        int count = 0;
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
-            SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT AdvanceId,AdvanceType,Folio,Currency, Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey,CreateDate, UpdateDate,CompanyId,Status FROM Advance where Status = @Status;";
-            cmd.Parameters.Add("@Status", SqlDbType.Int).Value = 1;
+            SqlCommand cmd = con.CreateCommand();
+            cmd.CommandText = " SELECT count(*) FROM dbo.Pendant_Documents where [Current_date] = CAST( GETDATE() AS Date ) ;";            
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
-            {
-                var advance = new AdvanceDTO();
-                advance.AdvanceId = dataReader.GetInt32(0);
-                advance.AdvanceType = Dict_Advancetype().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
-                advance.Folio = dataReader.GetString(2);
-                advance.Currency = dataReader.GetInt32(3);
-                advance.Amount = dataReader.GetDecimal(4);
-                if (!dataReader.IsDBNull(5))
-                {
-                    advance.DepartureDate = dataReader.GetDateTime(5);
-                }
-                if (!dataReader.IsDBNull(6))
-                {
-                    advance.ArrivalDate = dataReader.GetDateTime(6);
-                }
-                advance.CheckDate = dataReader.GetDateTime(7);
-                advance.ImmediateBoss = dataReader.GetString(8);
-                advance.UpdateUserKey = dataReader.GetInt32(9);
-                advance.CreateDate = dataReader.GetDateTime(10);
-                advance.UpdateDate = dataReader.GetDateTime(11);
-                advance.CompanyId = dataReader.GetString(12);
-                advance.Status = Doc_Tools.Dict_status().FirstOrDefault(x => x.Key == dataReader.GetInt32(13)).Value;
-                anticipos.Add(advance);
+            {               
+                count = dataReader.GetInt32(0);                
             }
         }
-        var grouped_user = anticipos.GroupBy(x => x.UpdateUserKey);
-        foreach (var user in grouped_user)
+        if(count==0)
         {
-            foreach (AdvanceDTO anticipo_pendients in user.ToList())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
             {
+                SqlCommand cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT AdvanceId,AdvanceType,Folio,Currency, Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey,CreateDate, UpdateDate,CompanyId,Status FROM Advance where Status = @Status;";
+                cmd.Parameters.Add("@Status", SqlDbType.Int).Value = 1;
+                cmd.Connection.Open();
+                SqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    var advance = new AdvanceDTO();
+                    advance.AdvanceId = dataReader.GetInt32(0);
+                    advance.AdvanceType = Dict_Advancetype().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
+                    advance.Folio = dataReader.GetString(2);
+                    advance.Currency = dataReader.GetInt32(3);
+                    advance.Amount = dataReader.GetDecimal(4);
+                    if (!dataReader.IsDBNull(5))
+                    {
+                        advance.DepartureDate = dataReader.GetDateTime(5);
+                    }
+                    if (!dataReader.IsDBNull(6))
+                    {
+                        advance.ArrivalDate = dataReader.GetDateTime(6);
+                    }
+                    advance.CheckDate = dataReader.GetDateTime(7);
+                    advance.ImmediateBoss = dataReader.GetString(8);
+                    advance.UpdateUserKey = dataReader.GetInt32(9);
+                    advance.CreateDate = dataReader.GetDateTime(10);
+                    advance.UpdateDate = dataReader.GetDateTime(11);
+                    advance.CompanyId = dataReader.GetString(12);
+                    advance.Status = Doc_Tools.Dict_status().FirstOrDefault(x => x.Key == dataReader.GetInt32(13)).Value;
+                    anticipos.Add(advance);
+                }
+            }
 
+            var grouped_user = anticipos.GroupBy(x => x.UpdateUserKey);
+            foreach (var user in grouped_user)
+            {
+                foreach (AdvanceDTO anticipo_pendients in user.ToList())
+                {
+                    int gerente_key = GetGerenteToNotify(anticipo_pendients.UpdateUserKey);
+                    if(gerente_key!=0)
+                    {
+                        EnviarCorreo(gerente_key, DocumentType.Advance);
+                    }
+                   
+                }
+            }
+            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandText = "INSERT INTO [dbo].[Pendant_Documents] ([Current_date])  VALUES (GETDATE()) ;";                
+                cmd.Connection.Open();
+                cmd.ExecuteNonQuery();                
             }
         }
+        
 
     }
 
+    public static void SetDefaultArticle(int itemkey, string companyId)
+    {      
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "if exists (SELECT [ItemKey] FROM [dbo].[DefaultItemMME] where [CompanyID] = @CompanyID) begin  UPDATE[dbo].[DefaultItemMME]  SET [ItemKey] = @ItemKey, [CompanyID] = @CompanyID, [DateUpdated] = GETDATE()  WHERE [CompanyID] = @CompanyID end else  begin INSERT INTO[dbo].[DefaultItemMME]([ItemKey],[CompanyID],[DateUpdated])  VALUES(@ItemKey, @CompanyID, Getdate()) end ";
+            cmd.Parameters.Add("@ItemKey", SqlDbType.Int).Value = itemkey;
+            cmd.Parameters.Add("@CompanyID", SqlDbType.NVarChar).Value = companyId;          
+            cmd.Connection.Open();
+            cmd.ExecuteNonQuery();            
+            cmd.Connection.Close();
+        }
+    }
+
+    public static ItemDTO GetDefaultItem(string companyId)
+    {
+        int itemKey = 0;
+        ItemDTO item = new ItemDTO();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT IsNull([ItemKey],0) FROM [dbo].[DefaultItemMME] where [CompanyID] = @CompanyID";
+            cmd.Parameters.Add("@CompanyID", SqlDbType.NVarChar).Value = companyId;
+            cmd.Connection.Open();
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                itemKey = reader.GetInt32(0);
+            }
+            cmd.Connection.Close();
+        }
+        if (itemKey != 0)
+        {
+            item = get_items(companyId).FirstOrDefault(x => x.ItemKey == itemKey);
+            return item;
+        }        
+        return null;
+    }
 
 }

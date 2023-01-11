@@ -351,7 +351,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 var expense = new ExpenseDTO();
                 expense.ExpenseId = dataReader.GetInt32(0);              
                 expense.Date = dataReader.GetDateTime(1);
-                expense.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                expense.Currency = dataReader.GetInt32(2);
                 expense.Amount = dataReader.GetDecimal(3);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 expense.DeniedReason = dataReader.GetString(5);
@@ -380,7 +380,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             {
                 expense.ExpenseId = dataReader.GetInt32(0);               
                 expense.Date = dataReader.GetDateTime(1);
-                expense.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                expense.Currency = dataReader.GetInt32(2);
                 expense.Amount = dataReader.GetDecimal(3);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 expense.AdvanceId = dataReader.GetInt32(5);                

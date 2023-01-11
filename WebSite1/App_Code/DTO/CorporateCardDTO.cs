@@ -9,8 +9,7 @@ using System.Web;
 public class CorporateCardDTO : Document
 {
     public int CorporateCardId { get; set; }
-    public DateTime Date { get; set; }
-    public string Currency { get; set; }     
+    public DateTime Date { get; set; }   
     public string DeniedReason { get; set; }
     public int? PackageId { get; set; }         
     public string ExpenseReason { get; set; }

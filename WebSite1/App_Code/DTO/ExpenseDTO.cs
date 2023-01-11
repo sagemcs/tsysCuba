@@ -12,8 +12,7 @@ using System.Web;
     {
 
         public int ExpenseId { get; set; }       
-        public DateTime Date { get; set; }
-        public string Currency { get; set; }       
+        public DateTime Date { get; set; }       
         public string DeniedReason { get; set; }
         public int? PackageId { get; set; }
         public int AdvanceId { get; set; }

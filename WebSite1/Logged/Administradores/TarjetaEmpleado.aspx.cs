@@ -173,8 +173,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         Page.Response.Cache.SetNoStore();
         Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
 
-        List<RolDTO> roles = Doc_Tools.get_Roles();
-
+        List<RolDTO> roles = Doc_Tools.get_Roles();       
         try
         {
             if (!roles.Any(x => x.ID == HttpContext.Current.Session["RolUser"].ToString()))
@@ -632,7 +631,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                 var tarjeta = new CorporateCardDTO();
                 tarjeta.CorporateCardId = dataReader.GetInt32(0);              
                 tarjeta.Date = dataReader.GetDateTime(1);
-                tarjeta.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                tarjeta.Currency = dataReader.GetInt32(2);
                 tarjeta.Amount = dataReader.GetDecimal(3);
                 tarjeta.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;               
                 gastos.Add(tarjeta);
@@ -700,7 +699,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             {
                 card.CorporateCardId = dataReader.GetInt32(0);              
                 card.Date = dataReader.GetDateTime(1);
-                card.Currency = Doc_Tools.Dict_moneda().First(x => x.Key == dataReader.GetInt32(2)).Value;
+                card.Currency = dataReader.GetInt32(2);
                 card.Amount = dataReader.GetDecimal(3);
                 card.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;               
                 card.ExpenseReason = dataReader.GetString(5);

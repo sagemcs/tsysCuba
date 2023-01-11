@@ -202,7 +202,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                 {
                     var expense = (ExpenseDTO)HttpContext.Current.Session["Expense"];
                     tbx_importe.Text = expense.Amount.ToString("0.00");
-                    tbx_currency.Text = expense.Currency;
+                    tbx_currency.Text =  Doc_Tools.Dict_moneda().FirstOrDefault(x=> x.Key == expense.Currency).Value ;
                     tbx_fechagasto.Text = expense.Date.ToString("yyyy-MM-dd");                 
                     Load_Articles_By_Expense(expense.ExpenseId, pUserKey, pCompanyID);
                        

@@ -16,6 +16,7 @@ using System.Web;
 using System.Web.UI;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using System.Web.Services;
 
 public partial class Logged_AprobSolCheq : System.Web.UI.Page
 {
@@ -242,7 +243,8 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
                     }
                     btn_carga_masiva.Visible = chek_masiva >= 1;
                     btn_carga_masiva.Text = string.Format("Aprobar ({0}) Solicitudes", chek_masiva.ToString());
-
+                    btn_rechazo_masivo.Visible = chek_masiva >= 1;
+                    btn_rechazo_masivo.Text = string.Format("Rechazar ({0}) Solicitudes", chek_masiva.ToString());
                 }
                     else
                     {
@@ -1273,7 +1275,7 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
         public string  llave {get;set;}        
     }
 
-    private List<Cheques> get_lista_cheques()
+    protected List<Cheques> get_lista_cheques()
     {
         List<Cheques> lista_valores = new List<Cheques>();
         foreach (GridViewRow row in gvFacturas.Rows)
@@ -1291,27 +1293,61 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
         return lista_valores;
     }
 
-    protected void btn_carga_masiva_Click(object sender, EventArgs e)
+
+
+    //protected void btn_carga_masiva_Click(object sender, EventArgs e)
+    //{
+    //    List<Cheques> lista_valores = get_lista_cheques();
+    //    if(lista_valores.Count > 0)
+    //    {
+    //        var json = JsonConvert.SerializeObject(lista_valores, type: typeof(Cheques), settings: null);
+    //        ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "update(" + json + ");", true);
+    //    }
+    //    BindGrid();
+
+    //}
+
+    protected void btnAprobar_Command(object sender, CommandEventArgs e)
     {
         List<Cheques> lista_valores = get_lista_cheques();
-        if(lista_valores.Count > 0)
+        if (lista_valores.Count > 0)
         {
             var json = JsonConvert.SerializeObject(lista_valores, type: typeof(Cheques), settings: null);
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "update(" + json + ");", true);
-        }      
+            BindGrid();
+        }
 
     }
 
-    private void ResolveToken()
-    {        
+    protected void btnRechazar_Command(object sender, CommandEventArgs e)
+    {
+        List<Cheques> lista_valores = get_lista_cheques();
+        if (lista_valores.Count > 0)
+        {
+            var json = JsonConvert.SerializeObject(lista_valores, type: typeof(Cheques), settings: null);
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "update(" + json + ");", true);
+            BindGrid();
+        }
+
+    }
+
+
+    [WebMethod]
+    public static string ResolveToken()
+    {
         Contrarecibos.CrearToken();
-        string token_vigente = Doc_Tools.Get_token_from_db(pUserKey);            
-                  
+        string token_vigente = Doc_Tools.Get_token_from_db(Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString()));
+        return token_vigente;
     }
-    
-    
 
-  
+    [WebMethod]
+    public static string ComparePassword(string pass)
+    {
+        int userkey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+        string result = Doc_Tools.CheckPassword(userkey, pass).ToString();
+        return result;
+    }
+
 }
 
 

@@ -7,6 +7,7 @@
 
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Newtonsoft.Json;
 using Proveedores_Model;
 using System;
 using System.Collections.Generic;
@@ -1153,6 +1154,113 @@ public class NotificacionesWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(UseHttpGet = true)]
+    public void enviar_notificacion_de_rechazo_cheque(string texto, string llave, string listFolios)
+    {
+        try
+        {
+            string supuesto_token = Context.Request.Headers.GetValues("Authorization").First();
+
+            if (Tools.EsTokenValido(supuesto_token) && Tools.UsuarioAutenticado() != null)
+            {
+                var js = new JavaScriptSerializer();
+                bool success = true;
+                string Tabla = string.Empty;
+                string msg = texto;
+
+                var list = JsonConvert.DeserializeObject<List<string>>(listFolios);
+                foreach(var folio in list)
+                {
+                    try
+                    {
+                        if (!string.IsNullOrWhiteSpace(folio))
+                        {
+                            int FFolio = Convert.ToInt16(folio);
+                            int User = Convert.ToInt16(HttpContext.Current.Session["UserKey"]);
+                            int Not = 0;
+
+                            string Email = string.Empty;
+                            Email = CorreoCreadorCheque(FFolio);
+                            //Email = "lgarcia@multiconsulting.com";
+                            success = false;
+                            msg = "Se ha generado un error intentar cancelar el cheque, intenta nuevamente si el problema persiste comunicate con el área de soporte";
+
+                            if (CancelarCheque(FFolio, User, texto))
+                            {
+
+                                //int Valor1 = Convert.ToInt32(folio);
+                                //if ((CancelarD1(Valor1, 0, 1, 2) == 0))
+                                //{
+
+                                string Body;
+                                using (StreamReader reader = new StreamReader(Server.MapPath("~/Account/Templates Email/ChequeRechazado.html")))
+                                {
+                                    Body = reader.ReadToEnd();
+                                    Body = Body.Replace("{Fac}", llave).Replace("{Comments}", texto);
+                                }
+
+                                bool SendEmail = Global.EmailGlobal(Email, Body, "Notificación de Rechazo de Solicitud de Cheque");
+                                if (SendEmail == true)
+                                {
+                                    success = true;
+                                    msg = "Se ha enviado un correo electronico con la notificación de rechazo del Compleneto de Pago con folio: " + llave;
+                                    Not = 1;
+                                }
+                                else
+                                {
+                                    success = false;
+                                    msg = "Se ha generado un error al enviar el correo, no se ha podido notificar el rechazo del Complemento de Pago con folio: " + llave;
+                                    Not = 0;
+                                }
+
+                                //int Valor = Convert.ToInt32(folio);
+                                //bool fav = CancelarD(Valor, Not, 2, 2);
+
+                                //}
+                                //else
+                                //{
+                                //    success = true;
+                                //    msg = "Ya se ha enviado un correo electronico con la notificación de rechazo de la factura con el folio: " + llave;
+                                //}
+
+                            }
+                            else
+                            {
+                                success = false;
+                                msg = "Se ha generado un error intentar cancelar el complemento de Pago, intenta nuevamente si el problema persiste comunicate con el área de soporte";
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        msg = e.Message;
+                        success = false;
+                    }
+                    var result = new
+                    {
+                        success = success,
+                        msg = msg,
+                    };
+
+                    Context.Response.Clear();
+                    Context.Response.ContentType = "application/json";
+                    Context.Response.Write(js.Serialize(result));
+                }
+            }
+            else
+            {
+                Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                Context.Response.End();
+            }
+        }
+        catch
+        {
+            Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            Context.Response.End();
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(UseHttpGet = true)]
     public void NOenviar_notificacion_de_rechazo_de_pago(string folio, string texto, string llave)
     {
         try
@@ -1209,6 +1317,63 @@ public class NotificacionesWebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(UseHttpGet = true)]
+    public void NOenviar_notificacion_de_rechazo_de_cheque(string folio, string texto, string llave)
+    {
+        try
+        {
+            string supuesto_token = Context.Request.Headers.GetValues("Authorization").First();
+
+            if (Tools.EsTokenValido(supuesto_token) && Tools.UsuarioAutenticado() != null)
+            {
+                var js = new JavaScriptSerializer();
+                bool success = true;
+                string msg = texto;
+                try
+                {
+                    int FFolio = Convert.ToInt16(folio);
+
+                    int User = Convert.ToInt16(HttpContext.Current.Session["UserKey"]);
+                    if (CancelarPago(FFolio, User) == true)
+                    {
+                        success = true;
+                        msg = "Se ha cancelado el Complemento de Pago con Folio :" + llave;
+                    }
+                    else
+                    {
+                        success = false;
+                        msg = "Se ha generado un error intentar cancelar el complemento, intenta nuevamente si el problema persiste comunicate con el área de soporte";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    msg = ex.Message;
+                    success = false;
+                }
+                var result = new
+                {
+                    success = success,
+                    msg = msg
+                };
+
+                Context.Response.Clear();
+                Context.Response.ContentType = "application/json";
+                Context.Response.Write(js.Serialize(result));
+            }
+            else
+            {
+                Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                Context.Response.End();
+            }
+        }
+        catch (Exception ex)
+        {
+            Context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            Context.Response.End();
+        }
+
+    }
 
     protected bool CancelarD(int FacKey, int Not, int Op, int Tipo)
     {
@@ -1368,6 +1533,36 @@ public class NotificacionesWebService : System.Web.Services.WebService
         return Cancel;
     }
 
+    protected bool CancelarCheque(int FacKey, int user, string texto)
+    {
+        bool Cancel = true;
+        try
+        {
+            //string Ssql = "Update InvoiceReceipt a inner join InvcRcptDetails b on a.InvcRptKey = b.InvcRptKey set a.Rechazador = " + user + "Where b.InvoiceKey = " + FacKey;
+
+            string Ssql = "declare @Keyy int; set @Keyy = (select InvcRcptDetails.InvcRcptKey from InvcRcptDetails where InvoiceKey = " + FacKey + "); Update InvoiceReceipt set Rechazador = " + user + ", Comment = '" + texto + "' Where InvcRcptKey = @Keyy";
+
+            SqlConnection sqlConnection2 = new SqlConnection();
+            sqlConnection2 = SqlConnectionDB("PortalConnection");
+            sqlConnection2.Open();
+            using (SqlCommand Cmdd = new SqlCommand(Ssql, sqlConnection2))
+            {
+                Cmdd.CommandType = CommandType.Text;
+                Cmdd.CommandText = Ssql;
+                Cmdd.ExecuteScalar();
+                //Llave = Convert.ToInt32(Cmdd.ExecuteScalar().ToString());
+            }
+            sqlConnection2.Close();
+
+        }
+        catch (Exception ex)
+        {
+            Cancel = false;
+            throw new MulticonsultingException(ex.Message);
+        }
+        return Cancel;
+    }
+
     protected string CorreoProvedor(int VendorKey)
     {
         string Correo = string.Empty;
@@ -1431,6 +1626,31 @@ public class NotificacionesWebService : System.Web.Services.WebService
             sqlConnection1 = SqlConnectionDB("PortalConnection");
             sqlConnection1.Open();
             string sql = @"Select top 1 b.UserName From Vendors a inner join AspNetUsers b on a.UserKey = b.UserKey inner join Payment c on a.VendorKey = c.VendorKey Where c.PaymentKey = " + VendorKey;
+            using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
+            {
+                sqlQuery.CommandType = CommandType.Text;
+                sqlQuery.CommandText = sql;
+                Correo = sqlQuery.ExecuteScalar().ToString();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new MulticonsultingException(ex.Message);
+        }
+
+        return Correo;
+    }
+
+    protected string CorreoCreadorCheque(int VendorKey)
+    {
+        string Correo = string.Empty;
+
+        try
+        {
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+            sqlConnection1.Open();
+            string sql = @"Select top 1 b.UserName From Vendors a inner join AspNetUsers b on a.UserKey = b.UserKey inner join InvoiceReceipt c on a.VendorKey = c.VendorKey inner join InvcRcptDetails d on d.InvcRcptKey = c.InvcRcptKey Where d.InvoiceKey = " + VendorKey;
             using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
             {
                 sqlQuery.CommandType = CommandType.Text;

@@ -143,6 +143,9 @@
                                 <li>
                                     <a runat="server" href="~/Logged/Administradores/EditPreRegistro" title="Editar permisos de usuario">Editar permisos de usuario</a>
                                 </li>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/ArticleMME" title="Establecer Articulo para Gastos Médicos Menores">Articulo para Gastos Médicos Menores</a>
+                                </li>
                                 </ul>
                                 </li>
 

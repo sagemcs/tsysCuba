@@ -46,14 +46,20 @@
         -webkit-border-radius: 20px 20px 20px 20px;
         /*border: 0px none #000000;*/
 }
+
+        .btnRech {
+            margin-left: 100px;
+        }
     </style>
 
     <script>
         $(document).ready(function () {
+            ;
 
             var ctrlKeyDown = false;            
             $(document).on("keydown", keydown);
             $(document).on("keyup", keyup);
+            var rechazar = false
 
             function keydown(e) {
 
@@ -77,12 +83,12 @@
           $('#btn_send_comments').click(function (e) {
               $('#myModal').modal('hide');
               $('#Update').modal('show');
-              Proceso(e, "/enviar_notificacion_de_rechazo")
+              Proceso(e, "/enviar_notificacion_de_rechazo_cheque")
               return false;
           });
 
           $('#btn_No_Send').click(function (e) {
-              Proceso(e, "/NOenviar_notificacion_de_rechazo");
+              Proceso(e, "/NOenviar_notificacion_de_rechazo_de_cheque");
               VariableG();
               setTimeout("location.href='AprobSolCheq'", 1);
               return false;
@@ -127,7 +133,16 @@
               var folio_factura = $('#inputFolio').val();
               var folio_llave = $('#inputllave').val();
               var Fila = $('#inputFila').val();
-              var url_list = NotificacionesWebService.get_path() + Proce;
+
+              var lista = [];
+              $("#MainContent_gvFacturas tbody tr td span input").each(function () {
+                  if ($(this).is(':checked')) {
+                      lista.push($(this).parent().parent().next().text());
+                  }
+              });
+
+              var url_list = NotificacionesWebService.get_path() + Proce;            
+
               $.ajax({
                   type: "POST",
                   "beforeSend": function (xhr) {
@@ -138,9 +153,12 @@
                   data: {
                       folio: folio_factura,
                       texto: comentario,
-                      llave: folio_llave
+                      llave: folio_llave,
+                      listFolios: JSON.stringify(lista)
                   },
                   success: function (respuesta) {
+                      debugger;
+
                       $('#myModal').modal('hide');
                       $('#Update').modal('hide');
                       if (respuesta.success) {
@@ -174,16 +192,34 @@
                       {
                           $('#myModal').modal('hide');
                           $('#Update').modal('hide');
-                          swal('Notificaciones T|SYS|', respuesta.msg, 'error');
+                          //alertme('Notificaciones T|SYS|', respuesta.msg, 'error');
+                          swal.fire({
+                              title: 'Notificaciones T|SYS|',
+                              text: respuesta.msg,
+                              icon: "error",
+                              customClass: 'swal-wide',
+                              closeModal: true,
+                              closeOnConfirm: false,
+                              dangerMode: true
+                          })
                           VariableG();
-                          setTimeout("location.href='AprobSolCheq'", 1);
+                          setTimeout("location.href='AprobSolCheq'", 3000);
                       }
    
                   },
                   error: function (respuesta) {
                       $('#Update').modal('close');
                       $('#myModal').modal('close');
-                      swal("La notificación de rechazo de Solicitud de Cheque no ha podido ser enviada");
+                      //swal("La notificación de rechazo de Solicitud de Cheque no ha podido ser enviada");
+                      swal.fire({
+                          title: 'Notificaciones T|SYS|',
+                          text: "La notificación de rechazo de Solicitud de Cheque no ha podido ser enviada",
+                          icon: "error",
+                          customClass: 'swal-wide',
+                          closeModal: true,
+                          closeOnConfirm: false,
+                          dangerMode: true
+                      })
                       VariableG();
                       setTimeout("location.href='AprobSolCheq'", 1);
                   }
@@ -282,6 +318,36 @@
                 return true;
             }
 
+            function PPP() {
+                swal.fire({
+                    title: "¿Desea Rechazar estas Solicitudes de Cheque?",
+                    text: "Una vez cancelada, no podrá volver actualizar el status de la Solicitudes",
+                    icon: "warning",
+                    buttons: ["No", "Si"],
+                    confirmButtonColor: "#FF6600",
+                    customClass: 'swal-wide',
+                    closeModal: true,
+                    closeOnConfirm: false,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $('#passwordValue').val(''); $('#hh1').val($('#btnAprobar:hover').parent().prev().prev().prev().prev().prev().prev().text()); $('#Button1').hide(); $('#myModal_Aprobar').modal(); $('#myModalLabel1').text('Teclee el Password para verificar su identidad'); $('#insert').show(); $('#showToken').hide(); $('#TextBox1').val(''); $('#validarToken').show(); $('#Button1').hide(); $('#Button3').hide();
+                            rechazar = true
+                        }
+                        else {
+                            folio = "";
+                            llave = "";
+                            Fila = "";
+                            VariableGs();
+                            setTimeout("location.href='AprobSolCheq'", 1);
+                        }
+                    });
+
+                $('#Update').modal('close');
+                $('#myModal').modal('close');
+                return true;
+            }
             function Pregunta2(folio, llave, Fila) {
 
                 swal.fire({
@@ -639,6 +705,62 @@
             swal(titulo, mesaje, Tipo);
         }
     </script>
+
+    <%-- Logica del password y Token (Manuel)--%>
+    <script type="text/javascript">
+        function CompararPassword(pass) {
+            try {
+                $.ajax({
+                    type: 'POST',
+                    url: 'AprobSolCheq.aspx/ComparePassword',
+                    data: JSON.stringify({ pass: pass }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (msg) {
+                        if (msg.d == "True") {
+                            try {
+                                $.ajax({
+                                    type: 'POST',
+                                    url: 'AprobSolCheq.aspx/ResolveToken',
+                                    //data: JSON.stringify({ pass: pass }),
+                                    contentType: 'application/json; charset=utf-8',
+                                    dataType: 'json',
+                                    success: function (msg2) {
+                                        $("#insert").hide()
+                                        $("#showToken").show()
+                                        $("#validarToken").hide()
+                                        $("#TextBox1").val(msg2.d)
+                                        $("#myModalLabel1").text('Token vigente')
+                                        if (!rechazar)
+                                            $("#Button1").show()
+                                        else $("#Button3").show()
+                                    }
+                                });
+                            }
+                            catch (err) {
+
+                            }
+                        }
+                    }
+                });
+            }
+            catch (err) {
+                $("#errorMsj").show()
+                setTimeout(() => {
+                    $("#errorMsj").hide()
+                }, 2000);
+            }
+            return false;
+        }
+        </script>   
+    <script>
+
+        function showModal() {
+            var inputVal = $("#passwordValue").val();
+            var result_password = CompararPassword(inputVal);
+            return false;
+        }
+    </script>
     <br />
     <br />
     <br />
@@ -708,7 +830,11 @@
             </div>
 
             <div class="col-xs-4 col-sm-2 col-md-1">                
-                <asp:Button ID="btn_carga_masiva" runat="server" Text="Carga Masiva" OnClientClick="$('#passwordValue').val(''); $('#myModal_Aprobar').modal(); $('#validarToken').show(); $('#Button1').hide();" CssClass="btn btn-tsys" title="Carga Masiva" />
+                <asp:Button ID="btn_carga_masiva" runat="server" Text="Carga Masiva"  OnClientClick="$('#passwordValue').val(''); $('#hh1').val($('#btnAprobar:hover').parent().prev().prev().prev().prev().prev().prev().text()); $('#Button3').hide(); $('#myModal_Aprobar').modal(); $('#myModalLabel1').text('Teclee el Password para verificar su identidad'); $('#insert').show(); $('#showToken').hide(); $('#TextBox1').val(''); $('#validarToken').show(); $('#Button1').hide()" CssClass="btn btn-tsys" title="Carga Masiva" />
+            </div>
+
+            <div class="col-xs-4 col-sm-2 col-md-1 btnRech">                
+                <asp:Button ID="btn_rechazo_masivo" runat="server" Text="Rechazo Masivo"  OnClientClick="return PPP()" CssClass="btn btn-tsys" title="Rechazo Masivo" />
             </div>
         </div>
     </div>
@@ -781,6 +907,8 @@
          <asp:BoundField DataField="FechaPago" HeaderText="Fecha Programada Pago" ReadOnly="True" SortExpression="Status" DataFormatString = "{0:dd/MM/yyyy}" />
          <asp:BoundField DataField="Total" HeaderText="Total" ReadOnly="True" SortExpression="Status" DataFormatString = "{0:C2}" />
          <asp:BoundField DataField="Aprobador" HeaderText="Aprobador" ReadOnly="True" SortExpression="Status" />
+        <asp:BoundField DataField="Rechazador" HeaderText="Rechazador" ReadOnly="True" SortExpression="Status" />
+        <asp:BoundField DataField="Motivo" HeaderText="Motivo de rechazo" ReadOnly="True" SortExpression="Status" />
          
 <%--      <asp:TemplateField>
           <ItemTemplate>
@@ -804,9 +932,9 @@
           </ItemTemplate>
          </asp:TemplateField>--%>
              <asp:TemplateField>
-          <ItemTemplate>
+          <%--<ItemTemplate>
             <asp:Button ID="Cancelar" CssClass="btn btn-default" runat="server" CommandName="Cancelar" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" Text="Rechazar" />
-          </ItemTemplate>
+          </ItemTemplate>--%>
          </asp:TemplateField> 
 
         <asp:BoundField DataField="Tipo" HeaderText="Tipo" ReadOnly="True" SortExpression="Tipo" Visible="false" />
@@ -902,7 +1030,7 @@
             </div>
 
             <%--  Modal para generar token --%>
-            <div class="modal fade" id="myModal_Aprobar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
+          <%--  <div class="modal fade" id="myModal_Aprobar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
                 <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -934,7 +1062,50 @@
                 </div>
             </div>
             </div>
-        
+        --%>
+             <div class="modal fade" id="myModal_Aprobar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title"
+                            id="myModalLabel1">Teclee el Password para verificar su identidad</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div id="insert" class="row">
+                                Inserte el password:
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <asp:TextBox runat="server" type="text" AutoComplete="off" ClientIDMode="Static" AutoCompleteType="Disabled"  ID="passwordValue" class="form-control" TabIndex="3" />
+                                    <p id="errorMsj" style="color: red;" hidden>Password Incorrecto</p>
+                                </div>
+                            </div>
+                            </div>
+                            <div id="showToken" class="row">
+                                Token vigente:
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <asp:TextBox runat="server" type="text" ReadOnly="true" AutoComplete="off" ClientIDMode="Static" AutoCompleteType="Disabled" ID="TextBox1" class="form-control" TabIndex="3" />
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="btn_No_Send1" type="button" title="No Enviar" class="btn btn-tsys pull-left" data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <asp:Button ID="validarToken" runat="server" Text="Validar token" ClientIDMode="Static" OnClientClick="return showModal()" CssClass="btn btn-primary" title="validar Token" />
+                        <asp:Button ID="Button1" runat="server" Text="Aprobar" ClientIDMode="Static"  CssClass="btn btn-primary cargaMasiva" title="Aprobar" data-toggle="tooltip" OnCommand="btnAprobar_Command" />    
+                        <asp:Button ID="Button3" runat="server" Text="Rechazar" ClientIDMode="Static"  CssClass="btn btn-primary cargaMasiva" title="Rechazar" data-toggle="tooltip" OnClientClick="$('#myModal_Aprobar').modal('hide');$('#myModal').modal('show'); return false;" />                    
+                    </div>
+                </div>
+            </div>
+        </div>
 
             
 

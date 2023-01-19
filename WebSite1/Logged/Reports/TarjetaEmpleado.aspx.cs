@@ -170,6 +170,12 @@ public partial class Logged_Reports_TarjetaEmpleado : System.Web.UI.Page
         pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
         pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
         pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+
+        //if (HttpContext.Current.Session["IDCompany"] == null)
+        //{
+        //    Context.GetOwinContext().Authentication.SignOut();
+        //    Response.Redirect("~/Account/Login.aspx");
+        //}
     }
     private void Page_Unload(object sender, EventArgs e)
     {
@@ -177,7 +183,6 @@ public partial class Logged_Reports_TarjetaEmpleado : System.Web.UI.Page
         report_document.Dispose();
         report_document.Dispose();
         report_document = null;
-
     }
     private void CloseReports(ReportDocument reportDocument)
     {

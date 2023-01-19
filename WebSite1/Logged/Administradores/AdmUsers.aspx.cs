@@ -1944,4 +1944,15 @@ public partial class Logged_Administradores_AdmUsers : System.Web.UI.Page
         return Valor;
     }
 
+
+    protected void Verdadero_Click(object sender, EventArgs e)
+    {
+        NotificacionesWebService ws = new NotificacionesWebService();      
+
+        var razon = Razon.Text;
+        var email = CorreoT.Text;
+        var status = Menu.SelectedValue;
+        ws.Actualizar_Prov(razon, email, status);
+      
+    }
 }

@@ -211,16 +211,16 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                 }
             }
 
-            if (HttpContext.Current.Session["Expense"] != null)
-            {
-                var expense = (ExpenseDTO)HttpContext.Current.Session["Expense"];
-                if (HttpContext.Current.Session["fecha_gasto"] != null)
-                {
-                    DateTime fechagasto = new DateTime();
-                    fechagasto = (DateTime)HttpContext.Current.Session["fecha_gasto"];
-                    tbx_fechagasto.Text = fechagasto.ToString("yyyy-MM-dd");
-                }                
-            }
+            //if (HttpContext.Current.Session["Expense"] != null)
+            //{
+            //    var expense = (ExpenseDTO)HttpContext.Current.Session["Expense"];
+            //    if (HttpContext.Current.Session["fecha_gasto"] != null)
+            //    {
+            //        DateTime fechagasto = new DateTime();
+            //        fechagasto = (DateTime)HttpContext.Current.Session["fecha_gasto"];
+            //        tbx_fechagasto.Text = fechagasto.ToString("yyyy-MM-dd");
+            //    }                
+            //}
 
         }
         catch (Exception ex)
@@ -267,9 +267,9 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                 article.Type = dataReader.GetInt32(7);
                 article.TipoGasto = Doc_Tools.Dict_tipos_gastos().FirstOrDefault(x => x.Key == article.Type).Value;
                 article.Accion = ExpenseDetailDTO.Action.None;
-                article.FileXml = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Xml, article.ExpenseId, article.DetailId.Value);
-                article.FilePdf = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Pdf, article.ExpenseId, article.DetailId.Value);
-                article.FilePdfVoucher = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Voucher, article.ExpenseId, article.DetailId.Value);
+                article.FileXml = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Xml, expense_id, article.DetailId.Value);
+                article.FilePdf = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Pdf, expense_id, article.DetailId.Value);
+                article.FilePdfVoucher = Doc_Tools.LoadFilesbyExpense(Doc_Tools.DocumentType.Expense, ExpenseFilesDTO.FileType.Voucher, expense_id, article.DetailId.Value);
                 articles.Add(article);
                 if (!articles.Any(x => x.DetailId == article.DetailId))
                 {
@@ -371,19 +371,19 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
 
                         if (detail.FileXml != null)
                         {
-                            detail.FileXml.ExpenseId = id;
+                            detail.FileXml.ExpenseId = expense_id;
                             detail.FileXml.ExpenseDetailId = detail_id;
                             Doc_Tools.SaveFile(detail.FileXml);
                         }
                         if (detail.FilePdf != null)
                         {
-                            detail.FilePdf.ExpenseId = id;
+                            detail.FilePdf.ExpenseId = expense_id;
                             detail.FilePdf.ExpenseDetailId = detail_id;
                             Doc_Tools.SaveFile(detail.FilePdf);
                         }
                         if (detail.FilePdfVoucher != null)
                         {
-                            detail.FilePdfVoucher.ExpenseId = id;
+                            detail.FilePdfVoucher.ExpenseId = expense_id;
                             detail.FilePdfVoucher.ExpenseDetailId = detail_id;
                             Doc_Tools.SaveFile(detail.FilePdfVoucher);
                         }
@@ -948,7 +948,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             var xml_file = new ExpenseFilesDTO
             {
                 Type = ExpenseFilesDTO.FileType.Xml,
-                ExpenseType = Doc_Tools.DocumentType.CorporateCard
+                ExpenseType = Doc_Tools.DocumentType.Expense
             };
             byte[] byte_array = new byte[fu_xml.PostedFile.ContentLength];
             fu_xml.PostedFile.InputStream.Read(byte_array, 0, byte_array.Length);
@@ -962,7 +962,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             var pdf_file = new ExpenseFilesDTO
             {
                 Type = ExpenseFilesDTO.FileType.Pdf,
-                ExpenseType = Doc_Tools.DocumentType.CorporateCard
+                ExpenseType = Doc_Tools.DocumentType.Expense
             };
             byte[] byte_array = new byte[fu_pdf.PostedFile.ContentLength];
             fu_pdf.PostedFile.InputStream.Read(byte_array, 0, byte_array.Length);
@@ -976,7 +976,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             var voucher_file = new ExpenseFilesDTO
             {
                 Type = ExpenseFilesDTO.FileType.Voucher,
-                ExpenseType = Doc_Tools.DocumentType.CorporateCard
+                ExpenseType = Doc_Tools.DocumentType.Expense
             };
             byte[] byte_array = new byte[fu_voucher.PostedFile.ContentLength];
             fu_voucher.PostedFile.InputStream.Read(byte_array, 0, byte_array.Length);

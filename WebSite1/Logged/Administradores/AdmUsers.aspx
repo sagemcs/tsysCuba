@@ -18,6 +18,60 @@
             swal(titulo, mesaje, Tipo)
         }
     </script>
+
+    <script>   
+
+        function Proceso(e, Proce) {
+            e.preventDefault();
+
+            var Razon = $('#Razon').val();
+            var CorreoV = $('#CorreoT').val();
+            if (document.getElementById('defaultCheck1').checked) {
+                Upd = '1';
+            }
+            else {
+                Upd = '0';
+            }
+
+            debugger;
+
+
+            var url_list = NotificacionesWebService.get_path() + Proce;
+
+            $.ajax({
+                type: "POST",
+                "beforeSend": function (xhr) {
+                    xhr.setRequestHeader("Authorization", 'Bearer ' + GetJWT());
+                },
+                url: url_list,
+                dataType: "json",
+                data: {
+                    Razon: Razon,
+                    CorreoV2: CorreoV,
+                    Estado: Upd
+                },
+                success: function (respuesta) {
+                    $('#myModal').modal('hide');
+                    if (respuesta.success) {
+                        $('#myModal').modal('hide');
+                        swal('Notificaciones T|SYS|', respuesta.msg, 'success');
+                    }
+                    else {
+                        $('#myModal').modal('hide');
+                        swal('Notificaciones T|SYS|', respuesta.msg, 'error');
+                    }
+
+                },
+                error: function (respuesta) {
+                    $('#myModal').modal('hide');
+                    swal('Notificaciones T|SYS|', Upd, 'error');
+                    //swal('Notificaciones T|SYS|', 'La actualización de datos no ha podido ser procesada', 'error');
+                }
+            });
+
+            return false;
+        }
+    </script>
     <script>
         function Update(Razon, Correo, Status) {
             $('#myModal').modal('show');
@@ -30,59 +84,7 @@
     <script>
         $(document).ready(function () {
 
-            $('#btn_send_comments').click(function (e) {
-                Proceso(e, "/Actualizar_Datos")
-                return false;
-            });
-
-            function Proceso(e, Proce) {
-                e.preventDefault();
-
-                var Razon = $('#Razon').val();
-                var CorreoV = $('#CorreoT').val();
-                if (document.getElementById('defaultCheck1').checked) {
-                    Upd = '1';
-                }
-                else {
-                    Upd = '0';
-                }
-
-
-                var url_list = NotificacionesWebService.get_path() + Proce;
-
-                $.ajax({
-                    type: "POST",
-                    "beforeSend": function (xhr) {
-                        xhr.setRequestHeader("Authorization", 'Bearer ' + GetJWT());
-                    },
-                    url: url_list,
-                    dataType: "json",
-                    data: {
-                        Razon: Razon,
-                        CorreoV2: CorreoV,
-                        Estado: Upd
-                    },
-                    success: function (respuesta) {
-                        $('#myModal').modal('hide');
-                        if (respuesta.success) {
-                            $('#myModal').modal('hide');
-                            swal('Notificaciones T|SYS|', respuesta.msg, 'success');
-                        }
-                        else {
-                            $('#myModal').modal('hide');
-                            swal('Notificaciones T|SYS|', respuesta.msg, 'error');
-                        }
-
-                    },
-                    error: function (respuesta) {
-                        $('#myModal').modal('hide');
-                        swal('Notificaciones T|SYS|', Upd, 'error');
-                        //swal('Notificaciones T|SYS|', 'La actualización de datos no ha podido ser procesada', 'error');
-                    }
-                });
-
-                return false;
-            }
+            
         });
     </script>
 
@@ -800,11 +802,14 @@
                         <div class="row">
                             <div class="form-group">
                                 Razón Social:
-                                        <input id="Razon" maxlength="200" class="form-control" autocomplete="off" />
+                                     <%--   <input id="Razon"  maxlength="200" class="form-control" autocomplete="off" />--%>
+                                    <asp:TextBox runat="server"  ID="Razon" ClientIDMode ="Static" MaxLength="200" AutoCompleteType="None" class="form-control" ></asp:TextBox>
+
                             </div>
                             <div class="form-group">
                                 Correo Electronico:
-                                        <input id="CorreoT" maxlength="200" class="form-control" autocomplete="off" />
+                                        <%--<input id="CorreoT" maxlength="200" class="form-control" autocomplete="off" />--%>
+                                        <asp:TextBox runat="server"  ID="CorreoT" ClientIDMode ="Static" MaxLength="200" AutoCompleteType="None" class="form-control"></asp:TextBox>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" name="defaultCheck1" id="defaultCheck1">
@@ -814,13 +819,12 @@
                             </div>
 
                             <div class="col-sm-3">
-                                <select class="form-control" id="Menu">
-                                    <option value="Activo">Activo</option>
-                                    <option value="Inactivo">Inactivo</option>
-                                    <option value="Pendiente">Pendiente</option>
-                                </select>
+                                <asp:DropDownList runat="server" class="form-control" id="Menu" ClientIDMode="Static">
+                                    <asp:ListItem Text="Activo" Value="Activo"></asp:ListItem>
+                                    <asp:ListItem Text="Inactivo" Value="Inactivo"></asp:ListItem>
+                                    <asp:ListItem Text="Pendiente" Value="Pendiente"></asp:ListItem>
+                                </asp:DropDownList>                                   
                             </div>
-
 
                         </div>
                     </div>
@@ -831,10 +835,10 @@
                         Cancelar
                     </button>
 
-
-                    <button id="btn_send_comments" class="btn btn-primary" title="Guardar Cambios" data-toggle="tooltip">
+                    <asp:Button ID="Verdadero" runat="server" OnClick="Verdadero_Click"/>
+                    <%--<button id="btn_send_comments" class="btn btn-primary" title="Guardar Cambios" data-toggle="tooltip" onclick=" Enviar();">
                         Guardar
-                    </button>
+                    </button>--%>
                 </div>
             </div>
         </div>

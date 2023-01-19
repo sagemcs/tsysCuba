@@ -233,12 +233,21 @@
             var result_password = CompararPassword(inputVal);            
             return false;
         }
+
+        function comprobar_gerente() {
+            var rol = $("#hiddel_rol").val();
+            if (rol == "Gerente")
+            {
+
+            }
+        }
     </script>   
 
     <div class="col-lg-12 col-sm-12 col-12" id="M1" >
         <h3>Validación de Reembolsos</h3>
     </div>    
     <asp:HiddenField runat="server" id="hh1" ClientIDMode="Static"/>
+    <asp:HiddenField runat="server" id="hidden_rol" ClientIDMode="Static"/>
         <ContentTemplate>
              <asp:Panel ID="upPackage" runat="server">
                 <div class="col-lg-12 col-sm-12 col-12" id="M2">

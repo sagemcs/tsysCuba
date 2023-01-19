@@ -263,7 +263,7 @@
                             <EmptyDataRowStyle ForeColor="Red" CssClass="table table-bordered" />
 
                             <Columns>
-                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="80px">
+                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="10%">
                                     <ItemTemplate>
                                         <asp:Button ID="btnCancel" CssClass="btn btn-danger" runat="server" CommandName="Eliminar" CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" Text="Eliminar" />
                                         <%--<asp:Button ID="Editar" CssClass="btn btn-danger" runat="server" CommandName="Editar"  Text="Editar" />--%>
@@ -272,73 +272,73 @@
                                         <%--<asp:Button ID="btnUpdate" runat="server" Text="Enviar" CssClass="btn btn-tsys" CommandName="Update" />
                                         <asp:Button ID="btnCancel" runat="server" Text="Cancelar" CssClass="btn btn-success" CommandName="Cancel" />--%>
                                     </EditItemTemplate>
-                                    <HeaderStyle Width="80px"></HeaderStyle>
+                                    <%--<HeaderStyle Width="80px"></HeaderStyle>--%>
                                     <ItemStyle HorizontalAlign="Center"></ItemStyle>
                                 </asp:TemplateField>
 
-                                <asp:BoundField DataField="UserKey" HeaderText="Id" HeaderStyle-Width="75px" ReadOnly="True">
-                                    <HeaderStyle Width="75px"></HeaderStyle>
+                                <asp:BoundField DataField="UserKey" HeaderText="Id" HeaderStyle-Width="10%" ReadOnly="True">
+                                    <%--<HeaderStyle Width="75px"></HeaderStyle>--%>
                                 </asp:BoundField>
 
-                                <asp:BoundField DataField="UserName" HeaderText="Usuario" HeaderStyle-Width="70px" ReadOnly="True">
-                                    <HeaderStyle Width="50px"></HeaderStyle>
+                                <asp:BoundField DataField="UserName" HeaderText="Usuario" HeaderStyle-Width="10%" ReadOnly="True">
+                                    <%--<HeaderStyle Width="50px"></HeaderStyle>--%>
                                 </asp:BoundField>
 
-                                <asp:BoundField DataField="CorreoElec" HeaderText="Correo" HeaderStyle-Width="70px" ReadOnly="True">
-                                    <HeaderStyle Width="70px"></HeaderStyle>
+                                <asp:BoundField DataField="CorreoElec" HeaderText="Correo" HeaderStyle-Width="10%" ReadOnly="True">
+                                    <%--<HeaderStyle Width="70px"></HeaderStyle>--%>
                                 </asp:BoundField>
 
-                                <asp:BoundField DataField="Role" HeaderText="Rol" HeaderStyle-Width="70px" ReadOnly="True">
-                                    <HeaderStyle Width="70px"></HeaderStyle>
+                                <asp:BoundField DataField="Role" HeaderText="Rol" HeaderStyle-Width="10%" ReadOnly="True">
+                                    <%--<HeaderStyle Width="70px"></HeaderStyle>--%>
                                 </asp:BoundField>
 
-                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="90px" HeaderText="Validador de CX" ValidateRequestMode="Enabled">
+                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="10%" HeaderText="Validador de CX" ValidateRequestMode="Enabled">
                                     <ItemTemplate>
                                         <asp:Label ID="lblValidadorCX" runat="server" Text='<%# Eval("UserValidadorCX") %>' Visible="false" />
-                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="ValidadorCX">
+                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="ValidadorCX" Width="99%">
                                         </asp:DropDownList>
                                     </ItemTemplate>
-                                    <HeaderStyle Width="90px" />
+                                    <%--<HeaderStyle Width="90px" />--%>
                                     <ItemStyle HorizontalAlign="Center" />
                                 </asp:TemplateField>
 
-                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="90px" HeaderText="Gerente" ValidateRequestMode="Enabled">
+                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="10%" HeaderText="Gerente" ValidateRequestMode="Enabled">
                                     <ItemTemplate>
                                         <asp:Label ID="lblGerente" runat="server" Text='<%# Eval("UserGerente") %>' Visible="false" />
-                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="Gerentes">
+                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="Gerentes" Width="99%">
                                         </asp:DropDownList>
                                     </ItemTemplate>
-                                    <HeaderStyle Width="90px" />
+                                    <%--<HeaderStyle Width="90px" />--%>
                                     <ItemStyle HorizontalAlign="Center" />
                                 </asp:TemplateField>
 
-                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="90px" HeaderText="Recursos Humanos" ValidateRequestMode="Enabled">
+                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="10%" HeaderText="Recursos Humanos" ValidateRequestMode="Enabled">
                                     <ItemTemplate>
                                         <asp:Label ID="lblRH" runat="server" Text='<%# Eval("UserRH") %>' Visible="false" />
-                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="RHs">
+                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="RHs" Width="99%">
                                         </asp:DropDownList>
                                     </ItemTemplate>
-                                    <HeaderStyle Width="90px" />
+                                    <%--<HeaderStyle Width="90px" />--%>
                                     <ItemStyle HorizontalAlign="Center" />
                                 </asp:TemplateField>
 
-                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="90px" HeaderText="Tesoreria" ValidateRequestMode="Enabled">
+                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="10%" HeaderText="Tesoreria" ValidateRequestMode="Enabled">
                                     <ItemTemplate>
                                         <asp:Label ID="lblTesoreria" runat="server" Text='<%# Eval("UserTesoreria") %>' Visible="false" />
-                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="Tesorerias">
+                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="Tesorerias" Width="99%">
                                         </asp:DropDownList>
                                     </ItemTemplate>
-                                    <HeaderStyle Width="90px" />
+                                    <%--<HeaderStyle Width="90px" />--%>
                                     <ItemStyle HorizontalAlign="Center" />
                                 </asp:TemplateField>
 
-                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="90px" HeaderText="Finanzas" ValidateRequestMode="Enabled">
+                                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="10%" HeaderText="Finanzas" ValidateRequestMode="Enabled">
                                     <ItemTemplate>
                                         <asp:Label ID="lblFinanzas" runat="server" Text='<%# Eval("UserFinanzas") %>' Visible="false" />
-                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="Finanzass">
+                                        <asp:DropDownList runat="server" class="selectpicker show-tick form-control" ID="Finanzass" Width="99%">
                                         </asp:DropDownList>
                                     </ItemTemplate>
-                                    <HeaderStyle Width="90px" />
+                                    <%--<HeaderStyle Width="90px" />--%>
                                     <ItemStyle HorizontalAlign="Center" />
                                 </asp:TemplateField>
 

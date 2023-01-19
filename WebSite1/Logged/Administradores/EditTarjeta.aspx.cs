@@ -201,6 +201,11 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                         HttpContext.Current.Session["Evento"] = null;
                     }
 
+                    if (HttpContext.Current.Session["motivo_gasto"] != null)
+                    {
+                        tbx_motivo.Text = HttpContext.Current.Session["motivo_gasto"].ToString();
+                    }
+
                 }
                 catch (Exception xD)
                 {
@@ -228,21 +233,21 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
                     tbx_motivo.Text = card.ExpenseReason;
                 }
             }
-            if (HttpContext.Current.Session["CorporateCard"] != null)
-            {
-                var card = (CorporateCardDTO)HttpContext.Current.Session["CorporateCard"];               
-                if (HttpContext.Current.Session["fecha_gasto"] != null)
-                {
-                    DateTime fechagasto = new DateTime();
-                    fechagasto = (DateTime)HttpContext.Current.Session["fecha_gasto"];
-                    tbx_fechagasto.Text = fechagasto.ToString("yyyy-MM-dd");
-                }
-                if (HttpContext.Current.Session["currency"] != null)
-                {
-                    drop_currency.SelectedValue = HttpContext.Current.Session["currency"].ToString();
-                }
+            //if (HttpContext.Current.Session["CorporateCard"] != null)
+            //{
+            //    var card = (CorporateCardDTO)HttpContext.Current.Session["CorporateCard"];               
+            //    if (HttpContext.Current.Session["fecha_gasto"] != null)
+            //    {
+            //        DateTime fechagasto = new DateTime();
+            //        fechagasto = (DateTime)HttpContext.Current.Session["fecha_gasto"];
+            //        tbx_fechagasto.Text = fechagasto.ToString("yyyy-MM-dd");
+            //    }
+            //    if (HttpContext.Current.Session["currency"] != null)
+            //    {
+            //        drop_currency.SelectedValue = HttpContext.Current.Session["currency"].ToString();
+            //    }
                 
-            }
+            //}
 
         }
         catch (Exception ex)
@@ -802,6 +807,11 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
     {
         is_valid = false;
         HttpContext.Current.Session["is_valid"] = is_valid;
+
+        if (!string.IsNullOrEmpty(tbx_motivo.Text))
+        {
+            HttpContext.Current.Session["motivo_gasto"] = tbx_motivo.Text;
+        }
 
         if (drop_currency.SelectedValue == "")
         {

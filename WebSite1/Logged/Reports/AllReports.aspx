@@ -20,9 +20,9 @@
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="MainContent" Runat="Server">
     <br/> <br/> <br/><br/>
-    <div>
+    <%--<div>
         <h3> Reportes de Validadores</h3>
-    </div>
+    </div>--%>
      <br /> <br/>
     <asp:UpdatePanel runat="server" ID="UpdatePanel2" UpdateMode="Conditional">
         <ContentTemplate>

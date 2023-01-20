@@ -29,9 +29,9 @@
             <asp:Button runat="server" id="btn_back" class="btn btn-primary" type="button" Text="Regresar" style="position: relative; left: 45%;" OnClick="btn_back_Click"  /> 
         </div>
     </div>
-    <div>
+    <%--<div>
         <h3> Reportes de Solicitudes de Cheque</h3>
-    </div>
+    </div>--%>
      <br /> <br/>
     <asp:UpdatePanel runat="server" ID="UpdatePanel2" UpdateMode="Conditional">
         <ContentTemplate>
@@ -47,16 +47,24 @@
                         </asp:DropDownList>
                     </div>
                 </div>
+                <%--<div class="col-lg-2 col-sm-2 col-xs-2">
+                    <br /><br />
+                    <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <div class="col-xs-4 col-sm-2 col-md-2">
+                            <asp:Button ID="Button1" runat="server" Class="btn btn-primary" Text="Generar Reporte" OnClick="btn_generar_Click" />
+                        </div>
+                    </div>
+                </div>--%>
             </div>
         </ContentTemplate>
     </asp:UpdatePanel>
     <br/>
     <div class="form-group row">
-            <label class="col-form-label col-xs-12 col-sm-12 col-md-12"></label>
-            <div class="col-xs-4 col-sm-2 col-md-2">
-                <asp:Button ID="btn_generar" runat="server" Class="btn btn-primary" Text="Generar Reporte" OnClick="btn_generar_Click" />
-            </div>
+        <label class="col-form-label col-xs-12 col-sm-12 col-md-12"></label>
+        <div class="col-xs-4 col-sm-2 col-md-2">
+            <asp:Button ID="btn_generar" runat="server" Class="btn btn-primary" Text="Generar Reporte" OnClick="btn_generar_Click" />
         </div>
+    </div>
     <br/>
          <div id = "dvReport"  style="position: relative; left: 5%;" > 
             <CR:CrystalReportViewer ID="Reporte_AprobacionSolCheque" runat="server" AutoDataBind="true" BestFitPage="False" DisplayStatusbar="False" HasCrystalLogo="False" HasDrilldownTabs="False" HasToggleGroupTreeButton="False" HasToggleParameterPanelButton="False" ToolPanelView="None" ClientIDMode="Inherit" PrintMode="pdf" HasPrintButton="True" />

@@ -196,7 +196,7 @@ public partial class Logged_Reports_AprobacionSolicitudCheque : System.Web.UI.Pa
     //}
     protected void btn_back_Click(object sender, EventArgs e)
     {
-        Response.Redirect("~/Logged/Administradores/AnticipoEmpleados");
+        Response.Redirect("~/");
     }
 
     //protected void btn_filtrar_Click(object sender, EventArgs e)

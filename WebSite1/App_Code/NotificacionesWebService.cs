@@ -1535,25 +1535,63 @@ public class NotificacionesWebService : System.Web.Services.WebService
 
     protected bool CancelarCheque(int FacKey, int user, string texto)
     {
+        //bool Cancel = true;
+        //try
+        //{
+        //    //string Ssql = "Update InvoiceReceipt a inner join InvcRcptDetails b on a.InvcRptKey = b.InvcRptKey set a.Rechazador = " + user + "Where b.InvoiceKey = " + FacKey;
+
+        //    string Ssql = "declare @Keyy int; set @Keyy = (select InvcRcptDetails.InvcRcptKey from InvcRcptDetails where InvoiceKey = " + FacKey + "); Update InvoiceReceipt set Rechazador = " + user + ", Comment = '" + texto + "' Where InvcRcptKey = @Keyy";
+
+        //    SqlConnection sqlConnection2 = new SqlConnection();
+        //    sqlConnection2 = SqlConnectionDB("PortalConnection");
+        //    sqlConnection2.Open();
+        //    using (SqlCommand Cmdd = new SqlCommand(Ssql, sqlConnection2))
+        //    {
+        //        Cmdd.CommandType = CommandType.Text;
+        //        Cmdd.CommandText = Ssql;
+        //        Cmdd.ExecuteScalar();
+        //        //Llave = Convert.ToInt32(Cmdd.ExecuteScalar().ToString());
+        //    }
+        //    sqlConnection2.Close();
+
+        //}
+        //catch (Exception ex)
+        //{
+        //    Cancel = false;
+        //    throw new MulticonsultingException(ex.Message);
+        //}
+        //return Cancel;
+
         bool Cancel = true;
         try
         {
-            //string Ssql = "Update InvoiceReceipt a inner join InvcRcptDetails b on a.InvcRptKey = b.InvcRptKey set a.Rechazador = " + user + "Where b.InvoiceKey = " + FacKey;
+            SqlConnection sqlConnection1 = new SqlConnection();
+            sqlConnection1 = SqlConnectionDB("PortalConnection");
+            sqlConnection1.Open();
+            int val1 = 1;
+            string sSQL;
 
-            string Ssql = "declare @Keyy int; set @Keyy = (select InvcRcptDetails.InvcRcptKey from InvcRcptDetails where InvoiceKey = " + FacKey + "); Update InvoiceReceipt set Rechazador = " + user + ", Comment = '" + texto + "' Where InvcRcptKey = @Keyy";
+            sSQL = "DenyInvoiceReceipt";
+            List<SqlParameter> parsT = new List<SqlParameter>();
+            parsT.Add(new SqlParameter("@UserKey", user));
+            parsT.Add(new SqlParameter("@FacKey", FacKey));
+            parsT.Add(new SqlParameter("@Motivo", texto));
 
-            SqlConnection sqlConnection2 = new SqlConnection();
-            sqlConnection2 = SqlConnectionDB("PortalConnection");
-            sqlConnection2.Open();
-            using (SqlCommand Cmdd = new SqlCommand(Ssql, sqlConnection2))
+            using (System.Data.SqlClient.SqlCommand Cmd = new System.Data.SqlClient.SqlCommand(sSQL, sqlConnection1))
             {
-                Cmdd.CommandType = CommandType.Text;
-                Cmdd.CommandText = Ssql;
-                Cmdd.ExecuteScalar();
-                //Llave = Convert.ToInt32(Cmdd.ExecuteScalar().ToString());
-            }
-            sqlConnection2.Close();
 
+                Cmd.CommandType = CommandType.StoredProcedure;
+                Cmd.CommandText = sSQL;
+
+                foreach (System.Data.SqlClient.SqlParameter par in parsT)
+                {
+                    Cmd.Parameters.AddWithValue(par.ParameterName, par.Value);
+                }
+                System.Data.SqlClient.SqlDataReader rdr = null;
+                rdr = Cmd.ExecuteReader();
+                sqlConnection1.Close();
+
+            }
         }
         catch (Exception ex)
         {

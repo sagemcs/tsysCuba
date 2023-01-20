@@ -7,7 +7,7 @@ var cli;
 $(document).ready(function () {
 
     hide_combo_proveedores(FacturasWebService.get_path());
-    var url_list = FacturasWebService.get_path() + "/listar_estado_factura_All20";
+    var url_list = FacturasWebService.get_path() + "/listar_estado_factura_All";
     cli = '1';
     table = $('#list').DataTable({
         language: window.datatableLang,

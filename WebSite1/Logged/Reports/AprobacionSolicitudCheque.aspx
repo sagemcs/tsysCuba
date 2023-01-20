@@ -19,19 +19,46 @@
     <script src="../../Scripts/print-report.js" type="text/javascript"></script>
 </asp:Content>
 <asp:Content ID="Content4" ContentPlaceHolderID="MainContent" Runat="Server">
-    <br/> <br/> <br/> <br /> <br/>
-    <div class="row">
-        <div class="col-lg-3 col-sm-3 col-xs-3">
-            <input id="btn_print" class="btn btn-primary" type="button" value="Imprimir" style="position: relative; left: 45%;"  /> 
-        </div>
-        <div class="col-lg-3 col-sm-3 col-xs-3">
-            <asp:Button runat="server" id="btn_back" class="btn btn-primary" type="button" Text="Regresar" style="position: relative; left: 45%;" OnClick="btn_back_Click"  /> 
-        </div>
+    <br/> <br/> <br/><br/>
+    <div>
+        <h3>Reportes de Solicitudes de Cheques</h3>
     </div>
+     <br /> <br/>
+    <asp:UpdatePanel runat="server" ID="UpdatePanel2" UpdateMode="Conditional">
+        <ContentTemplate>
+            <%--Fila de filtros--%>
+            <div class="row">
+                <%-- Documento--%>
+                <div class="col-lg-2 col-sm-2 col-xs-2">
+                    <h4>Tipo de documento:</h4>
+                    <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <asp:DropDownList ID="drop_docs" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="False">
+                            <asp:ListItem Value="1">Aprobadas</asp:ListItem>
+                            <asp:ListItem Value="2">Rechazadas</asp:ListItem>  
+                        </asp:DropDownList>
+                    </div>
+                </div>
+            </div>
+        </ContentTemplate>
+    </asp:UpdatePanel>
     <br/>
-         <div id = "dvReport"  style="position: relative; left: 5%;" > 
-            <CR:CrystalReportViewer ID="Reporte_AprobacionSolCheque" runat="server" AutoDataBind="true" BestFitPage="False" DisplayStatusbar="False" HasCrystalLogo="False" HasDrilldownTabs="False" HasToggleGroupTreeButton="False" HasToggleParameterPanelButton="False" ToolPanelView="None" ClientIDMode="Inherit" PrintMode="pdf" HasPrintButton="True" />
+
+    <%--<div class="col-xs-11 col-sm-11 col-md-11">--%>
+        <div class="form-group row">
+            <label class="col-form-label col-xs-12 col-sm-12 col-md-12"></label>
+
+            <div class="col-xs-4 col-sm-2 col-md-2">
+                <asp:Button ID="btn_generar" runat="server" Class="btn btn-primary" Text="Generar Reporte" OnClick="btn_generar_Click" />
+            </div>
         </div>
+    <%--</div>--%>
+    <%--<hr/>--%>
+
+    
+    <div id = "dvReport"  style="position: relative; left: 5%;" > 
+        <CR:CrystalReportViewer ID="Reporte_AprobacionSolCheque" runat="server" AutoDataBind="true" BestFitPage="False" DisplayStatusbar="False" HasCrystalLogo="False" HasDrilldownTabs="False" HasToggleGroupTreeButton="False" HasToggleParameterPanelButton="False" ToolPanelView="None" ClientIDMode="Inherit" PrintMode="pdf" HasPrintButton="True" />
+    </div>
+    
 <script>
         $(document).ready(function () {
             $('#Reporte_Facturas_toptoolbar_print').click(function (e) {

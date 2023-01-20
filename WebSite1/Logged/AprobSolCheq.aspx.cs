@@ -195,62 +195,66 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
                 else
                 {
                     if (HttpContext.Current.Session["RolUser"].ToString() != "Proveedor")
-                    {
-                       pVendKey = 0;
-                       pLogKey = Convert.ToInt32(Session["LogKey"]);
-                       pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
-                       pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
-                       //DatosV.Visible = false;
-                       //ActualizarFacturas();
+                        {
+                           pVendKey = 0;
+                           pLogKey = Convert.ToInt32(Session["LogKey"]);
+                           pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+                           pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+                           //DatosV.Visible = false;
+                           //ActualizarFacturas();
 
-                    if (HttpContext.Current.Session["Evento"] != null)
-                    {
-                        if (IsPostBackEventControlRegistered)
+                        if (HttpContext.Current.Session["Evento"] != null)
                         {
-                            HttpContext.Current.Session["Evento"] = null;
-                        }
-                        else
-                        {
-                            if (HttpContext.Current.Session["Evento"].ToString() == "Java")
+                            if (IsPostBackEventControlRegistered)
                             {
-                                int Cont = 0;
-                                if (HttpContext.Current.Session["Prv"] != null) { IdProveedor.Text = HttpContext.Current.Session["Prv"].ToString(); Cont = Cont + 1; }
-                                if (HttpContext.Current.Session["Fol"] != null) { Folio.Text = HttpContext.Current.Session["Fol"].ToString(); Cont = Cont + 1; }
-                                if (HttpContext.Current.Session["FeR"] != null) { FechaR.Text = HttpContext.Current.Session["FeR"].ToString(); Cont = Cont + 1; }
-                                if (HttpContext.Current.Session["FoC"] != null) { FolioC.Text = HttpContext.Current.Session["FoC"].ToString(); Cont = Cont + 1; }
-                                if (HttpContext.Current.Session["FaP"] != null) { FechaAp.Text = HttpContext.Current.Session["FaP"].ToString(); Cont = Cont + 1; }
-                                if (HttpContext.Current.Session["FgO"] != null) { FechaPago.Text = HttpContext.Current.Session["FgO"].ToString(); Cont = Cont + 1; }
-                                if (HttpContext.Current.Session["Tot"] != null) { total_.Text = HttpContext.Current.Session["Tot"].ToString(); Cont = Cont + 1; }
-
                                 HttpContext.Current.Session["Evento"] = null;
-                                //if (Cont >0)
-                                //{
-                                //    BindGrid();
-                                //}
-                                BindGrid();
+                            }
+                            else
+                            {
+                                if (HttpContext.Current.Session["Evento"].ToString() == "Java")
+                                {
+                                    int Cont = 0;
+                                    if (HttpContext.Current.Session["Prv"] != null) { IdProveedor.Text = HttpContext.Current.Session["Prv"].ToString(); Cont = Cont + 1; }
+                                    if (HttpContext.Current.Session["Fol"] != null) { Folio.Text = HttpContext.Current.Session["Fol"].ToString(); Cont = Cont + 1; }
+                                    if (HttpContext.Current.Session["FeR"] != null) { FechaR.Text = HttpContext.Current.Session["FeR"].ToString(); Cont = Cont + 1; }
+                                    if (HttpContext.Current.Session["FoC"] != null) { FolioC.Text = HttpContext.Current.Session["FoC"].ToString(); Cont = Cont + 1; }
+                                    if (HttpContext.Current.Session["FaP"] != null) { FechaAp.Text = HttpContext.Current.Session["FaP"].ToString(); Cont = Cont + 1; }
+                                    if (HttpContext.Current.Session["FgO"] != null) { FechaPago.Text = HttpContext.Current.Session["FgO"].ToString(); Cont = Cont + 1; }
+                                    if (HttpContext.Current.Session["Tot"] != null) { total_.Text = HttpContext.Current.Session["Tot"].ToString(); Cont = Cont + 1; }
+
+                                    HttpContext.Current.Session["Evento"] = null;
+                                    //if (Cont >0)
+                                    //{
+                                    //    BindGrid();
+                                    //}
+                                    BindGrid();
+                                }
                             }
                         }
-                    }
-                    //ResolveToken();
-                    int chek_masiva = 0;
-                    foreach (GridViewRow row in gvFacturas.Rows)
-                    {
-                        CheckBox check = (CheckBox)row.Cells[0].Controls[1];
-                        if (check.Checked)
+                        //ResolveToken();
+                        int chek_masiva = 0;
+                        foreach (GridViewRow row in gvFacturas.Rows)
                         {
-                            chek_masiva++;
+                            CheckBox check = (CheckBox)row.Cells[0].Controls[1];
+                            if (check.Checked)
+                            {
+                                chek_masiva++;
+                            }
                         }
+                        btn_carga_masiva.Visible = chek_masiva >= 1;
+                        btn_carga_masiva.Text = string.Format("Aprobar ({0}) Solicitudes", chek_masiva.ToString());
+                        if (HttpContext.Current.Session["RolUser"].ToString() != "T|SYS| - Validador")
+                        {
+                            btn_rechazo_masivo.Visible = chek_masiva >= 1;
+                            btn_rechazo_masivo.Text = string.Format("Rechazar ({0}) Solicitudes", chek_masiva.ToString());
+                        }
+                        
                     }
-                    btn_carga_masiva.Visible = chek_masiva >= 1;
-                    btn_carga_masiva.Text = string.Format("Aprobar ({0}) Solicitudes", chek_masiva.ToString());
-                    btn_rechazo_masivo.Visible = chek_masiva >= 1;
-                    btn_rechazo_masivo.Text = string.Format("Rechazar ({0}) Solicitudes", chek_masiva.ToString());
-                }
                     else
                     {
-                       HttpContext.Current.Session.RemoveAll();
-                       Context.GetOwinContext().Authentication.SignOut();
-                       Response.Redirect("~/Account/Login.aspx");
+                        HttpContext.Current.Session.RemoveAll();
+                        Context.GetOwinContext().Authentication.SignOut();
+                        Response.Redirect("~/Account/Login.aspx");
                     }
                 }
         }

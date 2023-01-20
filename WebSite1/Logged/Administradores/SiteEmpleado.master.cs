@@ -59,8 +59,18 @@ public partial class SiteMaster : MasterPage
 
     }
     public bool HasRightsForSpecifiedMenu(string menuItemName)
-    {         
-        int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+    {
+        int pUserKey = 0;
+        try
+        {
+            pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+        }
+        catch (Exception)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
+        
 
         if (menuItemName == "Facturas")
         {

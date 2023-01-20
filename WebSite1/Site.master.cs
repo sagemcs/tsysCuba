@@ -163,32 +163,36 @@ public partial class SiteMaster : MasterPage
 
     protected bool vermenu(int userkey, string Menu)
     {
-        try
+        if(userkey!=1)
         {
-            string sql;
-            string Cuenta;
-
-            SqlConnection sqlConnection1 = new SqlConnection();
-            sqlConnection1 = SqlConnectionDB("PortalConnection");
-
-            sqlConnection1.Open();
-            sql = @"SELECT " + Menu + " FROM PermEmpleados WHERE UserKey = " + userkey + "";
-
-            using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
+            try
             {
-                sqlQuery.CommandType = CommandType.Text;
-                sqlQuery.CommandText = sql;
-                Cuenta = sqlQuery.ExecuteScalar().ToString();
+                string sql;
+                string Cuenta;
+
+                SqlConnection sqlConnection1 = new SqlConnection();
+                sqlConnection1 = SqlConnectionDB("PortalConnection");
+
+                sqlConnection1.Open();
+                sql = @"SELECT " + Menu + " FROM PermEmpleados WHERE UserKey = " + userkey + "";
+
+                using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
+                {
+                    sqlQuery.CommandType = CommandType.Text;
+                    sqlQuery.CommandText = sql;
+                    Cuenta = sqlQuery.ExecuteScalar().ToString();
+                }
+
+                sqlConnection1.Close();
+
+                if (Cuenta == "True")
+                    return true;
+                else
+                    return false;
             }
-
-            sqlConnection1.Close();
-
-            if (Cuenta == "True")
-                return true;
-            else
-                return false;
+            catch (Exception ex) { }
         }
-        catch (Exception ex) { }
+        
         return false;
     }
 

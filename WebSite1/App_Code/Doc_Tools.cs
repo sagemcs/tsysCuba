@@ -20,6 +20,7 @@ using JWT.Serializers;
 using static ExpenseFilesDTO;
 using Microsoft.AspNet.Identity;
 using WebSite1;
+using System.Activities.Statements;
 
 /// <summary>
 /// Summary description for Doc_Tools
@@ -29,7 +30,7 @@ public static class Doc_Tools
     //Api Sage-Portal
     public static void Insert_tapApiLogErrorCgGst(int Batchkey, int vKey, int i_dtlkey, string errores)
     {
-        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
             cmd.CommandText = "insert into tapApiLogErrorCgGst values (@Batchkey,@vKey,@i_dtlkey,@errores)";
@@ -320,93 +321,162 @@ public static class Doc_Tools
         int iLote;
         int vkey = 0;
         int dtlKey = 0;
-        int RetVal;
+        int RetVal = 0;
         var taxes = get_taxes(document.CompanyId);
+        var articulos = get_items(document.CompanyId);
 
-        tapBatchCExtGst tapBatch = new tapBatchCExtGst
+        //Si el tipo de Documento es Anticipo
+        if (type == DocumentType.Advance)
         {
-            iBatchType = 401,
-            iOrigUserID = username,
-            iSourceCompanyID = document.CompanyId,
-            iHold = 1,
-            iPrivate = 1,
-            status = 0,
-            FechaCreacion = DateTime.Now,
-            FechaModificado = DateTime.Now,
-            CompanyID = document.CompanyId,
-            UserID = username
-        };
+            tapBatchCExtGst tapBatch = new tapBatchCExtGst
+            {
+                iBatchType = 401,
+                iOrigUserID = username,
+                iSourceCompanyID = document.CompanyId,
+                iHold = 1,
+                iPrivate = 1,
+                status = 0,
+                FechaCreacion = DateTime.Now,
+                FechaModificado = DateTime.Now,
+                CompanyID = document.CompanyId,
+                UserID = username
+            };
 
-        iLote = Insert_tapBatchCExtGst(tapBatch);
-        tapVoucherCExGst tapVoucher = new tapVoucherCExGst
-        {
-            iLote = iLote,
-            iRemitToVendAddrKey = 144830,
-            iRemitToCopyKey = 144830,
-            iCurrID =  ((Currencys) document.GetCurrency(type)).ToString(), //"MXN", //Moneda del gasto
-            iHoldPmt = 0,
-            iVendKey = 1652,
-            iVendID = "G778",
-            iPmtTermsKey = 2,
-            iSeparateCheck = 0,
-            iPurchFromVendAddrKey = 144830,
-            iPurchToCopyKey = 144830,
-            iTranDate = document.GetDate(type),
-            iTranNo = iLote.ToString(),
-            iTranType = 401,
-            iUserID = username,
-            iInvcRcptDate = document.GetDate(type),
-            iDueDate = document.GetDate(type),
-            iDiscDate = null,
-            iDiscAmt = 0,
-            iSTaxAmt = type == DocumentType.Advance ? 0 : items.Sum(x => x.TaxAmount),
-            iPurchAmt = type == DocumentType.Advance ? document.Amount : items.Sum(x => x.Amount),
-            iTranAmt = type == DocumentType.Advance ? document.Amount : items.Sum(x => x.Amount + x.TaxAmount)
-            //iTranDate, iInvcRcptDate, iDueDate, iDiscDate
-        };
-
-        vkey = Insert_tapVoucherCExGst(tapVoucher);
-        //Recorrido por los articulos del documento
-        foreach (ExpenseDetailDTO item in items)
-        {
-            tapVoucherDtlCExGst tapVoucherDtl = new tapVoucherDtlCExGst
+            iLote = Insert_tapBatchCExtGst(tapBatch);
+            tapVoucherCExGst tapVoucher = new tapVoucherCExGst
             {
                 iLote = iLote,
-                vKey = vkey,
+                iRemitToVendAddrKey = 144830,
+                iRemitToCopyKey = 144830,
+                iCurrID = ((Currencys)document.GetCurrency(type)).ToString(), //"MXN", //Moneda del gasto
+                iHoldPmt = 0,
+                iVendKey = 1652,
+                iVendID = "G778",
+                iPmtTermsKey = 2,
+                iSeparateCheck = 0,
+                iPurchFromVendAddrKey = 144830,
+                iPurchToCopyKey = 144830,
+                iTranDate = document.GetDate(type),
                 iTranNo = iLote.ToString(),
-                iTargetCompanyID = document.CompanyId,
-                iCmntOnly = 0,
-                iExtAmt = item.Amount,
-                iItemKey = 7229,
-                iQuantity = item.Qty,
-                iGLAcctKey = 7813,
-                iSTaxClassKey = taxes.FirstOrDefault(x => x.STaxCodeKey == item.STaxCodeKey).STaxClassKey,
-                iSTaxClassID = taxes.FirstOrDefault(x => x.STaxCodeKey == item.STaxCodeKey).STaxClassID,
-                iUnitCost = item.UnitCost,
-                iUnitMeasID = "Serv",
-                iFreightAmt = 0,
-                iSTaxSchdKey = 2,
-                iSTaxSchdID = "IVA 16",
-                iDefaultIfNull = 1,
-                iMatchStatus = 1,
-                iReturnType = 1,
-                iPOLineNo = null,
-                iPOKey = null,
-                iPONo = null,
-                iPOLineKey = null,
-                oRetVal = null
-
+                iTranType = 401,
+                iUserID = username,
+                iInvcRcptDate = document.GetDate(type),
+                iDueDate = document.GetDate(type),
+                iDiscDate = null,
+                iDiscAmt = 0,
+                iSTaxAmt =  0,
+                iPurchAmt = document.Amount,
+                iTranAmt = document.Amount               
             };
-            dtlKey = Insert_tapVoucherDtlCExGst(tapVoucherDtl);
+
+            if(tapVoucher.iCurrID != Currencys.MNX.ToString())
+            {
+                decimal? tranAmount = tapVoucher.iTranAmt;
+                double rate = 1;
+
+                var ChangeRates = get_ChangeRates().FirstOrDefault(x => x.EffectiveDate == tapVoucher.iTranDate);
+                if (ChangeRates != null)
+                {
+                   rate = ChangeRates.CurrExchRate;
+                }
+                
+               
+                    
+               tapVoucher.iTranAmt = decimal.Multiply(tranAmount.Value, Convert.ToDecimal(rate));
+            }
+            vkey = Insert_tapVoucherCExGst(tapVoucher);
+
+            RetVal = Exec_sppaVoucherAPIGst(iLote, vkey, document.CompanyId.Trim());
+            if (RetVal != 1)
+            {
+                Insert_tapApiLogErrorCgGst(iLote, vkey, dtlKey, "Ha ocurrido un error en la ejecucion del procedimiento Sage");               
+            }
         }
 
-
-        RetVal = Exec_sppaVoucherAPIGst(iLote, vkey, document.CompanyId.Trim());
-        if (RetVal != 1)
+        //Si el tipo de Documento es Reembolso, Tarjeta, Gasto Medico Menor
+        if (type != DocumentType.Advance)
         {
-            Insert_tapApiLogErrorCgGst(iLote, vkey, dtlKey, "Ha ocurrido un error en la ejecucion del procedimiento Sage");
-           // DeleteVoucherOnFail(iLote);
-        }
+            //Recorrido por los articulos del documento
+            foreach (ExpenseDetailDTO item in items)
+            {
+                tapBatchCExtGst tapBatch = new tapBatchCExtGst
+                {
+                    iBatchType = 401,
+                    iOrigUserID = username,
+                    iSourceCompanyID = document.CompanyId,
+                    iHold = 1,
+                    iPrivate = 1,
+                    status = 0,
+                    FechaCreacion = DateTime.Now,
+                    FechaModificado = DateTime.Now,
+                    CompanyID = document.CompanyId,
+                    UserID = username
+                };
+
+                iLote = Insert_tapBatchCExtGst(tapBatch);
+                tapVoucherCExGst tapVoucher = new tapVoucherCExGst
+                {
+                    iLote = iLote,
+                    iRemitToVendAddrKey = 144830,
+                    iRemitToCopyKey = 144830,
+                    iCurrID = ((Currencys)document.GetCurrency(type)).ToString(), 
+                    iHoldPmt = 0,
+                    iVendKey = 1652,
+                    iVendID = "G778",
+                    iPmtTermsKey = 2,
+                    iSeparateCheck = 0,
+                    iPurchFromVendAddrKey = 144830,
+                    iPurchToCopyKey = 144830,
+                    iTranDate = document.GetDate(type),
+                    iTranNo = iLote.ToString(),
+                    iTranType = 401,
+                    iUserID = username,
+                    iInvcRcptDate = document.GetDate(type),
+                    iDueDate = document.GetDate(type),
+                    iDiscDate = null,
+                    iDiscAmt = 0,
+                    iSTaxAmt =  item.TaxAmount, 
+                    iPurchAmt =  item.Amount,
+                    iTranAmt =  item.Amount + item.TaxAmount,                   
+                };
+                vkey = Insert_tapVoucherCExGst(tapVoucher);
+                tapVoucherDtlCExGst tapVoucherDtl = new tapVoucherDtlCExGst
+                {
+                    iLote = iLote,
+                    vKey = vkey,
+                    iTranNo = iLote.ToString(),
+                    iTargetCompanyID = document.CompanyId,
+                    iCmntOnly = 0,
+                    iExtAmt = item.Amount,
+                    iItemKey = item.ItemKey,
+                    iQuantity = item.Qty,
+                    iGLAcctKey = articulos.FirstOrDefault(x => x.ItemKey == item.ItemKey).ExpAcctKey,
+                    iSTaxClassKey = articulos.FirstOrDefault(x => x.ItemKey == item.ItemKey).STaxClassKey,
+                    iSTaxClassID = taxes.FirstOrDefault(x => x.STaxCodeKey == item.STaxCodeKey).STaxClassID,
+                    iUnitCost = item.UnitCost,
+                    iUnitMeasID = "Serv",
+                    iFreightAmt = 0,
+                    iSTaxSchdKey = 2,
+                    iSTaxSchdID = "IVA 16",
+                    iDefaultIfNull = 1,
+                    iMatchStatus = 1,
+                    iReturnType = 1,
+                    iPOLineNo = null,
+                    iPOKey = null,
+                    iPONo = null,
+                    iPOLineKey = null,
+                    oRetVal = null
+                };
+                dtlKey = Insert_tapVoucherDtlCExGst(tapVoucherDtl);
+
+                RetVal = Exec_sppaVoucherAPIGst(iLote, vkey, document.CompanyId.Trim());
+                if (RetVal != 1)
+                {
+                    Insert_tapApiLogErrorCgGst(iLote, vkey, dtlKey, string.Format("{0} - {1} - {2}", "Ha ocurrido un error en la ejecucion del procedimiento Sage",type.ToString(), DateTime.Now.ToShortDateString()));                 
+                }
+            }
+        }   
+       
         return RetVal;
 
     }
@@ -617,7 +687,7 @@ public static class Doc_Tools
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT ItemKey, LongDesc, CompanyID, PriceUnitMeasId FROM vluItem WITH (NOLOCK) WHERE @CompanyID = CompanyID AND Status = 1 AND (ItemType = 1 OR ItemType = 3 OR ItemType = 4) ORDER BY ItemID ASC,ShortDesc ASC;";
+            cmd.CommandText = "SELECT dbo.vluItem.ItemKey, dbo.vluItem.LongDesc, dbo.vluItem.CompanyID, dbo.vluItem.PriceUnitMeasID, dbo.vluItem.STaxClassKey, dbo.timItem.ExpAcctKey,dbo.timItem.STaxClassKey FROM dbo.vluItem WITH(NOLOCK) INNER JOIN dbo.timItem ON dbo.vluItem.ItemKey = dbo.timItem.ItemKey WHERE ('IEP' = dbo.vluItem.CompanyID) AND (dbo.vluItem.Status = 1) AND (dbo.vluItem.ItemType = 1 OR dbo.vluItem.ItemType = 3 OR dbo.vluItem.ItemType = 4) ORDER BY dbo.vluItem.ItemID, dbo.vluItem.ShortDesc;";
             cmd.Parameters.Add("@CompanyID", SqlDbType.VarChar).Value = company_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -628,6 +698,8 @@ public static class Doc_Tools
                 item.ItemId = dataReader.GetString(1);
                 item.CompanyID = dataReader.GetString(2);
                 item.PriceUnitMeasId = dataReader.GetString(3);
+                item.ExpAcctKey = dataReader.GetInt32(4);
+                item.STaxClassKey = dataReader.GetInt32(5);
                 lista.Add(item);
             }
             cmd.Connection.Close();
@@ -1005,6 +1077,8 @@ public static class Doc_Tools
             { "B53", "Número de Paquete requerido, favor de verificar e intentar nuevamente." },
             { "B54", "Debe seleccionar el tipo de impuesto, favor de verificar e intentar nuevamente." },
             { "B55", "La fecha del artículo no debe ser anterior a la fecha del gasto." },
+            { "B56", "La fecha del de final debe ser mayor que la de inicio." },
+            { "B57", "Ya existe un pago con esa fecha e importe." },
 
 
         };
@@ -1027,11 +1101,12 @@ public static class Doc_Tools
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
+            cmd.Parameters.Clear();
             cmd.CommandText = "select Id,ExpenseType,ExpenseId,ExpenseDetailId,FileName,FileType,FileBinary  from Files Where FileType = @FileType and ExpenseId = @ExpenseId  and ExpenseDetailId = @ExpenseDetailId and ExpenseType = @ExpenseType";
             cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = expense_id;
             cmd.Parameters.Add("@ExpenseDetailId", SqlDbType.Int).Value = detail_id;
-            cmd.Parameters.Add("@ExpenseType", SqlDbType.Int).Value = type;
-            cmd.Parameters.Add("@FileType", SqlDbType.Int).Value = fileType;
+            cmd.Parameters.Add("@ExpenseType", SqlDbType.Int).Value = (int)type;
+            cmd.Parameters.Add("@FileType", SqlDbType.Int).Value = (int)fileType;
             cmd.Connection.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())

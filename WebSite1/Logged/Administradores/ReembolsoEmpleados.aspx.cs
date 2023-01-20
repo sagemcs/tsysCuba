@@ -1404,16 +1404,16 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         if (Check_Exist(pUserKey, importe_gasto))
         {            
             tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB22").Value;         
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B57").Value;         
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }
 
         //Validaciones del Importe y Articulos - Impuestos
-        if(importe_gasto != Decimal.Parse(lista_detalles.Sum(x=> x.Amount + x.TaxAmount).ToString("0.00")))
-        {            
+        if (importe_gasto != Decimal.Parse(lista_detalles.Sum(x => x.Amount + x.TaxAmount).ToString("0.00")))
+        {
             tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB30").Value;          
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB30").Value;
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }

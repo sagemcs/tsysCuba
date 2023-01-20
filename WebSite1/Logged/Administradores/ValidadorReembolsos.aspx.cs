@@ -170,7 +170,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
 
         try
         {
-            string rol = HttpContext.Current.Session["RolUser"].ToString();
+            string rol = HttpContext.Current.Session["RolUser"].ToString();         
             int level = roles.FirstOrDefault(x => x.ID == rol).Key;
             if (!roles.Any(x => x.ID == HttpContext.Current.Session["RolUser"].ToString()))
             {
@@ -450,16 +450,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
                 ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 return;              
             }
-        }
-        
-        //if (e.CommandName == "Select")
-        //{
-        //    int status = 2;           
-        //    Update_Expense(expense_id, paquete.PackageId, status, string.Empty,level: level_validador);
-        //    EnviarCorreo(true);
-        //    BindPackageInfo();
-            
-        //}
+        }       
+       
         if (e.CommandName == "Deny")
         {
             int status = 3;
@@ -650,6 +642,19 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
 
     protected void tbx_fecha_fin_TextChanged(object sender, EventArgs e)
     {
+        if(!string.IsNullOrEmpty(tbx_fecha_inicio.Text))
+        {
+            DateTime inicio = DateTime.Parse(tbx_fecha_inicio.Text);
+            DateTime final = DateTime.Parse(tbx_fecha_fin.Text);
+            if(final<inicio)
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B56").Value;
+                ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                tbx_fecha_fin.Text = string.Empty;
+                return;
+            }
+        }
         int user_id = 0;
         if (drop_empleados.SelectedItem != null)
         {

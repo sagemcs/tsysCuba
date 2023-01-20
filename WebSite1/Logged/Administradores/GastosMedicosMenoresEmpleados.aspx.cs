@@ -275,7 +275,10 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
 
     private void get_items(string company_id)
     {
-        List<ItemDTO> lista = Doc_Tools.get_items(company_id);
+        var item_default = Doc_Tools.GetDefaultItem(company_id);        
+        List<ItemDTO> lista = new List<ItemDTO>();
+        lista.Add(new ItemDTO { ItemId = "", ItemKey = 0 });
+        lista.Add(item_default); 
         drop_articulos.DataSource = lista;
         drop_articulos.DataTextField = "ItemId";
         drop_articulos.DataValueField = "ItemKey";

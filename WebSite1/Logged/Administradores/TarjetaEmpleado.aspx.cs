@@ -226,6 +226,10 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                     }
                     btnSage.Enabled = is_valid;
 
+                    if (HttpContext.Current.Session["motivo_gasto"] != null)
+                    {
+                        tbx_motivo.Text = HttpContext.Current.Session["motivo_gasto"].ToString();
+                    }
 
                     pVendKey = 0;
                     MultiView1.SetActiveView(View_General);
@@ -338,6 +342,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         }
 
     }
+
     public void fill_filelists()
     {
         if (fu_xml.HasFile)
@@ -407,6 +412,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         }
         return false;
     }
+
     private void Sage()
     {
         is_valid = (bool)HttpContext.Current.Session["is_valid"];
@@ -479,7 +485,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         HttpContext.Current.Session["xml_files"] = null;
         HttpContext.Current.Session["pdf_files"] = null;
         HttpContext.Current.Session["voucher_files"] = null;
-        HttpContext.Current.Session["motivo"] = null;
+        HttpContext.Current.Session["motivo_gasto"] = null;
         tbx_pdf.Text = string.Empty;
         tbx_voucher.Text = string.Empty;
         tbx_xml.Text = string.Empty;
@@ -791,6 +797,11 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
     {
         is_valid = false;
         HttpContext.Current.Session["is_valid"] = is_valid;
+
+        if(!string.IsNullOrEmpty(tbx_motivo.Text))
+        {
+            HttpContext.Current.Session["motivo_gasto"] = tbx_motivo.Text;
+        }
         STipoGasto.ClearSelection();
         if(drop_currency.SelectedValue =="")
         {

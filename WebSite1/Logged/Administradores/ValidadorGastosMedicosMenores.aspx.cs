@@ -645,6 +645,19 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
 
     protected void tbx_fecha_fin_TextChanged(object sender, EventArgs e)
     {
+        if (!string.IsNullOrEmpty(tbx_fecha_inicio.Text))
+        {
+            DateTime inicio = DateTime.Parse(tbx_fecha_inicio.Text);
+            DateTime final = DateTime.Parse(tbx_fecha_fin.Text);
+            if (final < inicio)
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B56").Value;
+                ScriptManager.RegisterStartupScript(UpdatePanel, UpdatePanel.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                tbx_fecha_fin.Text = string.Empty;
+                return;
+            }
+        }
         int user_id = 0;
         if (drop_empleados.SelectedItem != null)
         {

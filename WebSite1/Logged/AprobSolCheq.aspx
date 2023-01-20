@@ -907,8 +907,6 @@
          <asp:BoundField DataField="FechaPago" HeaderText="Fecha Programada Pago" ReadOnly="True" SortExpression="Status" DataFormatString = "{0:dd/MM/yyyy}" />
          <asp:BoundField DataField="Total" HeaderText="Total" ReadOnly="True" SortExpression="Status" DataFormatString = "{0:C2}" />
          <asp:BoundField DataField="Aprobador" HeaderText="Aprobador" ReadOnly="True" SortExpression="Status" />
-        <asp:BoundField DataField="Rechazador" HeaderText="Rechazador" ReadOnly="True" SortExpression="Status" />
-        <asp:BoundField DataField="Motivo" HeaderText="Motivo de rechazo" ReadOnly="True" SortExpression="Status" />
          
 <%--      <asp:TemplateField>
           <ItemTemplate>

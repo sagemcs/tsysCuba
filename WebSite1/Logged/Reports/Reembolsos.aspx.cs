@@ -159,8 +159,7 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
             report_document.SetParameterValue("compannia", company != null ? company.CompanyName : "Nombre de la compañia");
 
             //report_document.SetParameterValue("logo", "~/Img/TSYS.png");
-            if (list_dto.Count > 0)
-                Reporte_Reembolsos.ReportSource = report_document;
+            Reporte_Reembolsos.ReportSource = report_document;
             Reporte_Reembolsos.SeparatePages = false;
         }
         catch (Exception exp)

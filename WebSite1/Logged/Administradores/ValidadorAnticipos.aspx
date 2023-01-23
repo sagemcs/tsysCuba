@@ -178,6 +178,12 @@
 
                             }
                         }
+                        else {
+                            $("#errorMsj").show()
+                            setTimeout(() => {
+                                $("#errorMsj").hide()
+                            }, 2000);
+                        }
                     }
                 });
             }

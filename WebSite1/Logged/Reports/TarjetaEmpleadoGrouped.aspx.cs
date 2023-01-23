@@ -148,18 +148,22 @@ public partial class Logged_Reports_TarjetaEmpleadoGrouped : System.Web.UI.Page
             else
                 list_dto = LoadData(pUserKey);
 
-            report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "TarjetaEmpleadoGroupedReport.rpt"));
-            report_document.SetDataSource(list_dto);
-            report_document.SetParameterValue("titulo", "Reporte de Gasto de Tarjeta Corporativa Agrupado");
+            
+            
+                report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "TarjetaEmpleadoGroupedReport.rpt"));
+                report_document.SetDataSource(list_dto);
+                report_document.SetParameterValue("titulo", "Reporte de Gasto de Tarjeta Corporativa Agrupado");
 
-            Company company = Tools.EmpresaAutenticada();
-            if (company == null)
-                return;
-            report_document.SetParameterValue("compannia", company != null ? company.CompanyName : "Nombre de la compañia");
+                Company company = Tools.EmpresaAutenticada();
+                if (company == null)
+                    return;
+                report_document.SetParameterValue("compannia", company != null ? company.CompanyName : "Nombre de la compañia");
 
-            //report_document.SetParameterValue("logo", "~/Img/TSYS.png");
-            Reporte_TarjetaEmpleadoGrouped.ReportSource = report_document;
-            Reporte_TarjetaEmpleadoGrouped.SeparatePages = false;
+                //report_document.SetParameterValue("logo", "~/Img/TSYS.png");
+                if (list_dto.Count > 0)
+                    Reporte_TarjetaEmpleadoGrouped.ReportSource = report_document;
+                Reporte_TarjetaEmpleadoGrouped.SeparatePages = false;
+            
         }
         catch (Exception exp)
         {

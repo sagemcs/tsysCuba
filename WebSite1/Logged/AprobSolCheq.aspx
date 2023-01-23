@@ -54,12 +54,10 @@
 
     <script>
         $(document).ready(function () {
-            ;
 
             var ctrlKeyDown = false;            
             $(document).on("keydown", keydown);
             $(document).on("keyup", keyup);
-            var rechazar = false
 
             function keydown(e) {
 
@@ -157,8 +155,6 @@
                       listFolios: JSON.stringify(lista)
                   },
                   success: function (respuesta) {
-                      debugger;
-
                       $('#myModal').modal('hide');
                       $('#Update').modal('hide');
                       if (respuesta.success) {
@@ -252,6 +248,7 @@
     </script>
 
     <script>
+            var rechazar = false;
 
             function VariableGs() {
                 var Proce = "/Actualizar_Variable2";
@@ -332,7 +329,15 @@
                 })
                     .then((willDelete) => {
                         if (willDelete) {
-                            $('#passwordValue').val(''); $('#hh1').val($('#btnAprobar:hover').parent().prev().prev().prev().prev().prev().prev().text()); $('#Button1').hide(); $('#myModal_Aprobar').modal(); $('#myModalLabel1').text('Teclee el Password para verificar su identidad'); $('#insert').show(); $('#showToken').hide(); $('#TextBox1').val(''); $('#validarToken').show(); $('#Button1').hide(); $('#Button3').hide();
+                            $('#passwordValue').val('');
+                            $('#hh1').val($('#btnAprobar:hover').parent().prev().prev().prev().prev().prev().prev().text());
+                            $('#Button1').hide(); $('#myModal_Aprobar').modal();
+                            $('#myModalLabel1').text('Teclee el Password para verificar su identidad');
+                            $('#insert').show(); $('#showToken').hide();
+                            $('#TextBox1').val('');
+                            $('#validarToken').show();
+                            $('#Button1').hide();
+                            $('#Button3').hide();
                             rechazar = true
                         }
                         else {
@@ -731,15 +736,22 @@
                                         $("#validarToken").hide()
                                         $("#TextBox1").val(msg2.d)
                                         $("#myModalLabel1").text('Token vigente')
+                                        debugger;
                                         if (!rechazar)
                                             $("#Button1").show()
                                         else $("#Button3").show()
+                                        rechazar = false;
                                     }
                                 });
                             }
                             catch (err) {
-
                             }
+                        }
+                        else {
+                            $("#errorMsj").show()
+                            setTimeout(() => {
+                                $("#errorMsj").hide()
+                            }, 2000);
                         }
                     }
                 });
@@ -907,8 +919,6 @@
          <asp:BoundField DataField="FechaPago" HeaderText="Fecha Programada Pago" ReadOnly="True" SortExpression="Status" DataFormatString = "{0:dd/MM/yyyy}" />
          <asp:BoundField DataField="Total" HeaderText="Total" ReadOnly="True" SortExpression="Status" DataFormatString = "{0:C2}" />
          <asp:BoundField DataField="Aprobador" HeaderText="Aprobador" ReadOnly="True" SortExpression="Status" />
-        <asp:BoundField DataField="Rechazador" HeaderText="Rechazador" ReadOnly="True" SortExpression="Status" />
-        <asp:BoundField DataField="Motivo" HeaderText="Motivo de rechazo" ReadOnly="True" SortExpression="Status" />
          
 <%--      <asp:TemplateField>
           <ItemTemplate>

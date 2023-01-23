@@ -145,6 +145,12 @@
                                 </li>
                                 <li>
                                     <a runat="server" href="~/Logged/Administradores/ArticleMME" title="Establecer Articulo para Gastos Médicos Menores">Articulo para Gastos Médicos Menores</a>
+                                </li> 
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/TabExpenseTypes" title="Tabulador Tipos de Gasto">Tabulador Tipos de Gasto</a>
+                                </li>
+                                <li>
+                                    <a runat="server" href="~/Logged/Administradores/TabAdvanceTypes" title="Tabulador Tipos de Anticipo">Tabulador Tipos de Anticipo</a>
                                 </li>
                                 </ul>
                                 </li>

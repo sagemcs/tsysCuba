@@ -704,17 +704,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             return -1;
         }       
     }
-       
-    public Dictionary<int, string> Dict_type()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Viaje" },
-            { 2, "Compra Extraordinaria" }
-        };
-        return dict;
-    }
-
+           
     private List<ExpenseDTO> ReadFromDb(int user_id)
     {
         List<ExpenseDTO> gastos = new List<ExpenseDTO>();
@@ -821,7 +811,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             while (dataReader.Read())
             {
                 advance.AdvanceId = dataReader.GetInt32(0);
-                advance.AdvanceType = Dict_type().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
+                advance.AdvanceType = Doc_Tools.Dict_Advancetype().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
                 advance.Folio = dataReader.GetString(2);
                 advance.Amount = dataReader.GetDecimal(3);
                 if (!dataReader.IsDBNull(4))

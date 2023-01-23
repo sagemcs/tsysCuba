@@ -362,17 +362,8 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         gvAnticipos.Visible = true;
         gvAnticipos.DataSource = ReadFromDb(pUserKey);
         gvAnticipos.DataBind();
-    }
-   
-    public Dictionary<int, string> Dict_type()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Viaje" },
-            { 2, "Compra Extraordinaria" }           
-        };
-        return dict;
-    }
+    }   
+    
     private List<AdvanceDTO> ReadFromDb(int user_id)
     {
         List<AdvanceDTO> anticipos = new List<AdvanceDTO>();
@@ -388,7 +379,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
             {                  
                 var advance = new AdvanceDTO();
                 advance.AdvanceId = dataReader.GetInt32(0);
-                advance.AdvanceType = Dict_type().FirstOrDefault(x=> x.Key== dataReader.GetInt32(1)).Value;
+                advance.AdvanceType =  Doc_Tools.Dict_Advancetype().FirstOrDefault(x=> x.Key== dataReader.GetInt32(1)).Value;
                 advance.Folio = dataReader.GetString(2);
                 advance.Currency = dataReader.GetInt32(3);
                 advance.Amount = dataReader.GetDecimal(4);
@@ -594,7 +585,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
             while (dataReader.Read())
             {
                 advance.AdvanceId = dataReader.GetInt32(0);
-                advance.AdvanceType = Dict_type().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
+                advance.AdvanceType = Doc_Tools.Dict_Advancetype().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
                 advance.Folio = dataReader.GetString(2);
                 advance.Amount = dataReader.GetDecimal(3);
                 if(!dataReader.IsDBNull(4))

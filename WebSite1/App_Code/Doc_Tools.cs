@@ -899,20 +899,25 @@ public static class Doc_Tools
         };
         return dict;
     }
+    
 
     public static Dictionary<int, string> Dict_tipos_gastos()
     {
-        Dictionary<int, string> dict = new Dictionary<int, string>
+        Dictionary<int, string> dict = new Dictionary<int, string>();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
-            { 1, "Transporte Aéreo" },
-            { 2, "Transporte Terrestre" },
-            { 3, "Casetas" },
-            { 4, "Gasolina" },
-            { 5, "Estacionamiento" },
-            { 6, "Alimentos" },
-            { 7, "Hospedaje" },
-            { 8, "Gastos extraordinarios" }
-        };
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT [Id] ,[Name] FROM [dbo].[ExpenseType]";
+            cmd.Connection.Open();
+            SqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {               
+                var id = dataReader.GetInt32(0);
+                var name = dataReader.GetString(1);
+                dict.Add(id, name);
+            }
+        }       
+        
         return dict;
     }
 
@@ -1079,6 +1084,7 @@ public static class Doc_Tools
             { "B55", "La fecha del artículo no debe ser anterior a la fecha del gasto." },
             { "B56", "La fecha del de final debe ser mayor que la de inicio." },
             { "B57", "Ya existe un pago con esa fecha e importe." },
+            { "B58", "Ya existe ese tipo de gasto en base de datos." },
 
 
         };
@@ -1087,12 +1093,21 @@ public static class Doc_Tools
 
     public static Dictionary<int, string> Dict_Advancetype()
     {
-        Dictionary<int, string> dict = new Dictionary<int, string>
+        Dictionary<int, string> dict = new Dictionary<int, string>();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
-            { 1, "Viaje" },
-            { 2, "Compra Extraordinaria" }
-        };
-        return dict;
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT [Id] ,[Name] FROM [dbo].[AdvanceType]";
+            cmd.Connection.Open();
+            SqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                var id = dataReader.GetInt32(0);
+                var name = dataReader.GetString(1);
+                dict.Add(id, name);
+            }
+        }
+        return dict;        
     }
 
     public static ExpenseFilesDTO LoadFilesbyExpense(DocumentType type, ExpenseFilesDTO.FileType fileType, int expense_id, int detail_id)

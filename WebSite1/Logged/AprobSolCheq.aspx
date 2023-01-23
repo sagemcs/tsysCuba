@@ -155,8 +155,6 @@
                       listFolios: JSON.stringify(lista)
                   },
                   success: function (respuesta) {
-                      debugger;
-
                       $('#myModal').modal('hide');
                       $('#Update').modal('hide');
                       if (respuesta.success) {
@@ -747,8 +745,13 @@
                                 });
                             }
                             catch (err) {
-
                             }
+                        }
+                        else {
+                            $("#errorMsj").show()
+                            setTimeout(() => {
+                                $("#errorMsj").hide()
+                            }, 2000);
                         }
                     }
                 });

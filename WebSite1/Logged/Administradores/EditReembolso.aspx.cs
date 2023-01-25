@@ -195,6 +195,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             {
                 get_items(pCompanyID);
                 get_taxes();
+                BindTipoGasto();
                 HttpContext.Current.Session["GridItems"] = null;
                 HttpContext.Current.Session["GridTaxes"] = null;
 
@@ -428,6 +429,16 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         tbx_pdf.Text = string.Empty;       
         btn_Guardar.Enabled = false;
         tbx_motivo.Text = string.Empty;
+    }
+
+    private void BindTipoGasto()
+    {
+        var lista = Doc_Tools.Dict_tipos_gastos();
+        lista.Add(0, string.Empty);
+        STipoGasto.DataSource = lista.OrderBy(x => x.Key).Select(x => new { Id = x.Key, Name = x.Value }).ToList();
+        STipoGasto.DataTextField = "Name";
+        STipoGasto.DataValueField = "Id";
+        STipoGasto.DataBind();
     }
 
     protected void btn_Guardar_Click(object sender, EventArgs e)
@@ -904,14 +915,17 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }
-        
-        if (!Check_Advance_Date(pUserKey, expense.AdvanceId, fecha_gasto))
+        if(expense.AdvanceId!=0)
         {
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB43").Value;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            return;
+            if (!Check_Advance_Date(pUserKey, expense.AdvanceId, fecha_gasto))
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB43").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
+            }
         }
+       
         //Solo alertas sin retorno
         is_valid = true;               
        

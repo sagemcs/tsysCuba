@@ -155,9 +155,9 @@
             <h4>Tipo de Anticipo:</h4>                           
                 <span class="dropdown-header">
                     <asp:DropDownList ID="drop_tipo_anticipo" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="True" OnSelectedIndexChanged="drop_tipo_anticipo_SelectedIndexChanged">
-                     <asp:ListItem Value=""> </asp:ListItem>
+                    <%-- <asp:ListItem Value=""> </asp:ListItem>
                      <asp:ListItem Value=1>Viaje</asp:ListItem>
-                     <asp:ListItem Value=2>Compra Extraordinaria</asp:ListItem>                       
+                     <asp:ListItem Value=2>Compra Extraordinaria</asp:ListItem>                --%>       
                     </asp:DropDownList>
                 </span> 
         </div>    

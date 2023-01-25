@@ -795,6 +795,7 @@ public static class Doc_Tools
 
     public static ValidatingUserDTO get_MatrizValidadores(int pUserKey, int level)
     {
+        
         ValidatingUserDTO matriz = new ValidatingUserDTO();
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
@@ -818,9 +819,7 @@ public static class Doc_Tools
                     break;
                 case 6:
                     cmd.CommandText = "SELECT UserKey,Isnull(UserValidadorCX,0), Isnull(UserGerente,0), Isnull(UserRH,0), Isnull(UserTesoreria,0), Isnull(UserFinanzas,0) FROM validatingUser where UserFinanzas = @UserKey";
-                    break;
-                default:
-                    break;
+                    break;              
             }
 
             cmd.Parameters.Add("@UserKey", SqlDbType.Int).Value = pUserKey;
@@ -870,6 +869,12 @@ public static class Doc_Tools
     {
         MNX = 1, USD = 2, EUR = 3
     }
+
+    public enum NotificationType
+    {
+        Aprobacion, Denegacion, Revision
+    }
+   
     public  class Paquete
     {
         public int PackageId { get; set; }
@@ -1297,22 +1302,100 @@ public static class Doc_Tools
         }
     }
 
-    public static void EnviarCorreo(int pUserKey, Doc_Tools.DocumentType type )
+    public static void EnviarCorreo(Doc_Tools.DocumentType type, int userkey, int aproval_level, NotificationType notification)
     {      
-        string server_address = ConfiguracionCorreoElectronico.server_address;
-        int server_port = ConfiguracionCorreoElectronico.server_port;
-        string user = ConfiguracionCorreoElectronico.user;
-        string password = ConfiguracionCorreoElectronico.password;
-        bool enable_ssl = ConfiguracionCorreoElectronico.enable_ssl;
-        CorreoElectronico email = new CorreoElectronico(server_address, server_port, user, password, enable_ssl);
-
-        //Tomar el nivel superior que corresponde
-        string from = Doc_Tools.getUserEmail(pUserKey);
-        string to = "boza32smart@gmail.com";       
-        string subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, type.ToString());
-        string text = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, type.ToString());
-        bool is_text_html = false;
-        email.Enviar(from, to, subject, text, is_text_html);
+        var matrix = Doc_Tools.get_MatrizValidadores(userkey, aproval_level);
+        string to = string.Empty;
+        string from = string.Empty;
+        switch (type)
+        {
+            case Doc_Tools.DocumentType.Advance:
+                switch (aproval_level)
+                {
+                    case 1:
+                        to = Doc_Tools.getUserEmail(matrix.Gerente);
+                        break;
+                    case 2:
+                        to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
+                        break;
+                    case 3:
+                        to = Doc_Tools.getUserEmail(matrix.Tesoreria);
+                        break;
+                    case 4:
+                        to = Doc_Tools.getUserEmail(matrix.Finanzas);
+                        break;
+                    
+                }
+                break;
+            case Doc_Tools.DocumentType.Expense:
+                switch (aproval_level)
+                {
+                    case 1:
+                        to = Doc_Tools.getUserEmail(matrix.Gerente);
+                        break;
+                    case 2:
+                        to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
+                        break;
+                    case 3:
+                        to = Doc_Tools.getUserEmail(matrix.Tesoreria);
+                        break;
+                    case 4:
+                        to = Doc_Tools.getUserEmail(matrix.Finanzas);
+                        break;
+                }
+                break;
+            case Doc_Tools.DocumentType.CorporateCard:
+                switch (aproval_level)
+                {
+                    case 1:
+                        to = Doc_Tools.getUserEmail(matrix.Gerente);
+                        break;
+                    case 2:
+                        to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
+                        break;
+                    case 3:
+                        to = Doc_Tools.getUserEmail(matrix.Tesoreria);
+                        break;
+                    case 4:
+                        to = Doc_Tools.getUserEmail(matrix.Finanzas);
+                        break;
+                }
+                break;
+            case Doc_Tools.DocumentType.MinorMedicalExpense:
+                switch (aproval_level)
+                {
+                    case 1:
+                        to = Doc_Tools.getUserEmail(matrix.Gerente);
+                        break;
+                    case 2:
+                        to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
+                        break;
+                    case 3:
+                        to = Doc_Tools.getUserEmail(matrix.Tesoreria);
+                        break;
+                    case 4:
+                        to = Doc_Tools.getUserEmail(matrix.Finanzas);
+                        break;
+                }
+                break;
+        }
+        string texto = string.Empty;       
+        from = Doc_Tools.getUserEmail(userkey);
+        switch (notification)
+        {
+            case NotificationType.Aprobacion:
+                texto = "El usuario {0} ha aprobado un {1} para su revisión";
+                break;
+            case NotificationType.Denegacion:
+                texto = "El usuario {0} ha denegado un {1} para su revisión";
+                break;
+            case NotificationType.Revision:
+                texto = "El usuario {0} ha añadido un {1} para su revisión";
+                break;           
+        }
+        string subject = string.Format(texto, from, type.ToString());
+        string text = string.Format(texto, from, type.ToString());     
+        bool SendEmail = Global.EmailGlobal(to, text, subject);
     }
 
     public static int GetGerenteToNotify(int userkey)
@@ -1435,12 +1518,8 @@ public static class Doc_Tools
             foreach (var user in grouped_user)
             {
                 foreach (AdvanceDTO anticipo_pendients in user.ToList())
-                {
-                    int gerente_key = GetGerenteToNotify(anticipo_pendients.UpdateUserKey);
-                    if(gerente_key!=0)
-                    {
-                        EnviarCorreo(gerente_key, DocumentType.Advance);
-                    }
+                {                    
+                    EnviarCorreo(DocumentType.Advance, user.Key, 1, NotificationType.Revision);                
                    
                 }
             }

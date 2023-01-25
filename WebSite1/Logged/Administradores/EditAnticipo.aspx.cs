@@ -190,12 +190,13 @@ public partial class Logged_Administradores_EditAnticipo : System.Web.UI.Page
 
             if (!IsPostBack)
             {
+                BindTipoAnticipo();
                 if (HttpContext.Current.Session["Advance"] != null)
                 {
                     var advance = (AdvanceDTO)HttpContext.Current.Session["Advance"];
                     tbx_folio.Text = advance.Folio;
                     tbx_importe.Text = advance.Amount.ToString("0.00");
-                    drop_tipo_anticipo.SelectedValue = Dict_type().FirstOrDefault(x => x.Value == advance.AdvanceType).Key.ToString();
+                    drop_tipo_anticipo.SelectedValue = Doc_Tools.Dict_Advancetype().FirstOrDefault(x => x.Value == advance.AdvanceType).Key.ToString();
                     tbx_fecha_salida.Text = advance.DepartureDate != null ? advance.DepartureDate.Value.ToString("yyyy-MM-dd") : string.Empty;
                     tbx_fecha_llegada.Text = advance.ArrivalDate != null ? advance.ArrivalDate.Value.ToString("yyyy-MM-dd") : string.Empty;
                     tbx_fecha_comprobacion.Text = advance.CheckDate.ToString("D", CultureInfo.CreateSpecificCulture("es-MX"));
@@ -222,17 +223,17 @@ public partial class Logged_Administradores_EditAnticipo : System.Web.UI.Page
 
 
     }
-    
-    public Dictionary<int, string> Dict_type()
+
+    private void BindTipoAnticipo()
     {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Viaje" },
-            { 2, "Compra Extraordinaria" }           
-        };
-        return dict;
-    }      
-  
+        var lista = Doc_Tools.Dict_Advancetype();
+        lista.Add(0, string.Empty);
+        drop_tipo_anticipo.DataSource = lista.OrderBy(x => x.Key).Select(x => new { Id = x.Key, Name = x.Value }).ToList();
+        drop_tipo_anticipo.DataTextField = "Name";
+        drop_tipo_anticipo.DataValueField = "Id";
+        drop_tipo_anticipo.DataBind();
+    }
+
     private List<AdvanceDTO> ReadFromDb(int user_id)
     {
         List<AdvanceDTO> anticipos = new List<AdvanceDTO>();
@@ -247,7 +248,7 @@ public partial class Logged_Administradores_EditAnticipo : System.Web.UI.Page
             {
                 var advance = new AdvanceDTO();
                 advance.AdvanceId = dataReader.GetInt32(0);
-                advance.AdvanceType = Dict_type().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
+                advance.AdvanceType = Doc_Tools.Dict_Advancetype().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
                 advance.Folio = dataReader.GetString(2);
                 advance.Amount = dataReader.GetDecimal(3);
                 if(!dataReader.IsDBNull(4))

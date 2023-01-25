@@ -241,7 +241,7 @@ public partial class Logged_Administradores_DocumentosGastos : System.Web.UI.Pag
                     cmd.CommandText = "SELECT DetailId,CorporateCardId,Type FROM CorporateCardDetail where CorporateCardId = @ExpenseId and CompanyId = @CompanyId;";
                     break;
                 case Doc_Tools.DocumentType.MinorMedicalExpense:
-                    cmd.CommandText = "SELECT Itemkey,MinorMedicalExpenseId FROM MinorMedicalExpenseDetail where MinorMedicalExpenseId = @ExpenseId and CompanyId = @CompanyId;";
+                    cmd.CommandText = "SELECT DetailId,MinorMedicalExpenseId, Itemkey FROM MinorMedicalExpenseDetail where MinorMedicalExpenseId = @ExpenseId and CompanyId = @CompanyId;";
                     break;             
             }              
             cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = expense_id;
@@ -253,8 +253,9 @@ public partial class Logged_Administradores_DocumentosGastos : System.Web.UI.Pag
                 var article = new ExpenseDetailDTO();
                 article.DetailId = dataReader.GetInt32(0);
                 article.ExpenseId = dataReader.GetInt32(1);
+                article.ItemKey = type == Doc_Tools.DocumentType.MinorMedicalExpense ? dataReader.GetInt32(2) : 0;
                 article.Type = type != Doc_Tools.DocumentType.MinorMedicalExpense ? dataReader.GetInt32(2) : 0;
-                article.TipoGasto = type != Doc_Tools.DocumentType.MinorMedicalExpense ? Doc_Tools.Dict_tipos_gastos().FirstOrDefault(x => x.Key == article.Type).Value : items.FirstOrDefault(x=> x.ItemKey == article.DetailId).ItemId;
+                article.TipoGasto = type != Doc_Tools.DocumentType.MinorMedicalExpense ? Doc_Tools.Dict_tipos_gastos().FirstOrDefault(x => x.Key == article.Type).Value : items.FirstOrDefault(x=> x.ItemKey == article.ItemKey).ItemId;
                 article.FileXml = Doc_Tools.LoadFilesbyExpense(type, ExpenseFilesDTO.FileType.Xml, article.ExpenseId, article.DetailId.Value);
                 article.FilePdf = Doc_Tools.LoadFilesbyExpense(type, ExpenseFilesDTO.FileType.Pdf, article.ExpenseId, article.DetailId.Value);
                 article.FilePdfVoucher = Doc_Tools.LoadFilesbyExpense(type, ExpenseFilesDTO.FileType.Voucher, article.ExpenseId, article.DetailId.Value);

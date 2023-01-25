@@ -206,6 +206,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                         HttpContext.Current.Session["voucher_files"] = null;
                         HttpContext.Current.Session["motivo"] = null;
                         HttpContext.Current.Session["is_valid"] = null;
+                        BindTipoAnticipo();
                     }                 
                     pVendKey = 0;                   
 
@@ -276,7 +277,8 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
     }
 
     protected void btnFinalizar_Click(object sender, EventArgs e)
-    {        
+    {
+        btnFinalizar.Enabled = false;
         //Logica para lanzar Reporte de Reembolsos
         Response.Redirect("~/Logged/Reports/Anticipos");
     }   
@@ -362,8 +364,18 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         gvAnticipos.Visible = true;
         gvAnticipos.DataSource = ReadFromDb(pUserKey);
         gvAnticipos.DataBind();
-    }   
-    
+    }
+
+    private void BindTipoAnticipo()
+    {
+        var lista = Doc_Tools.Dict_Advancetype();
+        lista.Add(0, string.Empty);
+        drop_tipo_anticipo.DataSource = lista.OrderBy(x => x.Key).Select(x => new { Id = x.Key, Name = x.Value }).ToList();
+        drop_tipo_anticipo.DataTextField = "Name";
+        drop_tipo_anticipo.DataValueField = "Id";
+        drop_tipo_anticipo.DataBind();
+    }
+
     private List<AdvanceDTO> ReadFromDb(int user_id)
     {
         List<AdvanceDTO> anticipos = new List<AdvanceDTO>();
@@ -421,52 +433,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         }
         return advance_id + 1;
     }
-
-    public void EnviarCorreo()
-    {             
-        var matrix = Doc_Tools.get_MatrizValidadores(pUserKey, 1);
-        string server_address = ConfiguracionCorreoElectronico.server_address;
-        int server_port = ConfiguracionCorreoElectronico.server_port;
-        string user = ConfiguracionCorreoElectronico.user;
-        string password = ConfiguracionCorreoElectronico.password;
-        bool enable_ssl = ConfiguracionCorreoElectronico.enable_ssl;
-        CorreoElectronico email = new CorreoElectronico(server_address, server_port, user, password, enable_ssl);
-        
-        var jerarquia = Doc_Tools.get_JerarquiaValidadores(((int)Doc_Tools.DocumentType.Advance));
-        var orden = jerarquia.Get_Orden(jerarquia);
-
-        string from = Doc_Tools.getUserEmail(pUserKey);
-        string to = string.Empty;
-       foreach(var item in orden) if(to == string.Empty)
-       {        
-            if (item.Value == "RecursosHumanos" && matrix.Rh != 0)
-            {
-                to = Doc_Tools.getUserEmail(matrix.Rh);
-            }
-            if (item.Value == "GerenciaArea" && matrix.Gerente != 0)
-            {
-                to = Doc_Tools.getUserEmail(matrix.Rh);
-            }
-            if (item.Value == "CuentasxPagar" && matrix.ValidadorCx != 0)
-            {
-                to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
-            }
-            if (item.Value == "Tesoreria" && matrix.Tesoreria != 0)
-            {
-                to = Doc_Tools.getUserEmail(matrix.Tesoreria);
-            }
-            if (item.Value == "Finanzas" && matrix.Finanzas != 0)
-            {
-                to = Doc_Tools.getUserEmail(matrix.Finanzas);
-            }
-
-       }
-        
-        string subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.Advance.ToString());
-        string text = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.Advance.ToString());
-        bool is_text_html = false;
-        email.Enviar(from, to, subject, text, is_text_html);
-    }
+   
 
     private void InsertAdvance()
     {
@@ -510,9 +477,12 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B4);", true);
                 System.Threading.Thread.Sleep(5000);
                 ClearControls();
+                btnFinalizar.Enabled = false;
                 return;
+              
             }
-            EnviarCorreo();
+            btnFinalizar.Enabled = true;
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, pUserKey, 1, Doc_Tools.NotificationType.Revision);
             BindGridView();
             ClearControls();
             HttpContext.Current.Session["is_valid"] = false;
@@ -607,8 +577,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
             }
         }
         return advance;
-    }
-   
+    }   
 
     protected void gvAnticipos_RowCommand(object sender, GridViewCommandEventArgs e)
     {

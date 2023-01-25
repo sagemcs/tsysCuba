@@ -436,7 +436,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
 
             Update_Advance(advance_id, paquete.PackageId, status, motivo.Text, level: level_validador);
             var advance = LoadAdvanceById(advance_id);
-            Doc_Tools.EnviarCorreo(advance.UpdateUserKey,Doc_Tools.DocumentType.Advance);
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, advance.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Denegacion);
             BindPackageInfo();
             BindGridView(user_id, status_id, type);
         }
@@ -444,7 +444,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         if (e.CommandName == "Coment")
         {
             var advance = LoadAdvanceById(advance_id);
-            Doc_Tools.EnviarCorreo(advance.UpdateUserKey, Doc_Tools.DocumentType.Advance);
+           // Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, advance.UpdateUserKey, level_validador);
             HttpContext.Current.Session["ExpenseComentId"] = advance_id;
             HttpContext.Current.Session["DocumentType"] = Doc_Tools.DocumentType.Advance;
             Response.Redirect("ComentariosValidador.aspx");
@@ -923,6 +923,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         }
 
         status_id = int.Parse(drop_status.SelectedValue);
+        Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, pUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion);
         BindGridView(user_id, status_id, type);
 
     }

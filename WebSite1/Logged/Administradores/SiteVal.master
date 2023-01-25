@@ -242,6 +242,9 @@
                                         <li role="presentation">
                                             <a runat="server" class="" href="~/Logged/Reports/AprobacionSolicitudCheque">Reporte de Solicitudes de Cheques</a>
                                         </li>
+                                         <li role="presentation">
+                                            <a runat="server" class="" href="~/Logged/Administradores/ListadoEmpleados">Listado de Empleados</a>
+                                        </li>
                                     </ul>
                                 </li>
                                 <li>

@@ -178,6 +178,12 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
 
         List<RolDTO> roles = Doc_Tools.get_Roles();
+
+        if (HttpContext.Current.Session["terminar_comprobacion"] == null)
+        {
+            HttpContext.Current.Session["terminar_comprobacion"] = false;
+        }
+
         try
         {
             if (!roles.Any(x => x.ID == HttpContext.Current.Session["RolUser"].ToString()))
@@ -214,6 +220,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                         HttpContext.Current.Session["voucher_files"] = null;
                         HttpContext.Current.Session["motivo"] = null;
                         HttpContext.Current.Session["is_valid"] = null;
+                        HttpContext.Current.Session["terminar_comprobacion"] = null;
                     }
                     if (HttpContext.Current.Session["is_valid"] != null)
                     {
@@ -549,7 +556,8 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 MultiView1.SetActiveView(View_General);
-                btnFinalizar.Enabled = false;
+                HttpContext.Current.Session["terminar_comprobacion"] = false;
+                btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
                 return;
             }
             EnviarCorreo();
@@ -559,14 +567,17 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             HttpContext.Current.Session["GridTaxes"] = null;           
             GvItems.DataSource = null;
             GvItems.DataBind();          
-            HttpContext.Current.Session["is_valid"] = false;
-            btnFinalizar.Enabled = true;
+            HttpContext.Current.Session["is_valid"] = false;           
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+
+            HttpContext.Current.Session["terminar_comprobacion"] = true;
+            btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
         }
         else
         {
             btnSage.Enabled = false;
-            btnFinalizar.Enabled = false;
+            HttpContext.Current.Session["terminar_comprobacion"] = true;
+            btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
         }
         
 
@@ -574,7 +585,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
 
     protected void btnFinalizar_Click(object sender, EventArgs e)
     {
-        btnFinalizar.Enabled = false;
+        HttpContext.Current.Session["terminar_comprobacion"] = null;
         //logica para enviar los correos
         //Logica para lanzar Reporte de Reembolsos
         Response.Redirect("~/Logged/Reports/ComprobacionGastosGMedicos");

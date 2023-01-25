@@ -62,7 +62,35 @@
         <br />
         <div class="row">
              <div class="col-lg-6 col-sm-6 col-6" >
-             <asp:ListBox runat="server" ID="listEmpleados" Width="50%"></asp:ListBox>                
+            <%--Grid Articulos--%>
+                    <asp:GridView Caption="Articulos"
+                        ID="GvEmpleados"
+                        runat="server"
+                        CssClass="table table-bordered bs-table"
+                        margin-left="auto" margin-right="auto"
+                        AutoGenerateColumns="False"                       
+                        CellPadding="4"
+                        ForeColor="#333333" GridLines="None">
+
+                        <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+                        <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                        <Columns>
+                            <asp:BoundField DataField="Correo" HeaderText="Correo" ReadOnly="True" SortExpression="Correo" />
+                            <asp:BoundField DataField="Nombre" HeaderText="Nombre" ReadOnly="True" SortExpression="Nombre" />
+                            <asp:BoundField DataField="Puesto" HeaderText="Puesto" ReadOnly="True" SortExpression="Puesto" />
+                            <asp:BoundField DataField="Area" HeaderText="Area" ReadOnly="True" SortExpression="Area" />
+                            <asp:BoundField DataField="GefeInmediato" HeaderText="Jefe Inmediato" SortExpression="GefeInmediato"/>                            
+                        </Columns>
+                        <EditRowStyle BackColor="#999999" />
+                        <FooterStyle BackColor="#5D7B9D" ForeColor="White" Font-Bold="True" />
+                        <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                        <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                        <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                        <SortedAscendingCellStyle BackColor="#E9E7E2" />
+                        <SortedAscendingHeaderStyle BackColor="#506C8C" />
+                        <SortedDescendingCellStyle BackColor="#FFFDF8" />
+                        <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+                    </asp:GridView>          
             </div>   
         </div>   
         

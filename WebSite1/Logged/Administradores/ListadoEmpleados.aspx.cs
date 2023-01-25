@@ -128,11 +128,8 @@ public partial class ListadoEmpleados : System.Web.UI.Page
                         }
                     });
                 }
-                listEmpleados.DataSource = list.Select(x => new { x.Nombre, x.Correo, x.Area }).ToList();
-                listEmpleados.DataTextField = "Nombre";
-                listEmpleados.DataBind();
-
-
+                GvEmpleados.DataSource = list;
+                GvEmpleados.DataBind();
             }           
 
         }

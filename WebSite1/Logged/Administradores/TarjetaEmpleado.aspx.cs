@@ -173,7 +173,12 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         Page.Response.Cache.SetNoStore();
         Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
 
-        List<RolDTO> roles = Doc_Tools.get_Roles();       
+        List<RolDTO> roles = Doc_Tools.get_Roles();
+
+        if (HttpContext.Current.Session["terminar_comprobacion"] == null)
+        {
+            HttpContext.Current.Session["terminar_comprobacion"] = false;
+        }
         try
         {
             if (!roles.Any(x => x.ID == HttpContext.Current.Session["RolUser"].ToString()))
@@ -211,6 +216,8 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                         HttpContext.Current.Session["voucher_files"] = null;
                         HttpContext.Current.Session["motivo"] = null;
                         HttpContext.Current.Session["is_valid"] = null;
+
+                        HttpContext.Current.Session["terminar_comprobacion"] = null;
                     }
 
                     //fill_filelists();
@@ -230,6 +237,11 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                     if (HttpContext.Current.Session["motivo_gasto"] != null)
                     {
                         tbx_motivo.Text = HttpContext.Current.Session["motivo_gasto"].ToString();
+                    }
+
+                    if (HttpContext.Current.Session["terminar_comprobacion"] != null)
+                    {
+                        btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
                     }
 
                     pVendKey = 0;
@@ -447,8 +459,9 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);                
                 ClearControls();
-                MultiView1.SetActiveView(View_General);
-                btnFinalizar.Enabled = false;
+                HttpContext.Current.Session["terminar_comprobacion"] = false;
+                btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
+                MultiView1.SetActiveView(View_General);               
                 return;
             }
 
@@ -460,12 +473,14 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             HttpContext.Current.Session["is_valid"] = false;
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
             GvItems.DataSource = null;
-            btnFinalizar.Enabled = true;
+            HttpContext.Current.Session["terminar_comprobacion"] = true;
+            btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
             GvItems.DataBind();
         }
         else 
-        { 
-            btnFinalizar.Enabled = false; 
+        {
+            HttpContext.Current.Session["terminar_comprobacion"] = false;
+            btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
         }
         
     }
@@ -680,7 +695,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
-        btnFinalizar.Enabled = false;
+        HttpContext.Current.Session["terminar_comprobacion"] = null;
         Response.Redirect("~/Logged/Reports/TarjetaEmpleado");
     }    
 

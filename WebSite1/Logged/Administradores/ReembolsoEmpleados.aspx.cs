@@ -246,6 +246,10 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
 
         List<RolDTO> roles = Doc_Tools.get_Roles();
 
+        if (HttpContext.Current.Session["terminar_comprobacion_reembolso"] == null)
+        {
+            HttpContext.Current.Session["terminar_comprobacion_reembolso"] = false;
+        }
         try
         {
             if (!roles.Any(x=> x.ID == HttpContext.Current.Session["RolUser"].ToString()))
@@ -284,6 +288,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                         HttpContext.Current.Session["voucher_files"] = null;
                         HttpContext.Current.Session["motivo"] = null;
                         HttpContext.Current.Session["is_valid"] = null;
+                        HttpContext.Current.Session["terminar_comprobacion"] = null;
                     }
                   
                     fill_fileUploads();
@@ -303,6 +308,13 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                     }
 
                     btnSage.Enabled = is_valid;
+
+                    if (HttpContext.Current.Session["terminar_comprobacion_reembolso"] != null)
+                    {
+                        btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];
+                    }
+                      
+                   
                     pVendKey = 0;
                     MultiView1.SetActiveView(View_General);                    
                    
@@ -455,8 +467,11 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+
+                HttpContext.Current.Session["terminar_comprobacion_reembolso"] = false;
+                btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];
                 MultiView1.SetActiveView(View_General);
-                btnFinalizar.Enabled = false;
+             
                 return;
             }
 
@@ -475,13 +490,15 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             GvItems.DataBind();
             HttpContext.Current.Session["is_valid"] = false;
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
-            btnFinalizar.Enabled = true;
+            HttpContext.Current.Session["terminar_comprobacion_reembolso"] = true;
+            btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];
             Response.Redirect(Page.Request.RawUrl);
         }
         else
         {
             btnSage.Enabled = false;
-            btnFinalizar.Enabled = false;
+            HttpContext.Current.Session["terminar_comprobacion_reembolso"] = false;
+            btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];
         }      
 
     }
@@ -760,7 +777,10 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
-        btnFinalizar.Enabled = false;
+
+        HttpContext.Current.Session["terminar_comprobacion_reembolso"] = false;
+        btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];       
+
         Response.Redirect("~/Logged/Reports/Reembolsos");
     }      
 

@@ -170,7 +170,12 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         if (HttpContext.Current.Session["is_valid"] == null)
         {
             HttpContext.Current.Session["is_valid"] = false;
-        }    
+        }
+
+        if (HttpContext.Current.Session["terminar_comprobacion"] == null)
+        {
+            HttpContext.Current.Session["terminar_comprobacion"] = false;
+        }
 
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
         Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
@@ -206,6 +211,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                         HttpContext.Current.Session["voucher_files"] = null;
                         HttpContext.Current.Session["motivo"] = null;
                         HttpContext.Current.Session["is_valid"] = null;
+                        HttpContext.Current.Session["terminar_comprobacion"] = null;
                         BindTipoAnticipo();
                     }                 
                     pVendKey = 0;                   
@@ -215,7 +221,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                     tbx_folio.Text =  string.Format("ANT-{0}-{1}/{2}/{3}" ,get_last_AdvanceId(), hoy.Day, hoy.Month, hoy.Year);
                     Vencer_Anticipos(pUserKey);
                     BindGridView();
-
+                    btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
                     if (IsPostBackEventControlRegistered)
                     {
                         HttpContext.Current.Session["Evento"] = null;
@@ -278,7 +284,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
 
     protected void btnFinalizar_Click(object sender, EventArgs e)
     {
-        btnFinalizar.Enabled = false;
+        HttpContext.Current.Session["terminar_comprobacion"] = null;     
         //Logica para lanzar Reporte de Reembolsos
         Response.Redirect("~/Logged/Reports/Anticipos");
     }   
@@ -478,11 +484,14 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                 ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alert(B4);", true);
                 System.Threading.Thread.Sleep(5000);
                 ClearControls();
-                btnFinalizar.Enabled = false;
+                HttpContext.Current.Session["terminar_comprobacion"] = false;
+                btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];               
                 return;
               
             }
-            btnFinalizar.Enabled = true;
+
+            HttpContext.Current.Session["terminar_comprobacion"] = true;
+            btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
             Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, pUserKey, 1, Doc_Tools.NotificationType.Revision);
             BindGridView();
             ClearControls();

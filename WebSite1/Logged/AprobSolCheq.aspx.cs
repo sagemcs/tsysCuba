@@ -243,8 +243,16 @@ public partial class Logged_AprobSolCheq : System.Web.UI.Page
                     }
                     btn_carga_masiva.Visible = chek_masiva >= 1;
                     btn_carga_masiva.Text = string.Format("Aprobar ({0}) Solicitudes", chek_masiva.ToString());
-                    btn_rechazo_masivo.Visible = chek_masiva >= 1;
-                    btn_rechazo_masivo.Text = string.Format("Rechazar ({0}) Solicitudes", chek_masiva.ToString());
+                    if (HttpContext.Current.Session["RolUser"].ToString() != "T|SYS| - Validador")
+                    {
+                        btn_rechazo_masivo.Visible = chek_masiva >= 1;
+                        btn_rechazo_masivo.Text = string.Format("Rechazar ({0}) Solicitudes", chek_masiva.ToString());
+                    }
+                    else
+                    {
+                        btn_rechazo_masivo.Visible = false;
+                    }
+                    
                 }
                     else
                     {

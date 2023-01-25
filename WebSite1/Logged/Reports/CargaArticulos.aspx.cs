@@ -23,6 +23,11 @@ public partial class Logged_Reports_CargaArticulosB : System.Web.UI.Page
 
     protected void Page_Init(object sender, EventArgs e)
     {
+        if (HttpContext.Current.Session["IDCompany"] == null)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
 
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
         Page.Response.Cache.SetAllowResponseInBrowserHistory(false);

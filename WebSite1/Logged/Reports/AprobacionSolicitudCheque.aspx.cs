@@ -112,6 +112,12 @@ public partial class Logged_Reports_AprobacionSolicitudCheque : System.Web.UI.Pa
 
     protected void Page_Init(object sender, EventArgs e)
     {
+        if (HttpContext.Current.Session["IDCompany"] == null)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
+
         pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
         pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
         pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());

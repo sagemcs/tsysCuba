@@ -651,6 +651,9 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 var modified = cmd.ExecuteScalar();
                 val = modified.ToString();
                 id = Convert.ToInt32(val);
+                HttpContext.Current.Session["DocKey"] = id;
+                HttpContext.Current.Session["CreateUser"] = userkey;
+                HttpContext.Current.Session["CompanyIdComprobacion"] = companyId;
 
                 foreach (ExpenseDetailDTO detail in expenseDetails)
                 {

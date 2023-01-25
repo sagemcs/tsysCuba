@@ -53,7 +53,7 @@ public partial class Logged_Reports_Anticipos : System.Web.UI.Page
             this.iLogKey = value;
         }
     }
-  
+
     public Dictionary<int, string> Dict_type()
     {
         Dictionary<int, string> dict = new Dictionary<int, string>
@@ -77,6 +77,20 @@ public partial class Logged_Reports_Anticipos : System.Web.UI.Page
                 ParameterName = "@UpdateUserKey",
                 Value = user_id
             });
+            if (HttpContext.Current.Session["DocKey"] != null)
+            {
+                cmd.Parameters.Add(new SqlParameter()
+                {
+                    ParameterName = "@docKey",
+                    Value = Convert.ToInt32(HttpContext.Current.Session["DocKey"].ToString())
+                });
+                HttpContext.Current.Session["DocKey"] = null;
+            }
+            else cmd.Parameters.Add(new SqlParameter()
+            {
+                ParameterName = "@docKey",
+                Value = -1
+            });
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -97,6 +111,12 @@ public partial class Logged_Reports_Anticipos : System.Web.UI.Page
 
     protected void Page_Init(object sender, EventArgs e)
     {
+        if (HttpContext.Current.Session["IDCompany"] == null)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
+
         pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
         pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
         pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());

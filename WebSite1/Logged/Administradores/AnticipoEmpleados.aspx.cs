@@ -486,8 +486,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                 ClearControls();
                 HttpContext.Current.Session["terminar_comprobacion"] = false;
                 btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];               
-                return;
-              
+                return;              
             }
 
             HttpContext.Current.Session["terminar_comprobacion"] = true;

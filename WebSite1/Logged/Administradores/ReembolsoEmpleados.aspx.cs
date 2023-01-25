@@ -467,11 +467,9 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 tipo = "error";
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-
                 HttpContext.Current.Session["terminar_comprobacion_reembolso"] = false;
                 btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];
-                MultiView1.SetActiveView(View_General);
-             
+                MultiView1.SetActiveView(View_General);             
                 return;
             }
 
@@ -492,6 +490,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
             HttpContext.Current.Session["terminar_comprobacion_reembolso"] = true;
             btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Expense, pUserKey, 1, Doc_Tools.NotificationType.Revision);
             Response.Redirect(Page.Request.RawUrl);
         }
         else

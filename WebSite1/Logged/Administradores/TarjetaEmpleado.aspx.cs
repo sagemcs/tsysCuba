@@ -475,6 +475,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             GvItems.DataSource = null;
             HttpContext.Current.Session["terminar_comprobacion"] = true;
             btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.CorporateCard, pUserKey, 1, Doc_Tools.NotificationType.Revision);
             GvItems.DataBind();
         }
         else 

@@ -448,6 +448,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);                
                 ClearControls();
                 MultiView1.SetActiveView(View_General);
+                btnFinalizar.Enabled = false;
                 return;
             }
 
@@ -459,7 +460,12 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             HttpContext.Current.Session["is_valid"] = false;
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
             GvItems.DataSource = null;
+            btnFinalizar.Enabled = true;
             GvItems.DataBind();
+        }
+        else 
+        { 
+            btnFinalizar.Enabled = false; 
         }
         
     }
@@ -671,6 +677,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
+        btnFinalizar.Enabled = false;
         Response.Redirect("~/Logged/Reports/TarjetaEmpleado");
     }    
 
@@ -872,14 +879,14 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             return;
         }
         //validacion de fecha articulo vs fecha del gasto
-        if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
-        {
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            MultiView1.SetActiveView(View_Articulos);
-            return;
-        }
+        //if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
+        //{
+        //    tipo = "error";
+        //    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
+        //    ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+        //    MultiView1.SetActiveView(View_Articulos);
+        //    return;
+        //}
         //validacion texto en importe
         if (tbx_importegasto.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
         {

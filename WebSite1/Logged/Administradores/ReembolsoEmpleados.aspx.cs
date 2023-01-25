@@ -456,6 +456,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 MultiView1.SetActiveView(View_General);
+                btnFinalizar.Enabled = false;
                 return;
             }
 
@@ -474,11 +475,13 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             GvItems.DataBind();
             HttpContext.Current.Session["is_valid"] = false;
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+            btnFinalizar.Enabled = true;
             Response.Redirect(Page.Request.RawUrl);
         }
         else
         {
             btnSage.Enabled = false;
+            btnFinalizar.Enabled = false;
         }      
 
     }
@@ -600,7 +603,6 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         btnSage.Enabled = false;
         tbx_motivo.Text = string.Empty;
     }
-
     
     private int WriteToDb(int tipo_moneda, DateTime fecha_gasto, decimal importe_gasto, int userkey, string companyId, int AdvanceId, List<ExpenseDetailDTO> expenseDetails, int status, string motivo_gasto)
     {
@@ -755,6 +757,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
+        btnFinalizar.Enabled = false;
         Response.Redirect("~/Logged/Reports/Reembolsos");
     }      
 
@@ -1015,15 +1018,15 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
-        //validacion de fecha articulo vs fecha del gasto
-        if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
-        {
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            MultiView1.SetActiveView(View_Articulos);
-            return;
-        }
+        ////validacion de fecha articulo vs fecha del gasto
+        //if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
+        //{
+        //    tipo = "error";
+        //    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
+        //    ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+        //    MultiView1.SetActiveView(View_Articulos);
+        //    return;
+        //}
 
         //validacion texto en importe
         if (tbx_importe_item.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))

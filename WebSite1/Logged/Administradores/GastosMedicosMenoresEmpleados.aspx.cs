@@ -546,6 +546,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                 Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B4").Value;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
                 MultiView1.SetActiveView(View_General);
+                btnFinalizar.Enabled = false;
                 return;
             }
             EnviarCorreo();
@@ -556,11 +557,13 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             GvItems.DataSource = null;
             GvItems.DataBind();          
             HttpContext.Current.Session["is_valid"] = false;
+            btnFinalizar.Enabled = true;
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
         }
         else
         {
             btnSage.Enabled = false;
+            btnFinalizar.Enabled = false;
         }
         
 
@@ -568,6 +571,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
 
     protected void btnFinalizar_Click(object sender, EventArgs e)
     {
+        btnFinalizar.Enabled = false;
         //logica para enviar los correos
         //Logica para lanzar Reporte de Reembolsos
         Response.Redirect("~/Logged/Reports/MinorMedicalExpense");
@@ -670,15 +674,15 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
-        //validacion de fecha articulo vs fecha del gasto
-        if (DateTime.Parse(tbx_fecha_articulo.Text) > DateTime.Parse(tbx_fechagasto.Text))
-        {
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            MultiView1.SetActiveView(View_Articulos);
-            return;
-        }
+        ////validacion de fecha articulo vs fecha del gasto
+        //if (DateTime.Parse(tbx_fecha_articulo.Text) < DateTime.Parse(tbx_fechagasto.Text))
+        //{
+        //    tipo = "error";
+        //    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B55").Value;
+        //    ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+        //    MultiView1.SetActiveView(View_Articulos);
+        //    return;
+        //}
         //validacion texto en importe
         if (tbx_importegasto.Text.Any(x => !char.IsDigit(x) && (x != '.') && (x != ',')))
         {

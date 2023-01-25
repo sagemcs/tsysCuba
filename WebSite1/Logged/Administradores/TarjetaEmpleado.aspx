@@ -32,6 +32,7 @@
             -webkit-border-radius: 15px 15px 15px 15px;
         }
 
+
         #backGround1 {
             position: fixed;
             top: 0px;

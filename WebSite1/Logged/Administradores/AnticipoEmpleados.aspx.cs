@@ -490,6 +490,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         else 
         {
             btnSage.Enabled = false;
+            btnFinalizar.Enabled = false;
         }
         
     }

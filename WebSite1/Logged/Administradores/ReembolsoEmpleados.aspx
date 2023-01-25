@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../Scripts/bootstrap-datepicker/css/datepicker.css">
     <style>
 
+
         #Update1{
         position :fixed;
         top:40%;
@@ -456,7 +457,7 @@
                     </Triggers>
                 </asp:UpdatePanel>
                 <div class="col-xs-3 col-md-3 col-xs-3">
-                    <asp:Button ID="btnFinalizar" runat="server" Class="btn btn-tsys cargar" title="Finalizar" Text="Terminar Comprobacion" OnClick="btnFinalizar_Click" />
+                    <asp:Button ID="btnFinalizar" runat="server" Class="btn btn-tsys cargar" title="Finalizar" Text="Terminar Comprobacion" OnClick="btnFinalizar_Click" Enabled="False" />
                 </div>
             </div>
     

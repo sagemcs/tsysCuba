@@ -407,6 +407,9 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                 var modified = cmd.ExecuteScalar();
                 val = modified.ToString();
                 id = Convert.ToInt32(val);
+                HttpContext.Current.Session["DocKey"] = id;
+                HttpContext.Current.Session["CreateUser"] = userkey;
+                HttpContext.Current.Session["CompanyIdComprobacion"] = companyId;
 
                 foreach (ExpenseDetailDTO detail in expenseDetails)
                 {
@@ -570,7 +573,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
     {
         //logica para enviar los correos
         //Logica para lanzar Reporte de Reembolsos
-        Response.Redirect("~/Logged/Reports/MinorMedicalExpense");
+        Response.Redirect("~/Logged/Reports/ComprobacionGastosGMedicos");
     }
 
     protected void gvGastos_RowCommand(object sender, GridViewCommandEventArgs e)

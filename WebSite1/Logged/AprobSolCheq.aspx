@@ -206,6 +206,8 @@
                   error: function (respuesta) {
                       $('#Update').modal('close');
                       $('#myModal').modal('close');
+                      $('#Update').modal('hide');
+                      $('#myModal').modal('hide');
                       //swal("La notificación de rechazo de Solicitud de Cheque no ha podido ser enviada");
                       swal.fire({
                           title: 'Notificaciones T|SYS|',

@@ -8,12 +8,13 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using WebSite1;
 
-public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
+public partial class Logged_Reports_Comprobacion_Gastos_Tarjeta : System.Web.UI.Page
 {
     private PortalProveedoresEntities db = new PortalProveedoresEntities();
     ReportDocument report_document = new ReportDocument();
@@ -54,38 +55,54 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
         }
     }
 
-    public List<ExpenseReportDTO> LoadData(int user_id)
+    public List<ExpenseDetailComprobacionDTO> LoadData(int docKey, int createUser, string companyId)
     {
-        List<ExpenseReportDTO> gastos = new List<ExpenseReportDTO>();
+        var lista = (List<ItemDTO>)HttpContext.Current.Session["Items"];
+        var taxes = (List<TaxesDTO>)HttpContext.Current.Session["Taxes"];
+        List<ExpenseDetailComprobacionDTO> articles = new List<ExpenseDetailComprobacionDTO>();
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "SpReportComprobacionGastos";
+            cmd.CommandText = "SpReportComprobacionGastosTarjeta";
             cmd.Parameters.Add(new SqlParameter()
             {
-                ParameterName = "@UpdateUserKey",
-                Value = user_id
-            });            
+                ParameterName = "@docKey",
+                Value = docKey
+            });
+            cmd.Parameters.Add(new SqlParameter()
+            {
+                ParameterName = "@createUser",
+                Value = createUser
+            });
+            cmd.Parameters.Add(new SqlParameter()
+            {
+                ParameterName = "@companyId",
+                Value = companyId
+            });
 
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
             {
-                var expense = new ExpenseReportDTO();
-                expense.Fecha = dataReader.GetString(0);
-                expense.Aereo = dataReader.GetDecimal(1);
-                expense.Terrestre = dataReader.GetDecimal(2);               
-                expense.Casetas = dataReader.GetDecimal(3);
-                expense.Gasolina = dataReader.GetDecimal(4);
-                expense.Estacionamiento = dataReader.GetDecimal(5);
-                expense.Alimentos = dataReader.GetDecimal(6);
-                expense.Hospedaje = dataReader.GetDecimal(7);
-                expense.GExtra = dataReader.GetDecimal(8);
-                gastos.Add(expense);
+                var article = new ExpenseDetailComprobacionDTO();
+                article.DetailId = dataReader.GetInt32(0);
+                article.ItemKey = dataReader.GetInt32(2);
+                article.Qty = dataReader.GetDecimal(3);
+                article.UnitCost = dataReader.GetDecimal(4);
+                article.ItemId = lista.FirstOrDefault(x => x.ItemKey == article.ItemKey).ItemId;
+                article.TaxAmount = dataReader.GetDecimal(6);
+                article.Type = dataReader.GetInt32(7);
+                article.STaxCodeKey = dataReader.GetInt32(5);
+                article.STaxCodeID = taxes.FirstOrDefault(x => x.STaxCodeKey == article.STaxCodeKey).STaxCodeID;
+                article.TipoGasto = Doc_Tools.Dict_tipos_gastos().FirstOrDefault(x => x.Key == article.Type).Value;
+                if (!articles.Any(x => x.DetailId == article.DetailId))
+                {
+                    articles.Add(article);
+                }
             }
         }
-        return gastos;
+        return articles;
     }
 
     protected void Page_Init(object sender, EventArgs e)
@@ -99,6 +116,9 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
         pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
         pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
         pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+
+        int docKey = Convert.ToInt32(HttpContext.Current.Session["DocKey"].ToString());
+        int createUser = Convert.ToInt32(HttpContext.Current.Session["CreateUser"].ToString());
 
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
         Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
@@ -132,7 +152,7 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
         }
         try
         {
-            List<ExpenseReportDTO> list_dto = new List<ExpenseReportDTO>();
+            List<ExpenseDetailComprobacionDTO> list_dto = new List<ExpenseDetailComprobacionDTO>();
             List<Invoice> list = new List<Invoice>();
 
             if (Request.QueryString.HasKeys())
@@ -150,14 +170,16 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
                 fecha = Tools.ObtenerFechaEnFormatoNew(fecha);
                 fechaR = Tools.ObtenerFechaEnFormatoNew(fechaR);
 
-                list_dto = LoadData(pUserKey);
+                list_dto = LoadData(docKey, createUser, pCompanyID).ToList();
             }
             else
-                list_dto = LoadData(pUserKey);
+                list_dto = LoadData(docKey, createUser, pCompanyID).ToList();
 
-            report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "ReembolsosReport.rpt"));
-            report_document.SetDataSource(list_dto);
-            report_document.SetParameterValue("titulo", "Reporte de Reembolsos");
+            report_document.Load(Path.Combine(Server.MapPath("~/Reports"), "ComprobacionReport.rpt"));
+            var anomlist = list_dto.Select(x => new { x.ItemKey, x.Qty, x.UnitCost, x.ItemId, x.TaxAmount, x.Type, x.STaxCodeKey, x.STaxCodeID, x.TipoGasto, x.Amount }).ToList();
+
+            report_document.SetDataSource(anomlist);
+            report_document.SetParameterValue("titulo", "Comprobación de Gastos de Tarjeta Corporativa");
 
             Company company = Tools.EmpresaAutenticada();
             //if (company == null)

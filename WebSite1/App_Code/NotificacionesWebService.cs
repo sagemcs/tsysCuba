@@ -1195,7 +1195,7 @@ public class NotificacionesWebService : System.Web.Services.WebService
                                 using (StreamReader reader = new StreamReader(Server.MapPath("~/Account/Templates Email/ChequeRechazado.html")))
                                 {
                                     Body = reader.ReadToEnd();
-                                    Body = Body.Replace("{Fac}", llave).Replace("{Comments}", texto);
+                                    Body = Body.Replace("{Fac}", FFolio.ToString()).Replace("{Comments}", texto);
                                 }
 
                                 bool SendEmail = Global.EmailGlobal(Email, Body, "Notificación de Rechazo de Solicitud de Cheque");

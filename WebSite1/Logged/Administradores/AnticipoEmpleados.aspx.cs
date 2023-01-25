@@ -327,6 +327,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                 id = Convert.ToInt32(val);
                 cmd.Connection.Close();
             }
+            HttpContext.Current.Session["DocKey"] = id;
 
             return id;
         }

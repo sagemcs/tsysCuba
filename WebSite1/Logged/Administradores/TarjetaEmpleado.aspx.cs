@@ -558,6 +558,9 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                 var modified = cmd.ExecuteScalar();
                 val = modified.ToString();
                 id = Convert.ToInt32(val);
+                HttpContext.Current.Session["DocKey"] = id;
+                HttpContext.Current.Session["CreateUser"] = userkey;
+                HttpContext.Current.Session["CompanyIdComprobacion"] = companyId;
 
                 foreach (ExpenseDetailDTO detail in expenseDetails)
                 {
@@ -660,8 +663,8 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
-        Response.Redirect("~/Logged/Reports/TarjetaEmpleado");
-    }    
+        Response.Redirect("~/Logged/Reports/ComprobacionGastosTarjeta");
+    }
 
     protected void STipoGasto_SelectedIndexChanged(object sender, EventArgs e)
     {

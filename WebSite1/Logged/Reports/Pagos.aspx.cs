@@ -24,6 +24,12 @@ public partial class Logged_Reports_PagosB : System.Web.UI.Page
 
     protected void Page_Init(object sender, EventArgs e)
     {
+        if (HttpContext.Current.Session["IDCompany"] == null)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
+
         bool isAuth = System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
         if (!isAuth)
         {

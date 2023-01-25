@@ -195,6 +195,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             {
                 get_items(pCompanyID);
                 get_taxes();
+                BindTipoGasto();
                 HttpContext.Current.Session["GridItems"] = null;
                 HttpContext.Current.Session["GridTaxes"] = null;
 
@@ -202,10 +203,9 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                 {
                     var expense = (ExpenseDTO)HttpContext.Current.Session["Expense"];
                     tbx_importe.Text = expense.Amount.ToString("0.00");
-                    tbx_currency.Text =  Doc_Tools.Dict_moneda().FirstOrDefault(x=> x.Key == expense.Currency).Value ;
+                    drop_currency.SelectedValue = expense.Currency.ToString();
                     tbx_fechagasto.Text = expense.Date.ToString("yyyy-MM-dd");                 
-                    Load_Articles_By_Expense(expense.ExpenseId, pUserKey, pCompanyID);
-                       
+                    Load_Articles_By_Expense(expense.ExpenseId, pUserKey, pCompanyID);                       
                    
                     tbx_motivo.Text = expense.ExpenseReason;
                 }
@@ -323,7 +323,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         }
     }
 
-    private int Update_Reembolso(int expense_id, DateTime fecha_gasto, decimal importe_gasto, int userkey, string companyId, List<ExpenseDetailDTO> expenseDetails, string motivo_gasto)
+    private int Update_Reembolso(int expense_id, int currency, DateTime fecha_gasto, decimal importe_gasto, int userkey, string companyId, List<ExpenseDetailDTO> expenseDetails, string motivo_gasto)
     {
         string d = string.Empty;
         int id = 0, detail_id = 0;
@@ -335,11 +335,12 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                 SqlCommand cmd = conn.CreateCommand();
                 StringBuilder sb = new StringBuilder();
                 //Cadena Inicial
-                sb.Append("UPDATE dbo.Expense  SET Date = @Date,Amount = @Amount");                    
+                sb.Append("UPDATE dbo.Expense  SET Date = @Date, Amount = @Amount, Currency = @Currency");                    
                 sb.Append(", UpdateDate = @UpdateDate, ExpenseReason = @ExpenseReason WHERE ExpenseId = @ExpenseId;");
                 cmd.CommandText = sb.ToString();              
                 cmd.Parameters.Add("@Date", SqlDbType.DateTime).Value = fecha_gasto;               
                 cmd.Parameters.Add("@Amount", SqlDbType.Decimal).Value = importe_gasto;                
+                cmd.Parameters.Add("@Currency", SqlDbType.Int).Value = currency;                
                 cmd.Parameters.Add("@UpdateDate", SqlDbType.DateTime).Value = DateTime.Now;                    
                 cmd.Parameters.Add("@ExpenseId", SqlDbType.Int).Value = expense_id; //Estado inicial Aprobado
                 cmd.Parameters.Add("@ExpenseReason", SqlDbType.VarChar).Value = motivo_gasto ?? (object)DBNull.Value;
@@ -416,7 +417,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         tbx_fechagasto.Text = string.Empty;
         tbx_importe.Text = string.Empty;
         STipoGasto.ClearSelection();
-        tbx_currency.Text = string.Empty;        
+        drop_currency.ClearSelection();
         HttpContext.Current.Session["fu_xml"] = null;
         HttpContext.Current.Session["fu_pdf"] = null;
         HttpContext.Current.Session["fu_voucher"] = null;
@@ -428,6 +429,16 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         tbx_pdf.Text = string.Empty;       
         btn_Guardar.Enabled = false;
         tbx_motivo.Text = string.Empty;
+    }
+
+    private void BindTipoGasto()
+    {
+        var lista = Doc_Tools.Dict_tipos_gastos();
+        lista.Add(0, string.Empty);
+        STipoGasto.DataSource = lista.OrderBy(x => x.Key).Select(x => new { Id = x.Key, Name = x.Value }).ToList();
+        STipoGasto.DataTextField = "Name";
+        STipoGasto.DataValueField = "Id";
+        STipoGasto.DataBind();
     }
 
     protected void btn_Guardar_Click(object sender, EventArgs e)
@@ -444,8 +455,9 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             //Atualizar Reembolso de gasto
             var expense = (ExpenseDTO)HttpContext.Current.Session["Expense"];
             var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridItems"];
+            int currency = int.Parse(drop_currency.SelectedValue);
            
-            var result = Update_Reembolso(expense.ExpenseId, fecha_gasto, importe_gasto,  pUserKey, pCompanyID, lista_detalles, motivo_gasto);
+            var result = Update_Reembolso(expense.ExpenseId, currency, fecha_gasto, importe_gasto,  pUserKey, pCompanyID, lista_detalles, motivo_gasto);
             if (result == -1)
             {
                 tipo = "error";
@@ -850,6 +862,15 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         is_valid = false;       
         var expense = (ExpenseDTO)HttpContext.Current.Session["Expense"];
 
+        //validacion de moneda
+        if(string.IsNullOrEmpty(drop_currency.SelectedValue))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B14").Value;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_General);
+            return;
+        }
         //validacion de fecha
         if (string.IsNullOrEmpty(tbx_fechagasto.Text))
         {            
@@ -894,14 +915,17 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }
-        
-        if (!Check_Advance_Date(pUserKey, expense.AdvanceId, fecha_gasto))
+        if(expense.AdvanceId!=0)
         {
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB43").Value;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            return;
+            if (!Check_Advance_Date(pUserKey, expense.AdvanceId, fecha_gasto))
+            {
+                tipo = "error";
+                Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB43").Value;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                return;
+            }
         }
+       
         //Solo alertas sin retorno
         is_valid = true;               
        
@@ -1011,5 +1035,10 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
 
     }
 
-    
+
+
+    protected void drop_currency_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
 }

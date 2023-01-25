@@ -174,7 +174,7 @@
                      <h4>Tipo del gasto:</h4>
                     <span class="dropdown-header">               
                         <asp:DropDownList ID="STipoGasto" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" OnSelectedIndexChanged="STipoGasto_SelectedIndexChanged" AutoPostBack="true" >                           
-                           <asp:ListItem Value=""> </asp:ListItem>
+                          <%-- <asp:ListItem Value=""> </asp:ListItem>
                            <asp:ListItem Value="1">Transporte Aéreo</asp:ListItem>
                            <asp:ListItem Value="2">Transporte Terrestre</asp:ListItem>
                            <asp:ListItem Value="3">Casetas</asp:ListItem>
@@ -182,7 +182,7 @@
                            <asp:ListItem Value="5">Estacionamiento</asp:ListItem>
                            <asp:ListItem Value="6">Alimentos</asp:ListItem>
                            <asp:ListItem Value="7">Hospedaje</asp:ListItem>
-                           <asp:ListItem Value="8">Gastos Extraordinarios</asp:ListItem>
+                           <asp:ListItem Value="8">Gastos Extraordinarios</asp:ListItem>--%>
                         </asp:DropDownList>                             
                     </span>            
                 </div>   

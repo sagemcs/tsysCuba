@@ -300,9 +300,16 @@
                 
                 <%--   Tipo de moneda--%>
                 <div class="col-lg-3 col-sm-6 col-xs-5">
-                    <h4>Tipo de moneda:</h4>
-                    <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_currency" class="form-control" BackColor="White" ReadOnly="True"></asp:TextBox>
-                </div>
+                    <h4>Tipo de moneda:</h4>                           
+                        <span class="dropdown-header">
+                            <asp:DropDownList ID="drop_currency" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" AutoPostBack="true" OnSelectedIndexChanged="drop_currency_SelectedIndexChanged">
+                                <asp:ListItem> </asp:ListItem>
+                                <asp:ListItem Value=1>Pesos</asp:ListItem>
+                                <asp:ListItem Value=2>Dólares</asp:ListItem>
+                                <asp:ListItem Value=3>Euros</asp:ListItem>   
+                            </asp:DropDownList>
+                        </span> 
+                </div> 
                 <%--Fecha del gasto--%>
                 <div class="col-lg-4 col-sm-5 col-xs-5">
                     <h4>Fecha del gasto:</h4>
@@ -334,6 +341,7 @@
                 <asp:AsyncPostBackTrigger ControlID="STipoGasto" EventName="selectedindexchanged" />                                                           
                 <asp:AsyncPostBackTrigger ControlID="tbx_fechagasto" EventName="TextChanged" />     
                 <asp:AsyncPostBackTrigger ControlID="btn_Guardar" EventName="Click" />                     
+                <asp:AsyncPostBackTrigger ControlID="drop_currency" EventName="selectedindexchanged" />                     
                                    
             </Triggers>
         </asp:UpdatePanel>

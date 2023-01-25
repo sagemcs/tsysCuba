@@ -603,10 +603,10 @@ public partial class Logged_Administradores_EditGastosMedicosMenores : System.We
         if (HttpContext.Current.Session["GridList"] != null)
         {
             var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
-            if (!lista.Any(x => x.ItemKey == detalle.ItemKey))
-            {                
-                lista.Add(detalle);
-            }
+            //if (!lista.Any(x => x.ItemKey == detalle.ItemKey))
+            //{                
+            lista.Add(detalle);
+            //}
             HttpContext.Current.Session["GridList"] = lista;
             GvItems.DataSource = null;
             GvItems.DataSource = lista.Where(x=> x.Accion != ExpenseDetailDTO.Action.Delete);

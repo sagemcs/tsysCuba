@@ -272,6 +272,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                         get_anticipos(pUserKey);
                         get_items(pCompanyID);
                         get_taxes();
+                        BindTipoGasto();
                         HttpContext.Current.Session["GridItems"] = null;
                         HttpContext.Current.Session["GridTaxes"] = null;
                         //Limpiar Variables de sesion del Gastos
@@ -569,6 +570,16 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         gvGastos.DataBind();
     }
 
+    private void BindTipoGasto()
+    {
+        var lista = Doc_Tools.Dict_tipos_gastos();
+        lista.Add(0, string.Empty);
+        STipoGasto.DataSource = lista.OrderBy(x=> x.Key).Select(x=> new {Id=x.Key, Name=x.Value}).ToList();
+        STipoGasto.DataTextField = "Name";
+        STipoGasto.DataValueField = "Id";
+        STipoGasto.DataBind();
+    }
+
     private void ClearControls()
     {
         tbx_fechagasto.Text = string.Empty;
@@ -590,10 +601,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         tbx_motivo.Text = string.Empty;
     }
 
-    /// <summary>
-    /// Metodo para Guardar el Gasto en BD
-    /// </summary>
-    /// <returns>Entero</returns>
+    
     private int WriteToDb(int tipo_moneda, DateTime fecha_gasto, decimal importe_gasto, int userkey, string companyId, int AdvanceId, List<ExpenseDetailDTO> expenseDetails, int status, string motivo_gasto)
     {
         string val = string.Empty, d = string.Empty;
@@ -707,17 +715,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             return -1;
         }       
     }
-       
-    public Dictionary<int, string> Dict_type()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Viaje" },
-            { 2, "Compra Extraordinaria" }
-        };
-        return dict;
-    }
-
+           
     private List<ExpenseDTO> ReadFromDb(int user_id)
     {
         List<ExpenseDTO> gastos = new List<ExpenseDTO>();
@@ -824,7 +822,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             while (dataReader.Read())
             {
                 advance.AdvanceId = dataReader.GetInt32(0);
-                advance.AdvanceType = Dict_type().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
+                advance.AdvanceType = Doc_Tools.Dict_Advancetype().FirstOrDefault(x => x.Key == dataReader.GetInt32(1)).Value;
                 advance.Folio = dataReader.GetString(2);
                 advance.Amount = dataReader.GetDecimal(3);
                 if (!dataReader.IsDBNull(4))
@@ -1249,6 +1247,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         tbx_voucher.Text = string.Empty;
         tbx_xml.Text = string.Empty;
         tbx_fecha_articulo.Text = string.Empty;
+        STipoGasto.ClearSelection();      
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;

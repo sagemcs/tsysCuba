@@ -199,6 +199,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                     {
                         get_taxes();
                         get_items(pCompanyID);
+                        BindTipoGasto();
                         HttpContext.Current.Session["GridList"] = null;
                         HttpContext.Current.Session["GridTaxes"] = null;
                         //Limpiar Variables de sesion del Gastos
@@ -471,7 +472,17 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         gvGastos.Visible = true;
         gvGastos.DataSource = ReadFromDb(pUserKey);
         gvGastos.DataBind();
-    }    
+    }
+
+    private void BindTipoGasto()
+    {
+        var lista = Doc_Tools.Dict_tipos_gastos();
+        lista.Add(0, string.Empty);
+        STipoGasto.DataSource = lista.OrderBy(x => x.Key).Select(x => new { Id = x.Key, Name = x.Value }).ToList();
+        STipoGasto.DataTextField = "Name";
+        STipoGasto.DataValueField = "Id";
+        STipoGasto.DataBind();
+    }
 
     private void ClearControls()
     {

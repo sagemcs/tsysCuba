@@ -217,6 +217,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             {              
                 get_items(pCompanyID);
                 get_taxes();
+                BindTipoGasto();
                 HttpContext.Current.Session["GridList"] = null;
                 HttpContext.Current.Session["GridTaxes"] = null;
                 if (HttpContext.Current.Session["CorporateCard"] != null)
@@ -307,6 +308,15 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         GvItems.DataBind();
     }
 
+    private void BindTipoGasto()
+    {
+        var lista = Doc_Tools.Dict_tipos_gastos();
+        lista.Add(0, string.Empty);
+        STipoGasto.DataSource = lista.OrderBy(x => x.Key).Select(x => new { Id = x.Key, Name = x.Value }).ToList();
+        STipoGasto.DataTextField = "Name";
+        STipoGasto.DataValueField = "Id";
+        STipoGasto.DataBind();
+    }
     private void get_taxes()
     {
         List<TaxesDTO> lista = Doc_Tools.get_taxes(pCompanyID);
@@ -379,19 +389,19 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
 
                         if (detail.FileXml != null)
                         {
-                            detail.FileXml.ExpenseId = id;
+                            detail.FileXml.ExpenseId = card_id;
                             detail.FileXml.ExpenseDetailId = detail_id;
                             Doc_Tools.SaveFile(detail.FileXml);
                         }
                         if (detail.FilePdf != null)
                         {
-                            detail.FilePdf.ExpenseId = id;
+                            detail.FilePdf.ExpenseId = card_id;
                             detail.FilePdf.ExpenseDetailId = detail_id;
                             Doc_Tools.SaveFile(detail.FilePdf);
                         }
                         if (detail.FilePdfVoucher != null)
                         {
-                            detail.FilePdfVoucher.ExpenseId = id;
+                            detail.FilePdfVoucher.ExpenseId = card_id;
                             detail.FilePdfVoucher.ExpenseDetailId = detail_id;
                             Doc_Tools.SaveFile(detail.FilePdfVoucher);
                         }
@@ -714,10 +724,10 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
         if (HttpContext.Current.Session["GridList"] != null)
         {
             var lista = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridList"];
-            if (!lista.Any(x => x.ItemKey == detalle.ItemKey))
-            {                
-                lista.Add(detalle);
-            }
+            //if (!lista.Any(x => x.ItemKey == detalle.ItemKey))
+            //{                
+            lista.Add(detalle);
+            //}
             HttpContext.Current.Session["GridList"] = lista;
             GvItems.DataSource = null;
             GvItems.DataSource = lista.Where(x => x.Accion != ExpenseDetailDTO.Action.Delete);
@@ -828,6 +838,7 @@ public partial class Logged_Administradores_EditTarjeta : System.Web.UI.Page
             ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
         }
+        STipoGasto.ClearSelection();
         HttpContext.Current.Session["voucher_file"] = null;
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;

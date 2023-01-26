@@ -102,6 +102,12 @@ public partial class SiteMaster : MasterPage
 
     public bool HasRightsForSpecifiedMenu(string menuItemName)
     {
+        if (HttpContext.Current.Session["IDCompany"] == null)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            Response.Redirect("~/Account/Login.aspx");
+        }
+
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
 

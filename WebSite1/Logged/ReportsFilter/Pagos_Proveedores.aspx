@@ -165,6 +165,15 @@
               <asp:DropDownList ID="SelP" runat="server" class="selectpicker show-tick form-control" OnSelectedIndexChanged="List_SelectProvs" AutoPostBack ="true"></asp:DropDownList>
             </div>
         </div>
+         <div class="col-xs-12 col-md-3 col-lg-3">
+              <label>Estatus</label>
+            <asp:DropDownList ID="DropDownList1" runat="server" class="selectpicker show-tick form-control" OnSelectedIndexChanged="List_SelectedIndexChanged" AutoPostBack="True">
+               <asp:ListItem Value="2">Aprobado</asp:ListItem>
+               <asp:ListItem Value="1">Pendiente</asp:ListItem>
+               <asp:ListItem Value="3">Rechazado</asp:ListItem>
+               <asp:ListItem Value="4">Eliminado</asp:ListItem>
+            </asp:DropDownList>
+          </div>
 
         <div class="col-lg-10 col-sm-10 col-xs-10" style="margin-top: 30px;">
           <div class="alert alert-block alert-danger" id="B1" style="display: none">
@@ -202,23 +211,50 @@
                     <asp:CheckBox ID="Check" CssClass="ChkBoxClass" Style="width: 20px; height: 20px;" runat="server" AutoPostBack="true" OnCheckedChanged="GridView2_RowCommand" />
                   </ItemTemplate>
                 </asp:TemplateField>
-                <asp:BoundField DataField="Serie" HeaderText="Serie de Factura" ReadOnly="True" SortExpression="Serie" />
-                <asp:BoundField DataField="Fecha" HeaderText="Fecha" ReadOnly="False" Visible="true" SortExpression="Fecha" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
-                <asp:BoundField DataField="Fecha2" HeaderText="Fecha de Recepción" ReadOnly="False" Visible="true" SortExpression="Fecha2" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
-                <asp:BoundField DataField="Fecha3" HeaderText="Fecha de Aprobación" ReadOnly="False" Visible="true" SortExpression="Fecha3" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+
+                <%--Original--%>
+                <%--<asp:BoundField DataField="Fecha" HeaderText="Fecha" ReadOnly="False" Visible="true" SortExpression="Fecha" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
                 <asp:BoundField DataField="VendID" HeaderText="ID Proveedor" ReadOnly="False" Visible="true" SortExpression="VendID" />
                 <asp:BoundField DataField="RFC" HeaderText="RFC" ReadOnly="True" SortExpression="RFC" />
                 <asp:BoundField DataField="OC" HeaderText="OC" ReadOnly="True" SortExpression="OC" />
                 <asp:BoundField DataField="Folio" HeaderText="Folio" ReadOnly="True" SortExpression="Folio" />
-                <asp:BoundField DataField="Folio2" HeaderText="Folio de Contrarrecibo" ReadOnly="True" SortExpression="Foli02" />
-                <asp:BoundField DataField="Folio3" HeaderText="Folio de Solicitud de Cheque" ReadOnly="True" SortExpression="Foli3" />
-                <asp:BoundField DataField="Fecha4" HeaderText="Fecha Programada de Pago" ReadOnly="False" Visible="true" SortExpression="Fecha4" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
-                <asp:BoundField DataField="Fecha5" HeaderText="Fecha de Pago" ReadOnly="False" Visible="true" SortExpression="Fecha5" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
-                <asp:BoundField DataField="Banco" HeaderText="Banco Emisor de Pago" ReadOnly="True" SortExpression="Banco" />
-                <asp:BoundField DataField="Cuenta" HeaderText="Numero de Cuenta" ReadOnly="True" SortExpression="Cuenta" />
-                <asp:BoundField DataField="Fecha6" HeaderText="Fecha de Notificación de Pago" ReadOnly="False" Visible="true" SortExpression="Fecha6" HeaderStyle-Width="25px" ControlStyle-Width="25px" /> 
-                <asp:BoundField DataField="FolioPago" HeaderText="Folio Completo de Pago" ReadOnly="True" SortExpression="FolioPago" />
-                <asp:BoundField DataField="Fecha7" HeaderText="Fecha Recepción Complemento de Pago" ReadOnly="False" Visible="true" SortExpression="Fecha7" HeaderStyle-Width="25px" ControlStyle-Width="25px" /> 
+                <asp:BoundField DataField="Moneda" HeaderText="Moneda" ReadOnly="True" SortExpression="Moneda" />
+                <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="95px" HeaderText="Pago" ControlStyle-Width="90px">
+                  <ItemTemplate>
+                   <asp:TextBox ID="cant" type="text" AutoComplete="off" AutoCompleteType="Disabled" CssClass="form-control" runat="server" AutoPostBack="true" onkeypress="return isFloatNumber(this,event);" OnTextChanged="TextBox1_TextChanged" />
+                  </ItemTemplate>
+                </asp:TemplateField>
+                <asp:BoundField DataField="Saldo" HeaderText="Pago" ReadOnly="True" visible="false" SortExpression="Saldo" />
+                <asp:BoundField DataField="Total" HeaderText="Total" ReadOnly="True" SortExpression="Total" />
+                <asp:BoundField DataField="Resto" HeaderText="Saldo Restante" ReadOnly="True" SortExpression="Resto" />--%>
+                
+
+                <%--De pago--%>
+                <asp:BoundField DataField="Fecha" HeaderText="Fecha de Pago" ReadOnly="False" Visible="true" SortExpression="Fecha" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+                <asp:BoundField DataField="FechaProgPago" HeaderText="Fecha Programada de Pago" ReadOnly="True" SortExpression="FechaProgPago" />
+                <asp:BoundField DataField="FechaNot" HeaderText="Fecha Notificación de Pago" ReadOnly="False" Visible="true" SortExpression="FechaNot" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+                <asp:BoundField DataField="FolioComplPago" HeaderText="Folio Complemento de Pago" ReadOnly="False" Visible="true" SortExpression="FolioComplPago" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+                <asp:BoundField DataField="FechaRecepComplPago" HeaderText="Fecha Recepción Complemento de Pago" ReadOnly="False" Visible="true" SortExpression="FechaRecepComplPago" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+                <asp:BoundField DataField="FechaAprobComplPago" HeaderText="Fecha Recepción Complemento de Pago" ReadOnly="False" Visible="true" SortExpression="FechaAprobComplPago" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+                <asp:BoundField DataField="RFC" HeaderText="RFC" ReadOnly="True" SortExpression="RFC" />
+                <asp:BoundField DataField="OC" HeaderText="OC" ReadOnly="True" SortExpression="OC" />
+                <asp:BoundField DataField="BancoPago" HeaderText="Banco Emisor de Pago" ReadOnly="True" SortExpression="BancoPago" />
+                <asp:BoundField DataField="Cuenta" HeaderText="Número de Cuenta" ReadOnly="True" SortExpression="Cuenta" />
+                <asp:BoundField DataField="Moneda" HeaderText="Moneda" ReadOnly="True" SortExpression="Moneda" />
+                <%--De factura--%>
+                <asp:BoundField DataField="Serie" HeaderText="Serie de Factura" ReadOnly="True" SortExpression="Serie" />
+                <asp:BoundField DataField="Folio" HeaderText="Folio de Factura" ReadOnly="True" SortExpression="Folio" />
+                <asp:BoundField DataField="VendID" HeaderText="Proveedor" ReadOnly="False" Visible="true" SortExpression="VendID" />
+                <asp:BoundField DataField="FechaFactura" HeaderText="Fecha de Factura" ReadOnly="False" Visible="true" SortExpression="FechaFactura" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+                <asp:BoundField DataField="FechaRecep" HeaderText="Fecha de Recepción" ReadOnly="False" Visible="true" SortExpression="FechaRecep" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+                <asp:BoundField DataField="FechaAprob" HeaderText="Fecha de Aprobación" ReadOnly="False" Visible="true" SortExpression="FechaAprob" HeaderStyle-Width="25px" ControlStyle-Width="25px" />
+                <asp:BoundField DataField="SubTotal" HeaderText="SubTotal" ReadOnly="True" SortExpression="SubTotal" />
+                <asp:BoundField DataField="Impuestos" HeaderText="Impuestos" ReadOnly="True" SortExpression="Impuestos" />
+                <asp:BoundField DataField="Total" HeaderText="Total" ReadOnly="True" SortExpression="Total" />
+                <asp:BoundField DataField="FolioContrarecibo" HeaderText="Folio de Contrarecibo" ReadOnly="True" SortExpression="FolioContrarecibo" />
+                <asp:BoundField DataField="FolioSolChqk" HeaderText="Folio de Solicitud de Cheque" ReadOnly="True" SortExpression="FolioSolChqk" />
+
+                
                 <asp:TemplateField ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="95px" HeaderText="Pago" ControlStyle-Width="90px">
                   <ItemTemplate>
                    <asp:TextBox ID="cant" type="text" AutoComplete="off" AutoCompleteType="Disabled" CssClass="form-control" runat="server" AutoPostBack="true" onkeypress="return isFloatNumber(this,event);" OnTextChanged="TextBox1_TextChanged" />
@@ -227,7 +263,6 @@
                 <asp:BoundField DataField="Saldo" HeaderText="Pago" ReadOnly="True" visible="false" SortExpression="Saldo" />
                 <asp:BoundField DataField="Total" HeaderText="Total" ReadOnly="True" SortExpression="Total" />
                 <asp:BoundField DataField="Resto" HeaderText="Saldo Restante" ReadOnly="True" SortExpression="Resto" />
-                <asp:BoundField DataField="Estado" HeaderText="Saldo Restante" ReadOnly="True" SortExpression="Estado" />
               </Columns>
               
               <EditRowStyle BackColor="#F7F6F3" ForeColor="#333333" />

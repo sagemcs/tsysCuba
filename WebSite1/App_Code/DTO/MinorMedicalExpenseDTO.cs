@@ -16,6 +16,8 @@ using System.Web;
         public List<string> FileNameXml { get; set; }
         public List<string> FileNamePdf { get; set; }
         public bool SageIntegration { get; set; }
+
+        public string Nivel { get; set; }
         public MinorMedicalExpenseDTO()
             {
                 //

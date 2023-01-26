@@ -484,6 +484,7 @@
                 <asp:BoundField DataField="Currency" HeaderText="Tipo de Moneda" ReadOnly="True" SortExpression="Currency" />
                 <asp:BoundField DataField="Amount" HeaderText="Importe del Gasto" ReadOnly="True" SortExpression="Amount" DataFormatString="{0:c}" />
                 <asp:BoundField DataField="Status" HeaderText="Estado del Gasto" ReadOnly="True" SortExpression="Status" />
+                <asp:BoundField DataField="Nivel" HeaderText="Nivel" ReadOnly="True" SortExpression="Nivel" />        
                 <asp:CommandField ShowSelectButton="True" ControlStyle-CssClass="btn-success" ButtonType="Button" SelectText="Editar" ShowCancelButton="False">
                     <ControlStyle CssClass="btn-success"></ControlStyle>
                 </asp:CommandField>

@@ -52,9 +52,7 @@
         </style>
 
     <script type="text/javascript">
-        $(function () {
-
-            
+        $(function () {         
 
             
 
@@ -391,6 +389,7 @@
          <asp:BoundField DataField="CheckDate" HeaderText="Fecha de Comprobación" ReadOnly="True" SortExpression="CheckDate" />        
          <asp:BoundField DataField="ImmediateBoss" HeaderText="Jefe Inmediato" ReadOnly="True" SortExpression="ImmediateBoss" />        
          <asp:BoundField DataField="Status" HeaderText="Estado" ReadOnly="True" SortExpression="Status" />                   
+         <asp:BoundField DataField="Nivel" HeaderText="Nivel" ReadOnly="True" SortExpression="Nivel" />                   
          <asp:CommandField ShowSelectButton="True"  ControlStyle-CssClass="btn-success" ButtonType="Button" SelectText="Editar" CancelText="Eliminar" ShowCancelButton="True" >
                 <ControlStyle CssClass="btn-success"></ControlStyle>
          </asp:CommandField>

@@ -793,6 +793,29 @@ public static class Doc_Tools
         return matriz;
     }
 
+    public static string GetAprovalLevel(int level)
+    {
+        string nivel = string.Empty;
+        switch (level)
+        {
+            case 0:                
+                break;
+            case 1:
+                nivel = "Gerente / RH";
+                break;
+            case 2:
+                nivel = "Cuentas Por Pagar";
+                break;
+            case 3:
+                nivel = "Tesoreria";
+                break;
+            case 4:
+                nivel = "Finanzas";
+                break;
+        }
+        return nivel;
+    }
+
     public static ValidatingUserDTO get_MatrizValidadores(int pUserKey, int level)
     {
         
@@ -836,7 +859,7 @@ public static class Doc_Tools
             }
         }
         return matriz;
-    }
+    }    
 
     public static ValidatingTree get_JerarquiaValidadores(int document_type)
     {

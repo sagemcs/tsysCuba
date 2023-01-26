@@ -479,7 +479,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey;";
+            cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, isnull(ApprovalLevel,0) FROM MinorMedicalExpense where UpdateUserKey = @UpdateUserKey;";
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -490,6 +490,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
                 expense.Date = dataReader.GetDateTime(1);               
                 expense.Amount = dataReader.GetDecimal(2);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(3)).Value;
+                expense.Nivel = Doc_Tools.GetAprovalLevel(dataReader.GetInt32(4));
                 gastos.Add(expense);
             }
         }
@@ -923,8 +924,8 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         {
             if (e.Row.Cells[3].Text != "Pendiente")
             {
-                Button btnEdit = (Button)e.Row.Cells[4].Controls[0];
-                Button btnDelete = (Button)e.Row.Cells[6].Controls[1];
+                Button btnEdit = (Button)e.Row.Cells[5].Controls[0];
+                Button btnDelete = (Button)e.Row.Cells[7].Controls[1];
                 btnEdit.Visible = false;
                 btnDelete.Visible = false;
             }

@@ -211,7 +211,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                         HttpContext.Current.Session["voucher_files"] = null;
                         HttpContext.Current.Session["motivo"] = null;
                         HttpContext.Current.Session["is_valid"] = null;
-                        HttpContext.Current.Session["terminar_comprobacion"] = null;
+                     
                         BindTipoAnticipo();
                     }                 
                     pVendKey = 0;                   
@@ -390,7 +390,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT AdvanceId,AdvanceType,Folio,Currency, Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey,CreateDate, UpdateDate,CompanyId,Status FROM Advance where UpdateUserKey = @UpdateUserKey;";
+            cmd.CommandText = "SELECT AdvanceId,AdvanceType,Folio,Currency, Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey,CreateDate, UpdateDate,CompanyId,Status, isnull(ApprovalLevel,0) FROM Advance where UpdateUserKey = @UpdateUserKey;";
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -417,6 +417,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                 advance.UpdateDate = dataReader.GetDateTime(11);
                 advance.CompanyId = dataReader.GetString(12);
                 advance.Status = Doc_Tools.Dict_status().FirstOrDefault(x=> x.Key == dataReader.GetInt32(13)).Value;
+                advance.Nivel = Doc_Tools.GetAprovalLevel(dataReader.GetInt32(14));
                 anticipos.Add(advance);
             }
         }
@@ -614,8 +615,8 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         {            
             if (e.Row.Cells[7].Text != "Pendiente")
             {
-                Button btnEdit = (Button)e.Row.Cells[8].Controls[0];
-                Button btnDelete = (Button)e.Row.Cells[9].Controls[1];
+                Button btnEdit = (Button)e.Row.Cells[9].Controls[0];
+                Button btnDelete = (Button)e.Row.Cells[10].Controls[1];
                 btnEdit.Visible = false;
                 btnDelete.Visible = false;
             }

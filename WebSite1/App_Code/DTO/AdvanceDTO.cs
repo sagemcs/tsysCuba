@@ -19,6 +19,7 @@ public class AdvanceDTO : Document
     public int? PackageId { get; set; }   
     public string ExpenseReason { get; set; }
     public bool SageIntegration { get; set; }
+    public string Nivel { get; set; }
     public AdvanceDTO()
     {
         

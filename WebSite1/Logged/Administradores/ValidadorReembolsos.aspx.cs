@@ -465,9 +465,8 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
             }
            
             Update_Expense(expense_id, paquete.PackageId, status, motivo.Text, level: level_validador);
-            EnviarCorreo(false);
-            BindPackageInfo();
-            
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Expense, pUserKey, level_validador, Doc_Tools.NotificationType.Denegacion);
+            BindPackageInfo();            
            
         }
         if (e.CommandName == "Coment")
@@ -937,7 +936,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         var roles = Doc_Tools.get_RolesValidadores();
         int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
         Update_Expense(expense_id, paquete.PackageId, status, string.Empty, level: level_validador);
-        EnviarCorreo(true);
+        Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Expense, pUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion);
         BindPackageInfo();
         if (drop_empleados.SelectedItem != null)
         {

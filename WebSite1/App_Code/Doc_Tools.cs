@@ -21,6 +21,7 @@ using static ExpenseFilesDTO;
 using Microsoft.AspNet.Identity;
 using WebSite1;
 using System.Activities.Statements;
+using System.IO;
 
 /// <summary>
 /// Summary description for Doc_Tools
@@ -793,6 +794,29 @@ public static class Doc_Tools
         return matriz;
     }
 
+    public static string GetAprovalLevel(int level)
+    {
+        string nivel = string.Empty;
+        switch (level)
+        {
+            case 0:                
+                break;
+            case 1:
+                nivel = "Gerente / RH";
+                break;
+            case 2:
+                nivel = "Cuentas Por Pagar";
+                break;
+            case 3:
+                nivel = "Tesoreria";
+                break;
+            case 4:
+                nivel = "Finanzas";
+                break;
+        }
+        return nivel;
+    }
+
     public static ValidatingUserDTO get_MatrizValidadores(int pUserKey, int level)
     {
         
@@ -836,7 +860,7 @@ public static class Doc_Tools
             }
         }
         return matriz;
-    }
+    }    
 
     public static ValidatingTree get_JerarquiaValidadores(int document_type)
     {
@@ -863,6 +887,18 @@ public static class Doc_Tools
     public enum DocumentType
     {
         Advance = 1, Expense = 2, CorporateCard = 3, MinorMedicalExpense = 4
+    }
+
+    public static Dictionary<int,string> TiposDocumentos()
+    {
+        var tipos = new Dictionary<int, string>
+        {
+            { 1, "Anticipo" },
+            { 2, "Reembolso" },
+            { 3, "Tarjeta Corporativa" },
+            { 4, "Gasto Médico Menor" }
+        };
+        return tipos;
     }
 
     public enum Currencys
@@ -1305,6 +1341,7 @@ public static class Doc_Tools
     public static void EnviarCorreo(Doc_Tools.DocumentType type, int userkey, int aproval_level, NotificationType notification)
     {      
         var matrix = Doc_Tools.get_MatrizValidadores(userkey, aproval_level);
+        string tipo_documento = TiposDocumentos().FirstOrDefault(x => x.Key == (int)type).Value;
         string to = string.Empty;
         string from = string.Empty;
         switch (type)
@@ -1384,13 +1421,25 @@ public static class Doc_Tools
         switch (notification)
         {
             case NotificationType.Aprobacion:
-                texto = "El usuario {0} ha aprobado un {1} para su revisión";
+                using (StreamReader reader = new StreamReader("~/Account/Templates Email/AprobacionPago.html"))
+                {
+                    texto = reader.ReadToEnd();
+                    texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
+                }
                 break;
             case NotificationType.Denegacion:
-                texto = "El usuario {0} ha denegado un {1} para su revisión";
+                using (StreamReader reader = new StreamReader("~/Account/Templates Email/DenegacionPago.html"))
+                {
+                    texto = reader.ReadToEnd();
+                    texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
+                }
                 break;
             case NotificationType.Revision:
-                texto = "El usuario {0} ha añadido un {1} para su revisión";
+                using (StreamReader reader = new StreamReader("~/Account/Templates Email/RevisionPago.html"))
+                {
+                    texto = reader.ReadToEnd();
+                    texto = texto.Replace("{empleado}", from ).Replace("{documento}", tipo_documento);
+                }              
                 break;           
         }
         string subject = string.Format(texto, from, type.ToString());

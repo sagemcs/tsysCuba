@@ -288,7 +288,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                         HttpContext.Current.Session["voucher_files"] = null;
                         HttpContext.Current.Session["motivo"] = null;
                         HttpContext.Current.Session["is_valid"] = null;
-                        HttpContext.Current.Session["terminar_comprobacion"] = null;
+                        //HttpContext.Current.Session["terminar_comprobacion"] = null;
                     }
                   
                     fill_fileUploads();
@@ -741,7 +741,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, AdvanceId FROM Expense where UpdateUserKey = @UpdateUserKey;";
+            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, AdvanceId, isnull(ApprovalLevel,0)  FROM Expense where UpdateUserKey = @UpdateUserKey;";
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;               
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -754,6 +754,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 expense.Amount = dataReader.GetDecimal(3);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
                 expense.AdvanceId = dataReader.GetInt32(5);
+                expense.Nivel = Doc_Tools.GetAprovalLevel(dataReader.GetInt32(6));
                 gastos.Add(expense);
             }
         }
@@ -891,8 +892,8 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         {
             if (e.Row.Cells[4].Text != "Pendiente")
             {
-                Button btnEdit = (Button)e.Row.Cells[5].Controls[0];           
-                Button btnDelete = (Button)e.Row.Cells[7].Controls[1];
+                Button btnEdit = (Button)e.Row.Cells[6].Controls[0];           
+                Button btnDelete = (Button)e.Row.Cells[8].Controls[1];
                 btnEdit.Visible = false;              
                 btnDelete.Visible = false;
             }

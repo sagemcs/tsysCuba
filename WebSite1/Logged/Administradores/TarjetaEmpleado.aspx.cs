@@ -664,7 +664,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status FROM CorporateCard where UpdateUserKey = @UpdateUserKey;";
+            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, isnull(ApprovalLevel,0) FROM CorporateCard where UpdateUserKey = @UpdateUserKey;";
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -675,7 +675,8 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
                 tarjeta.Date = dataReader.GetDateTime(1);
                 tarjeta.Currency = dataReader.GetInt32(2);
                 tarjeta.Amount = dataReader.GetDecimal(3);
-                tarjeta.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;               
+                tarjeta.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(4)).Value;
+                tarjeta.Nivel = Doc_Tools.GetAprovalLevel(dataReader.GetInt32(5));
                 gastos.Add(tarjeta);
             }
         }
@@ -774,8 +775,8 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
             int card_id =  int.Parse(e.Row.Cells[0].Text);
             if (e.Row.Cells[4].Text != "Pendiente")
             {
-                Button btnEdit = (Button)e.Row.Cells[5].Controls[0];
-                Button btnDelete = (Button)e.Row.Cells[7].Controls[1];
+                Button btnEdit = (Button)e.Row.Cells[6].Controls[0];
+                Button btnDelete = (Button)e.Row.Cells[8].Controls[1];
                 btnEdit.Visible = false;
                 btnDelete.Visible = false;
             }           

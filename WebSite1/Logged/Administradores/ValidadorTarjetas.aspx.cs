@@ -478,7 +478,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             }
 
             Update_Expense(card_id, paquete.PackageId, status, motivo.Text, level: level_validador);
-            EnviarCorreo(false);
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.CorporateCard, pUserKey, level_validador, Doc_Tools.NotificationType.Denegacion);
             BindPackageInfo();           
             BindGridView(user_id, status_id);
         }
@@ -937,8 +937,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             HttpContext.Current.Session["screen_type"] = 1;
             Response.Redirect("DocumentosGastos");
         }
-    }
-      
+    }      
 
     protected void btnAprobar_Command(object sender, CommandEventArgs e)
     {
@@ -950,7 +949,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         var roles = Doc_Tools.get_RolesValidadores();
         int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
         Update_Expense(card_id, paquete.PackageId, status, string.Empty, level: level_validador);
-        EnviarCorreo(true);
+        Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.CorporateCard, pUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion);
         BindPackageInfo();
         if (drop_empleados.SelectedItem != null)
         {

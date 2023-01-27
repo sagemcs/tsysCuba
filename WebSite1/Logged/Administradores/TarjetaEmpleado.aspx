@@ -435,7 +435,7 @@
                 </div>
                 
                 <div class="col-xs-4 col-md-4 col-xs-3">
-                    <asp:Button ID="btnFinalizar" runat="server" Class="btn btn-tsys cargar" title="Finalizar" Text="Terminar Comprobacion" OnClick="btnFinalizar_Click" />
+                    <asp:Button ID="btnFinalizar" runat="server" Class="btn btn-tsys cargar" title="Finalizar" Text="Terminar Comprobacion" OnClick="btnFinalizar_Click" Enabled="False" />
                 </div>
             </div>
 

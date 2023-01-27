@@ -233,7 +233,17 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         }      
 
     }
-   
+
+    private void BindTipoGasto()
+    {
+        var lista = Doc_Tools.Dict_tipos_gastos();
+        lista.Add(0, string.Empty);
+        STipoGasto.DataSource = lista.OrderBy(x => x.Key).Select(x => new { Id = x.Key, Name = x.Value }).ToList();
+        STipoGasto.DataTextField = "Name";
+        STipoGasto.DataValueField = "Id";
+        STipoGasto.DataBind();
+    }
+
     private void Load_Articles_By_Expense(int expense_id, int user_id, string company_id)
     {
         var lista = (List<ItemDTO>)HttpContext.Current.Session["Items"];
@@ -359,8 +369,8 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
                         cmd.Parameters.Add("@_Qty", SqlDbType.Decimal).Value = detail.Qty; 
                         cmd.Parameters.Add("@_UnitCost", SqlDbType.Decimal).Value = detail.UnitCost;
                         cmd.Parameters.Add("@_Amount", SqlDbType.Decimal).Value = detail.Amount;
-                        cmd.Parameters.Add("@_CreateDate", SqlDbType.DateTime).Value = DateTime.Now;
-                        cmd.Parameters.Add("@_UpdateDate", SqlDbType.DateTime).Value = DateTime.Now;
+                        cmd.Parameters.Add("@_CreateDate", SqlDbType.DateTime).Value = detail.CreateDate;
+                        cmd.Parameters.Add("@_UpdateDate", SqlDbType.DateTime).Value = detail.CreateDate;
                         cmd.Parameters.Add("@_CreateUser", SqlDbType.Int).Value = userkey;
                         cmd.Parameters.Add("@_CompanyId", SqlDbType.VarChar).Value = companyId;
                         cmd.Parameters.Add("@_STaxCodeKey", SqlDbType.Decimal).Value = detail.STaxCodeKey;
@@ -430,16 +440,7 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         btn_Guardar.Enabled = false;
         tbx_motivo.Text = string.Empty;
     }
-
-    private void BindTipoGasto()
-    {
-        var lista = Doc_Tools.Dict_tipos_gastos();
-        lista.Add(0, string.Empty);
-        STipoGasto.DataSource = lista.OrderBy(x => x.Key).Select(x => new { Id = x.Key, Name = x.Value }).ToList();
-        STipoGasto.DataTextField = "Name";
-        STipoGasto.DataValueField = "Id";
-        STipoGasto.DataBind();
-    }
+   
 
     protected void btn_Guardar_Click(object sender, EventArgs e)
     {
@@ -546,6 +547,15 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
             tipo = "error";
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B40").Value;
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+            MultiView1.SetActiveView(View_Articulos);
+            return;
+        }
+        //validacion de fecha
+        if (string.IsNullOrEmpty(tbx_fecha_articulo.Text))
+        {
+            tipo = "error";
+            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "MB24").Value;
+            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             MultiView1.SetActiveView(View_Articulos);
             return;
         }
@@ -678,6 +688,10 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
         detalle.ItemId = drop_articulos.SelectedItem.Text;
         detalle.Qty = decimal.Parse(tbx_cantidad.Text);
         detalle.UnitCost = decimal.Parse(tbx_importegasto.Text);
+
+        DateTime fecha_articulo = DateTime.Parse(tbx_fecha_articulo.Text);
+        detalle.CreateDate = fecha_articulo;
+
         if (drop_taxes.SelectedValue != "0")
         {
             detalle.STaxCodeKey = int.Parse(drop_taxes.SelectedItem.Value);
@@ -1035,10 +1049,15 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
 
     }
 
-
-
     protected void drop_currency_SelectedIndexChanged(object sender, EventArgs e)
     {
 
+    }
+
+    protected void tbx_fecha_articulo_TextChanged(object sender, EventArgs e)
+    {
+        HttpContext.Current.Session["is_valid"] = false;
+        btn_Guardar.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+        MultiView1.SetActiveView(View_Articulos);
     }
 }

@@ -179,7 +179,7 @@
                     <h4>Tipo del gasto:</h4>
                     <span class="dropdown-header">
                         <asp:DropDownList ID="STipoGasto" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server" OnSelectedIndexChanged="STipoGasto_SelectedIndexChanged" AutoPostBack="true">
-                            <asp:ListItem Value=""> </asp:ListItem>
+                            <%--<asp:ListItem Value=""> </asp:ListItem>
                             <asp:ListItem Value="1">Transporte Aéreo</asp:ListItem>
                             <asp:ListItem Value="2">Transporte Terrestre</asp:ListItem>
                             <asp:ListItem Value="3">Casetas</asp:ListItem>
@@ -187,29 +187,39 @@
                             <asp:ListItem Value="5">Estacionamiento</asp:ListItem>
                             <asp:ListItem Value="6">Alimentos</asp:ListItem>
                             <asp:ListItem Value="7">Hospedaje</asp:ListItem>
-                            <asp:ListItem Value="8">Gastos Extraordinarios</asp:ListItem>
+                            <asp:ListItem Value="8">Gastos Extraordinarios</asp:ListItem>--%>
                         </asp:DropDownList>
                     </span>
                 </div>                
            </div>
            <div class="row">
                 <%--Articulos--%>
-                <div class="col-lg-3 col-sm-3 col-xs-3">
+                <div class="col-lg-5 col-sm-5 col-xs-5">
                     <h4>Gastos:</h4>
                     <span class="dropdown-header">
                         <asp:DropDownList ID="drop_articulos" class="selectpicker show-tick form-control" data-live-search="true" data-style="btn-primary" runat="server">
                         </asp:DropDownList>
                     </span>
                 </div>
+                <%--Fecha del gasto--%>
+                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                        <h4>Fecha del gasto:</h4>
+                        <div class="col-lg-12 col-sm-12 col-xs-12">
+                            <asp:TextBox type="date" name="fecha" ID="tbx_fecha_articulo" AutoComplete="off" AutoCompleteType="Disabled" min="1980-01-01" max="2050-12-31" step="1" class="form-control" runat="server" OnTextChanged="tbx_fecha_articulo_TextChanged" />
+                        </div>
+                    </div>
+            </div>
+            <div class="row">
                 <%--Importe del Articulo--%>
-                <div class="col-lg-2 col-sm-2 col-xs-2">
+                <div class="col-lg-3 col-sm-3 col-xs-3">
                     <h4>Coste Unitario:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_importegasto" MaxLength="15" class="form-control"></asp:TextBox>
                     </div>
                 </div>
+
                 <%--Cantidad--%>
-                <div class="col-lg-2 col-sm-2 col-xs-2">
+                <div class="col-lg-3 col-sm-3 col-xs-3">
                     <h4>Cantidad:</h4>
                     <div class="col-lg-12 col-sm-12 col-xs-12">
                         <asp:TextBox runat="server" type="text" AutoComplete="off" AutoCompleteType="Disabled" ID="tbx_cantidad" MaxLength="11" class="form-control"></asp:TextBox>

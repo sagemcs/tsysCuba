@@ -703,8 +703,17 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         }
         
         Create_Package(pUserKey, "comentario vacio");
-        BindPackageInfo();        
+        BindPackageInfo();
+
+        int user_id = 0;        
+        if (drop_empleados.SelectedItem != null)
+        {
+            user_id = int.Parse(drop_empleados.SelectedItem.Value);
+        }
         
+        int status_id = int.Parse(drop_status.SelectedItem.Value);
+        BindGridView(user_id, status_id);
+
     }
 
     protected Doc_Tools.Paquete get_Package(int user_id)
@@ -747,6 +756,16 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
         int level = roles.FirstOrDefault(x => x.ID == rol).Key;
+      
+        var paquete = get_Package(pUserKey);
+        if (level == 1)
+        {
+            if (paquete.PackageId == 0)
+            {
+                paquete = null;
+            }
+        }
+        
         //5 - Aprobar
         //6 - Denegar
         //7 - Motivos Denegacion
@@ -767,8 +786,8 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 case "Pendiente":
                     if (level - gasto.ApprovalLevel == 1)
                     {
-                        btn_aprobar.Visible = true;
-                        btn_denegar.Visible = true;
+                        btn_aprobar.Visible = paquete != null ? true : false;//true;
+                        btn_denegar.Visible = paquete != null ? true : false;//true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;
                         btn_integrar.Visible = false;
@@ -796,8 +815,8 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 case "Aprobado":
                     if (level - gasto.ApprovalLevel == 1)
                     {
-                        btn_aprobar.Visible = true;
-                        btn_denegar.Visible = true;
+                        btn_aprobar.Visible = paquete != null ? true : false;//true;
+                        btn_denegar.Visible = paquete != null ? true : false;//true;
                         tbx_motivo.Visible = true;
                         tbx_motivo.ReadOnly = false;
                         btn_integrar.Visible = false;

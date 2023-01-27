@@ -210,7 +210,6 @@
         <h3>Validación de Anticipos</h3>
     </div>
 
-
     <asp:Panel runat="server" ID="upPackage">      
             <div class="col-lg-12 col-sm-12 col-12" id="M2">
                 <h4>Paquete de Anticipos</h4>

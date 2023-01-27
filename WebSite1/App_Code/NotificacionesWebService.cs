@@ -1178,9 +1178,9 @@ public class NotificacionesWebService : System.Web.Services.WebService
                             int User = Convert.ToInt16(HttpContext.Current.Session["UserKey"]);
                             int Not = 0;
 
-                            string Email = string.Empty;
-                            Email = CorreoCreadorCheque(FFolio);
-                            //Email = "lgarcia@multiconsulting.com";
+                            List<string> Emails = new List<string>();
+                            Emails = Correos(FFolio);
+                            //string Email = "lgarcia@multiconsulting.com";
                             success = false;
                             msg = "Se ha generado un error intentar cancelar el cheque, intenta nuevamente si el problema persiste comunicate con el área de soporte";
 
@@ -1198,19 +1198,23 @@ public class NotificacionesWebService : System.Web.Services.WebService
                                     Body = Body.Replace("{Fac}", FFolio.ToString()).Replace("{Comments}", texto);
                                 }
 
-                                bool SendEmail = Global.EmailGlobal(Email, Body, "Notificación de Rechazo de Solicitud de Cheque");
-                                if (SendEmail == true)
+                                foreach (var Email in Emails)
                                 {
-                                    success = true;
-                                    msg = "Se ha enviado un correo electronico con la notificación de rechazo del Compleneto de Pago con folio: " + llave;
-                                    Not = 1;
+                                    bool SendEmail = Global.EmailGlobal(Email, Body, "Notificación de Rechazo de Solicitud de Cheque");
+                                    if (SendEmail == true)
+                                    {
+                                        success = true;
+                                        msg = "Se ha enviado un correo electronico con la notificación de rechazo del Compleneto de Pago con folio: " + llave;
+                                        Not = 1;
+                                    }
+                                    else
+                                    {
+                                        success = false;
+                                        msg = "Se ha generado un error al enviar el correo, no se ha podido notificar el rechazo del Complemento de Pago con folio: " + llave;
+                                        Not = 0;
+                                    }
                                 }
-                                else
-                                {
-                                    success = false;
-                                    msg = "Se ha generado un error al enviar el correo, no se ha podido notificar el rechazo del Complemento de Pago con folio: " + llave;
-                                    Not = 0;
-                                }
+                                
 
                                 //int Valor = Convert.ToInt32(folio);
                                 //bool fav = CancelarD(Valor, Not, 2, 2);
@@ -1652,21 +1656,25 @@ public class NotificacionesWebService : System.Web.Services.WebService
         return Correo;
     }
 
-    protected string CorreoCreadorCheque(int VendorKey)
+    protected List<string> Correos(int VendorKey)
     {
-        string Correo = string.Empty;
+        string rol = HttpContext.Current.Session["RolUser"].ToString();
+        List<string> Correos = new List<string>();
 
         try
         {
-            SqlConnection sqlConnection1 = new SqlConnection();
-            sqlConnection1 = SqlConnectionDB("PortalConnection");
-            sqlConnection1.Open();
-            string sql = @"Select top 1 b.UserName From Vendors a inner join AspNetUsers b on a.UserKey = b.UserKey inner join InvoiceReceipt c on a.VendorKey = c.VendorKey inner join InvcRcptDetails d on d.InvcRcptKey = c.InvcRcptKey Where d.InvoiceKey = " + VendorKey;
-            using (var sqlQuery = new SqlCommand(sql, sqlConnection1))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
             {
-                sqlQuery.CommandType = CommandType.Text;
-                sqlQuery.CommandText = sql;
-                Correo = sqlQuery.ExecuteScalar().ToString();
+                SqlCommand cmd = conn.CreateCommand();
+                cmd.CommandText = "select u.UserID From Users u inner join UsersInRoles ur on u.UserKey = ur.UserKey where ur.RoleKey = 7";
+                if (rol == "T|SYS| - Finanzas")
+                    cmd.CommandText = cmd.CommandText + " and ur.RoleKey = 13;";
+                cmd.Connection.Open();
+                SqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    Correos.Add(dataReader.GetString(0));
+                }
             }
         }
         catch (Exception ex)
@@ -1674,7 +1682,7 @@ public class NotificacionesWebService : System.Web.Services.WebService
             throw new MulticonsultingException(ex.Message);
         }
 
-        return Correo;
+        return Correos;
     }
 
     private static DataSet GetData(string VendId, string CFolio, string NoOdc, string Estatus, string Opcion, string Fecha1, string Fecha2)

@@ -184,7 +184,7 @@
                                             if (HasRightsForSpecifiedMenu("Facturas") == true)
                                             { %>
                                         <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/Contrarecibo">Consulta de Facturas</a>
+                                            <a runat="server" class="" href="~/Logged/Contrarecibo">Generar Contrarecibo</a> <%--Consulta de Facturas--%>
                                         </li>
                                         <% } %>
                                         <li>
@@ -205,7 +205,7 @@
                                             if (HasRightsForSpecifiedMenu("Reembolso") == true)
                                             { %>
                                         <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/SolicitudCheque">Consulta Reembolso de Gastos</a>
+                                            <a runat="server" class="" href="~/Logged/SolicitudCheque">Generar Solicitud de Cheque</a> <%--Consulta Reembolso de Gastos--%>
                                         </li>
                                         <% } %>
 
@@ -262,7 +262,7 @@
                                             if (HasRightsForSpecifiedMenu("Anticipo") == true)
                                             { %>
                                         <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/ReportsFilter/EmpresasFilter">Consulta Anticipo de Gastos</a>
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/EmpresasFilter">Compañías</a> <%--Consulta Anticipo de Gastos--%>
                                         </li>
                                         <% } %>
 
@@ -270,7 +270,7 @@
                                             if (HasRightsForSpecifiedMenu("Tarjeta") == true)
                                             { %>
                                         <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/ReportsFilter/ErroresFilter">Consulta Gasto Tarjeta Corporativa</a>
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/ErroresFilter">Errores</a> <%--Consulta Gasto Tarjeta Corporativa--%>
                                         </li>
                                         <% } %>
 
@@ -278,7 +278,7 @@
                                             if (HasRightsForSpecifiedMenu("GMedicos") == true)
                                             { %>
                                         <li role="presentation">
-                                            <a runat="server" class="" href="~/Logged/ReportsFilter/FacturasFilter">Consulta Gastos Médicos Mayores</a>
+                                            <a runat="server" class="" href="~/Logged/ReportsFilter/FacturasFilter">Facturas</a> <%--Consulta Gastos Médicos Mayores--%>
                                         </li>
                                         <% } %>
                                     </ul>

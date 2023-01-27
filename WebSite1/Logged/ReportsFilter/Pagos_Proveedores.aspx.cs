@@ -78,11 +78,14 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
                 string rol = HttpContext.Current.Session["RolUser"].ToString();
                 if (rol.Contains("T|SYS| "))
                 {
-                    CargaProv();
+                    //CargaProv();
                     CargaProvs();
                     Panel2.Visible = false;
                     GridView2.Visible = false;
                     CambiaProv();
+                    F1.ReadOnly = true;
+                    F2.ReadOnly = true;
+                    DropDownList2.Attributes.Add("disabled", "disabled");
                 }
                 else
                 {
@@ -92,6 +95,8 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
                 }
             }
         }
+        //CambiaProv();
+
     }
 
 
@@ -136,8 +141,8 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
             int index = row.RowIndex;
             CheckBox cb1 = (CheckBox)GridView1.Rows[index].FindControl("Check");
             TextBox tex = (TextBox)GridView1.Rows[index].FindControl("cant");
-            string costoz = GridView1.Rows[index].Cells[9].Text.ToString(); // total
-            string costov = GridView1.Rows[index].Cells[10].Text.ToString(); // rest
+            string costoz = GridView1.Rows[index].Cells[24].Text.ToString(); // total
+            string costov = GridView1.Rows[index].Cells[25].Text.ToString(); // rest
             int variabl = 0;
 
             if (cb1.Checked == true)
@@ -427,15 +432,15 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
                 if (check.Checked == true)
                 {
 
-                    string Folio = gvr.Cells[5].Text.ToString();
-                    string OCom = gvr.Cells[4].Text.ToString();
+                    string Folio = gvr.Cells[13].Text.ToString();
+                    string OCom = gvr.Cells[8].Text.ToString();
                     string fec1 = gvr.Cells[1].Text.ToString();
                     string fec2 = gvr.Cells[1].Text.ToString();
                     string Totsl = cantidades.Text.ToString();
                     Folio = Folio.TrimEnd(' ');
                     string UUID = Folio + "-" + OCom;
 
-                    string Vendr = HttpUtility.HtmlDecode(gvr.Cells[2].Text);
+                    string Vendr = HttpUtility.HtmlDecode(gvr.Cells[14].Text);
                     string UUIDF = GETUUID(Folio, OCom, Vendr);
 
                     //Sube Archivos al Portal
@@ -666,40 +671,17 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
     {
         try
         {
-            Company company = Tools.EmpresaAutenticada();
-            //if (company == null)
-            //    return null;
-            Users user = Tools.UsuarioAutenticado();
-            //if (user == null)
-            //    return null;
-
-            //Expression<Func<Invoice, bool>> predicate;
-            //bool is_tsys_user = user.UsersInRoles.Where(r => r.Roles.RoleID.Contains("T|SYS|")).FirstOrDefault() != null;
-            //if (is_tsys_user)
-            //    predicate = (a => a.TranType == "IN");
-            //else
-            //{
-            //    List<int> VendorsIds = user.Vendors.Select(v => v.VendorKey).ToList();
-            //    predicate = (a => a.TranType == "IN" && VendorsIds.Contains(a.VendorKey));
-            //}
-
-            //List<FacturasAllDTO> facturas = new List<FacturasAllDTO>();
-            //PortalProveedoresEntities db = new PortalProveedoresEntities();
-
-            //List<Invoice> list = db.Invoice.Where(i => i.Status >= 6 && i.Status < 8).ToList();
-
-            //foreach (Invoice invoice in list)
-            //{
-            //    FacturasAllDTO factura = new FacturasAllDTO(invoice.InvoiceKey);
-            //    facturas.Add(factura);
-            //}
-
             string SQL = string.Empty;
             //string prov = SelProv.SelectedItem.ToString();
             //string Company = HttpContext.Current.Session["IDCompany"].ToString();
             string users = HttpContext.Current.Session["UserKey"].ToString();
             int Filas = 0;
             string Vend = "0";
+            var folio = "";
+            int status = 2;
+            int fecha = -1;
+            string desde = "";
+            string hasta = "";
             SQL = "";
             SQL = "spGetDocsEmpleados";
 
@@ -707,6 +689,23 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
             {
                 Vend = SelP.SelectedItem.ToString();
             }
+
+            if (TextBox6.Text != "")
+                folio = TextBox6.Text;
+            status = Int32.Parse(DropDownList1.SelectedItem.Value);
+            if (ChkFechas.Checked == true)
+            {
+                if (F1.Text != "")
+                {
+                    desde = F1.Text;
+                }
+                if (F2.Text != "")
+                {
+                    hasta = F2.Text + " 23:59:59";
+                }
+                fecha = Int32.Parse(DropDownList2.SelectedItem.Value);
+            }
+
 
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
@@ -716,6 +715,12 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
                 cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Opcion", Value = 3 });
                 cmd.Parameters.Add(new SqlParameter() { ParameterName = "@UserKey", Value = users });
                 cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Prov", Value = Vend });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Folio", Value = folio });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Status", Value = status });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@Fecha", Value = fecha });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@FechaDesde", Value = desde });
+                cmd.Parameters.Add(new SqlParameter() { ParameterName = "@FechaHasta", Value = hasta });
+
                 if (conn.State == ConnectionState.Open) { conn.Close(); }
                 conn.Open();
                 SqlDataReader rdr = cmd.ExecuteReader();
@@ -736,16 +741,16 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
                     Datos.Visible = true;
                 }
 
-                if (GridView1.Rows.Count == 0)
-                {
-                    DatosV.Visible = true;
-                    Datos.Visible = false;
-                }
-                else
-                {
-                    DatosV.Visible = false;
-                    Datos.Visible = true;
-                }
+                //if (GridView1.Rows.Count == 0)
+                //{
+                //    DatosV.Visible = true;
+                //    Datos.Visible = false;
+                //}
+                //else
+                //{
+                //    DatosV.Visible = false;
+                //    Datos.Visible = true;
+                //}
                 Conteo();
             }
         }
@@ -799,7 +804,7 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
                 decimal Pago = Convert.ToDecimal(HttpUtility.HtmlDecode(row["Saldo"].ToString()));
                 decimal Resto = Convert.ToDecimal(Total - 0);
                 cantidad[i] = HttpUtility.HtmlDecode(row["Saldo"].ToString());
-
+                var s = row["BancoPago"];
                 dr["Fecha"] = HttpUtility.HtmlDecode(row["Fecha"].ToString());
                 dr["FechaProgPago"] = HttpUtility.HtmlDecode(row["FechaProgPago"].ToString());
                 dr["FechaNot"] = HttpUtility.HtmlDecode(row["FechaNot"].ToString());
@@ -1047,7 +1052,6 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
                 {
                     DataRow Fila = Registros.Rows[0];
                     vkey = Convert.ToInt32(Fila["VendorKey"].ToString());
-
                 }
                 conn.Close();
             }
@@ -1312,207 +1316,208 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
     /// 
     /// </summary>
     /// <returns></returns>
-    protected void CargaProv()
-    {
-        try
-        {
-            DataTable dt = new DataTable();
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-            {
-                SqlCommand cmd = new SqlCommand("spSelectUserDoc", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                string Company = HttpContext.Current.Session["IDCompany"].ToString();
-                string users = HttpContext.Current.Session["UserKey"].ToString();
-                int Opc = 19;
+    //protected void CargaProv()
+    //{
+    //    try
+    //    {
+    //        DataTable dt = new DataTable();
+    //        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+    //        {
+    //            SqlCommand cmd = new SqlCommand("spSelectUserDoc", conn);
+    //            cmd.CommandType = CommandType.StoredProcedure;
+    //            string Company = HttpContext.Current.Session["IDCompany"].ToString();
+    //            string users = HttpContext.Current.Session["UserKey"].ToString();
+    //            int Opc = 19;
 
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Opcion", Value = Opc });
+    //            cmd.Parameters.Add(new SqlParameter()
+    //            { ParameterName = "@Opcion", Value = Opc });
 
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@User", Value = users });
+    //            cmd.Parameters.Add(new SqlParameter()
+    //            { ParameterName = "@User", Value = users });
 
-                cmd.Parameters.Add(new SqlParameter()
-                { ParameterName = "@Company", Value = Company });
+    //            cmd.Parameters.Add(new SqlParameter()
+    //            { ParameterName = "@Company", Value = Company });
 
-                if (conn.State == ConnectionState.Open)
-                {
-                    conn.Close();
-                }
+    //            if (conn.State == ConnectionState.Open)
+    //            {
+    //                conn.Close();
+    //            }
 
-                conn.Open();
-                SelProv.Items.Clear();
-                SqlDataReader rdr = cmd.ExecuteReader();
-                while (rdr.Read())
-                {
-                    if (rdr["Nombre"].ToString().Length > 1)
-                    {
-                        ListItem Linea = new ListItem();
-                        Linea.Value = (rdr["Nombre"].ToString());
-                        SelProv.Items.Insert(0, Linea);
-                    }
+    //            conn.Open();
+    //            SelProv.Items.Clear();
+    //            SqlDataReader rdr = cmd.ExecuteReader();
+    //            while (rdr.Read())
+    //            {
+    //                if (rdr["Nombre"].ToString().Length > 1)
+    //                {
+    //                    ListItem Linea = new ListItem();
+    //                    Linea.Value = (rdr["Nombre"].ToString());
+    //                    SelProv.Items.Insert(0, Linea);
+    //                }
 
-                }
+    //            }
 
-                ListItem Lineas = new ListItem();
-                Lineas.Value = "Todos";
-                SelProv.Items.Insert(0, Lineas);
+    //            ListItem Lineas = new ListItem();
+    //            Lineas.Value = "Todos";
+    //            SelProv.Items.Insert(0, Lineas);
 
-                conn.Close();
-            }
+    //            conn.Close();
+    //        }
 
-            //if (SelProv.Items.Count == 0)
-            //{
-            //    DatosV.Visible = true;
-            //    //Datos.Visible = false;
-            //}
-            //else
-            //{
-            //    DatosV.Visible = false;
-            //    //Datos.Visible = true;
-            //}
-        }
-        catch (Exception ex)
-        {
-            //RutinaError(ex);
-        }
-    }
+    //        //if (SelProv.Items.Count == 0)
+    //        //{
+    //        //    DatosV.Visible = true;
+    //        //    //Datos.Visible = false;
+    //        //}
+    //        //else
+    //        //{
+    //        //    DatosV.Visible = false;
+    //        //    //Datos.Visible = true;
+    //        //}
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        //RutinaError(ex);
+    //    }
+    //}
 
-    private string Filtros()
-    {
-        string Cadena = string.Empty;
-        string Vendor = HttpContext.Current.Session["UserKey"].ToString();
-        //int Vedn = int.Parse(Vendor.ToString());
+    //private string Filtros()
+    //{
+    //    string Cadena = string.Empty;
+    //    string Vendor = HttpContext.Current.Session["UserKey"].ToString();
+    //    //int Vedn = int.Parse(Vendor.ToString());
 
-        Cadena = "Select a.Folio,c.Serie,c.Folio,convert(decimal(12, 2), c.Total),e.VendName,d.CompanyName,c.CreateDate,c.PaymentDate,g.Descripcion from Invoice a INNER JOIN PaymentAppl b ON b.ApplInvoiceKey = a.InvoiceKey INNER JOIN Payment c ON b.PaymentKey = c.PaymentKey INNER JOIN Company d ON c.CompanyID = d.CompanyID INNER JOIN Vendors e ON c.VendorKey = e.VendorKey INNER JOIN StatusDocs g ON c.Status = g.Status Where g.Descripcion = '";
+    //    Cadena = "Select a.Folio,c.Serie,c.Folio,convert(decimal(12, 2), c.Total),e.VendName,d.CompanyName,c.CreateDate,c.PaymentDate,g.Descripcion from Invoice a INNER JOIN PaymentAppl b ON b.ApplInvoiceKey = a.InvoiceKey INNER JOIN Payment c ON b.PaymentKey = c.PaymentKey INNER JOIN Company d ON c.CompanyID = d.CompanyID INNER JOIN Vendors e ON c.VendorKey = e.VendorKey INNER JOIN StatusDocs g ON c.Status = g.Status Where g.Descripcion = '";
 
-        Cadena = Cadena + List.SelectedItem.ToString() + "'";
+    //    Cadena = Cadena + List.SelectedItem.ToString() + "'";
 
-        //Cadena = Cadena + " AND f.UserKey = " + Vendor + " ";
+    //    //Cadena = Cadena + " AND f.UserKey = " + Vendor + " ";
 
-        //if (SelProv.SelectedItem.ToString() != "Todos")
-        //{
-        //    Cadena = " AND c.VendName = '" + SelProv.SelectedItem.ToString() + "' ";
-        //}
-        if (SelProv.Items.Count >= 1)
-        {
-            if (SelProv.SelectedItem.ToString() != "Todos")
-            {
-                Cadena = Cadena + " AND e.VendName = '" + SelProv.SelectedItem.ToString() + "' ";
-            }
-        }
+    //    //if (SelProv.SelectedItem.ToString() != "Todos")
+    //    //{
+    //    //    Cadena = " AND c.VendName = '" + SelProv.SelectedItem.ToString() + "' ";
+    //    //}
+    //    if (SelProv.Items.Count >= 1)
+    //    {
+    //        if (SelProv.SelectedItem.ToString() != "Todos")
+    //        {
+    //            Cadena = Cadena + " AND e.VendName = '" + SelProv.SelectedItem.ToString() + "' ";
+    //        }
+    //    }
 
-        if (Folio.Text != "")
-        {
-            Cadena = Cadena + " AND a.Folio LIKE '%" + Folio.Text + "%' ";
-        }
+    //    if (Folio.Text != "")
+    //    {
+    //        Cadena = Cadena + " AND a.Folio LIKE '%" + Folio.Text + "%' ";
+    //    }
 
-        if (Factura.Text != "")
-        {
-            Cadena = Cadena + " AND f.Folio LIKE '%" + Factura.Text + "%' ";
-        }
+    //    if (Factura.Text != "")
+    //    {
+    //        Cadena = Cadena + " AND f.Folio LIKE '%" + Factura.Text + "%' ";
+    //    }
 
-        if (Monto.Text != "")
-        {
-            string Total = Monto.Text.Replace("$", "");
-            Cadena = Cadena + " AND a.Total LIKE '%" + Total + "%' ";
-        }
+    //    if (Monto.Text != "")
+    //    {
+    //        string Total = Monto.Text.Replace("$", "");
+    //        Cadena = Cadena + " AND a.Total LIKE '%" + Total + "%' ";
+    //    }
 
-        if (ChkFechas.Checked == true)
-        {
-            if (LFechas.SelectedValue == "Factura")
-            {
-                if (F1.Text != "")
-                {
-                    Cadena = Cadena + " AND a.CreateDate >= '" + F1.Text + "' ";
-                }
-                if (F2.Text != "")
-                {
-                    Cadena = Cadena + " AND a.CreateDate <= '" + F2.Text + " 23:59:59' ";
-                }
-            }
-            if (LFechas.SelectedValue == "Pago")
-            {
-                if (F1.Text != "")
-                {
-                    Cadena = Cadena + " AND a.PaymentDate >= '" + F1.Text + "' ";
-                }
-                if (F2.Text != "")
-                {
-                    Cadena = Cadena + " AND a.PaymentDate <= '" + F2.Text + " 23:59:59' ";
-                }
-            }
-        }
+    //    if (ChkFechas.Checked == true)
+    //    {
+    //        if (LFechas.SelectedValue == "Factura")
+    //        {
+    //            if (F1.Text != "")
+    //            {
+    //                Cadena = Cadena + " AND a.CreateDate >= '" + F1.Text + "' ";
+    //            }
+    //            if (F2.Text != "")
+    //            {
+    //                Cadena = Cadena + " AND a.CreateDate <= '" + F2.Text + " 23:59:59' ";
+    //            }
+    //        }
+    //        if (LFechas.SelectedValue == "Pago")
+    //        {
+    //            if (F1.Text != "")
+    //            {
+    //                Cadena = Cadena + " AND a.PaymentDate >= '" + F1.Text + "' ";
+    //            }
+    //            if (F2.Text != "")
+    //            {
+    //                Cadena = Cadena + " AND a.PaymentDate <= '" + F2.Text + " 23:59:59' ";
+    //            }
+    //        }
+    //    }
 
-        Cadena = Cadena + " Order By a.InvoiceKey DESC ";
+    //    Cadena = Cadena + " Order By a.InvoiceKey DESC ";
 
-        return Cadena;
+    //    return Cadena;
 
-    }
+    //}
 
-    private void BindGridView()
-    {
-        DataTable dt = new DataTable();
-        DatosV.Visible = false;
-        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
-        {
-            // Create a DataSet object. 
-            string SpFiltros;
-            SpFiltros = Filtros();
-            DataSet dsProveedores = new DataSet();
-            SqlCommand cmd = new SqlCommand(SpFiltros, conn);
-            //cmd.CommandType = CommandType.StoredProcedure;
+    //private void BindGridView()
+    //{
+    //    DataTable dt = new DataTable();
+    //    DatosV.Visible = false;
+    //    using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+    //    {
+    //        // Create a DataSet object. 
+    //        string SpFiltros;
+    //        SpFiltros = Filtros();
+    //        DataSet dsProveedores = new DataSet();
+    //        SqlCommand cmd = new SqlCommand(SpFiltros, conn);
+    //        //cmd.CommandType = CommandType.StoredProcedure;
 
-            //cmd.Parameters.Add(new SqlParameter()
-            //{ ParameterName = "@Cadena", Value = SpFiltros });
+    //        //cmd.Parameters.Add(new SqlParameter()
+    //        //{ ParameterName = "@Cadena", Value = SpFiltros });
 
-            if (conn.State == ConnectionState.Open)
-            {
-                conn.Close();
-            }
+    //        if (conn.State == ConnectionState.Open)
+    //        {
+    //            conn.Close();
+    //        }
 
-            conn.Open();
+    //        conn.Open();
 
-            string Errores = string.Empty;
-            SqlDataReader rdr = cmd.ExecuteReader();
+    //        string Errores = string.Empty;
+    //        SqlDataReader rdr = cmd.ExecuteReader();
 
-            dt.Columns.Add("Factura");
-            dt.Columns.Add("Serie");
-            dt.Columns.Add("Folio");
-            dt.Columns.Add("Total");
-            dt.Columns.Add("Proveedor");
-            dt.Columns.Add("Company");
-            dt.Columns.Add("FechaR");
-            dt.Columns.Add("FechaP");
-            dt.Columns.Add("Status");
+    //        dt.Columns.Add("Factura");
+    //        dt.Columns.Add("Serie");
+    //        dt.Columns.Add("Folio");
+    //        dt.Columns.Add("Total");
+    //        dt.Columns.Add("Proveedor");
+    //        dt.Columns.Add("Company");
+    //        dt.Columns.Add("FechaR");
+    //        dt.Columns.Add("FechaP");
+    //        dt.Columns.Add("Status");
 
-            while (rdr.Read())
-            {
-                DataRow row = dt.NewRow();
+    //        while (rdr.Read())
+    //        {
+    //            DataRow row = dt.NewRow();
 
-                row["Factura"] = Convert.ToString(rdr.GetValue(0));
-                row["Serie"] = Convert.ToString(rdr.GetValue(1));
-                row["Folio"] = Convert.ToString(rdr.GetValue(2));
-                row["Total"] = "$" + " " + Convert.ToString(rdr.GetValue(3));
-                row["Proveedor"] = Convert.ToString(rdr.GetValue(4));
-                row["Company"] = Convert.ToString(rdr.GetValue(5));
-                row["FechaR"] = Convert.ToString(rdr.GetValue(6));
-                row["FechaP"] = Convert.ToString(rdr.GetValue(7));
-                row["Status"] = Convert.ToString(rdr.GetValue(8));
-                dt.Rows.Add(row);
-            }
-        }
+    //            row["Factura"] = Convert.ToString(rdr.GetValue(0));
+    //            row["Serie"] = Convert.ToString(rdr.GetValue(1));
+    //            row["Folio"] = Convert.ToString(rdr.GetValue(2));
+    //            row["Total"] = "$" + " " + Convert.ToString(rdr.GetValue(3));
+    //            row["Proveedor"] = Convert.ToString(rdr.GetValue(4));
+    //            row["Company"] = Convert.ToString(rdr.GetValue(5));
+    //            row["FechaR"] = Convert.ToString(rdr.GetValue(6));
+    //            row["FechaP"] = Convert.ToString(rdr.GetValue(7));
+    //            row["Status"] = Convert.ToString(rdr.GetValue(8));
+    //            dt.Rows.Add(row);
+    //        }
+    //    }
 
-        GridView3.DataSource = dt;
-        GridView3.DataBind();
+    //    GridView3.DataSource = dt;
+    //    GridView3.DataBind();
 
-        if (dt.Rows.Count == 0) { Panel1.Visible = true; } else { Panel1.Visible = false; }
-    }
+    //    if (dt.Rows.Count == 0) { Panel1.Visible = true; } else { Panel1.Visible = false; }
+    //}
 
     protected void Buscar(object sender, EventArgs e)
     {
         try
         {
-            BindGridView();
+            //BindGridView();
+            CambiaProv();
         }
         catch
         {
@@ -1769,95 +1774,95 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
         return VK;
     }
 
-    protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
-    {
-        try
-        {
+    //protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+    //{
+    //    try
+    //    {
 
-            MemoryStream memoryStream = new MemoryStream();
+    //        MemoryStream memoryStream = new MemoryStream();
 
-            int index = Convert.ToInt32(e.CommandArgument);
-            string Pago, archivo, Folio, Cte;
-            GridViewRow row = GridView3.Rows[index];
-            string vend = HttpUtility.HtmlDecode(row.Cells[6].Text);
-            string vens = HttpUtility.HtmlDecode(row.Cells[7].Text);
-            int vkey = ObtenerVK(HttpUtility.HtmlDecode(row.Cells[6].Text), HttpUtility.HtmlDecode(row.Cells[7].Text));
-            Folio = HttpUtility.HtmlDecode(row.Cells[3].Text);
-            Pago = HttpUtility.HtmlDecode(row.Cells[5].Text);
-            Cte = HttpUtility.HtmlDecode(row.Cells[7].Text);
-
-
-            if (e.CommandName == "Documento_2")
-            {
-                string tipo = ".pdf";
-                if (e.CommandName == "Documento_2")
-                {
-                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[4].Text, "FileBinary", tipo, vkey);
-                }
-
-                if (memoryStream == null || memoryStream.Length == 0)
-                {
-                    string titulo, Msj, tipo2;
-                    tipo2 = "error";
-                    Msj = "Se genero error al intentar descargar el archivo, comunícate con el área de sistemas para ofrecerte una Solución";
-                    titulo = "Notificaciones T|SYS|";
-                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo2 + "');", true);
-                    return;
-                }
-                else
-                {
-                    archivo = Cte + "- Pago Folio " + Pago + " - Factura " + Folio;
-                    archivo = archivo + tipo;
-                    HttpContext.Current.Response.ContentType = "application/pdf";
-                    HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + archivo + "\"");
-                    HttpContext.Current.Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
-                    HttpContext.Current.Response.BinaryWrite(memoryStream.ToArray());
-                    HttpContext.Current.Response.End();
-                }
+    //        int index = Convert.ToInt32(e.CommandArgument);
+    //        string Pago, archivo, Folio, Cte;
+    //        GridViewRow row = GridView3.Rows[index];
+    //        string vend = HttpUtility.HtmlDecode(row.Cells[6].Text);
+    //        string vens = HttpUtility.HtmlDecode(row.Cells[7].Text);
+    //        int vkey = ObtenerVK(HttpUtility.HtmlDecode(row.Cells[6].Text), HttpUtility.HtmlDecode(row.Cells[7].Text));
+    //        Folio = HttpUtility.HtmlDecode(row.Cells[3].Text);
+    //        Pago = HttpUtility.HtmlDecode(row.Cells[5].Text);
+    //        Cte = HttpUtility.HtmlDecode(row.Cells[7].Text);
 
 
+    //        if (e.CommandName == "Documento_2")
+    //        {
+    //            string tipo = ".pdf";
+    //            if (e.CommandName == "Documento_2")
+    //            {
+    //                memoryStream = databaseFileRead("InvoiceKey", row.Cells[4].Text, "FileBinary", tipo, vkey);
+    //            }
 
-            }
+    //            if (memoryStream == null || memoryStream.Length == 0)
+    //            {
+    //                string titulo, Msj, tipo2;
+    //                tipo2 = "error";
+    //                Msj = "Se genero error al intentar descargar el archivo, comunícate con el área de sistemas para ofrecerte una Solución";
+    //                titulo = "Notificaciones T|SYS|";
+    //                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo2 + "');", true);
+    //                return;
+    //            }
+    //            else
+    //            {
+    //                archivo = Cte + "- Pago Folio " + Pago + " - Factura " + Folio;
+    //                archivo = archivo + tipo;
+    //                HttpContext.Current.Response.ContentType = "application/pdf";
+    //                HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + archivo + "\"");
+    //                HttpContext.Current.Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
+    //                HttpContext.Current.Response.BinaryWrite(memoryStream.ToArray());
+    //                HttpContext.Current.Response.End();
+    //            }
 
-            if (e.CommandName == "Documento_3")
-            {
-                string tipo = ".xml";
-                if (e.CommandName == "Documento_3")
-                {
-                    memoryStream = databaseFileRead("InvoiceKey", row.Cells[4].Text, "FileBinary", tipo, vkey);
-                }
 
-                if (memoryStream == null || memoryStream.Length == 0)
-                {
-                    string titulo, Msj, tipo2;
-                    tipo2 = "error";
-                    Msj = "Se genero error al intentar descargar el archivo, comunícate con el área de sistemas para ofrecerte una Solución";
-                    titulo = "Notificaciones T|SYS|";
-                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo2 + "');", true);
-                    return;
-                }
-                else
-                {
-                    archivo = Cte + "- Pago Folio " + Pago + " - Factura " + Folio;
-                    archivo = archivo + tipo;
-                    HttpContext.Current.Response.ContentType = "text/xml";
-                    HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + archivo + "\"");
-                    HttpContext.Current.Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
-                    HttpContext.Current.Response.BinaryWrite(memoryStream.ToArray());
-                    HttpContext.Current.Response.End();
-                }
-            }
 
-        }
-        catch (Exception ex)
-        {
-            string respuesta = ex.Message;
-            int pLogKey = 1;
-            int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
-            string pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
-            LogError(pLogKey, pUserKey, "Aprobacion de Documentos:GridView1_RowCommand", ex.Message, pCompanyID);
-        }
-    }
+    //        }
+
+    //        if (e.CommandName == "Documento_3")
+    //        {
+    //            string tipo = ".xml";
+    //            if (e.CommandName == "Documento_3")
+    //            {
+    //                memoryStream = databaseFileRead("InvoiceKey", row.Cells[4].Text, "FileBinary", tipo, vkey);
+    //            }
+
+    //            if (memoryStream == null || memoryStream.Length == 0)
+    //            {
+    //                string titulo, Msj, tipo2;
+    //                tipo2 = "error";
+    //                Msj = "Se genero error al intentar descargar el archivo, comunícate con el área de sistemas para ofrecerte una Solución";
+    //                titulo = "Notificaciones T|SYS|";
+    //                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo2 + "');", true);
+    //                return;
+    //            }
+    //            else
+    //            {
+    //                archivo = Cte + "- Pago Folio " + Pago + " - Factura " + Folio;
+    //                archivo = archivo + tipo;
+    //                HttpContext.Current.Response.ContentType = "text/xml";
+    //                HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + archivo + "\"");
+    //                HttpContext.Current.Response.AppendHeader("Content-Length", memoryStream.Length.ToString());
+    //                HttpContext.Current.Response.BinaryWrite(memoryStream.ToArray());
+    //                HttpContext.Current.Response.End();
+    //            }
+    //        }
+
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        string respuesta = ex.Message;
+    //        int pLogKey = 1;
+    //        int pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
+    //        string pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+    //        LogError(pLogKey, pUserKey, "Aprobacion de Documentos:GridView1_RowCommand", ex.Message, pCompanyID);
+    //    }
+    //}
 
     private MemoryStream databaseFileRead(string consulta, string InvoiceKey, string columna, string Tipo, int Vkey)
     {
@@ -1913,41 +1918,48 @@ public partial class Pagos_Proveedores : System.Web.UI.Page
         {
             F1.ReadOnly = true;
             F2.ReadOnly = true;
+            DropDownList2.Attributes.Add("disabled", "disabled");
         }
         else
         {
             F1.ReadOnly = false;
             F2.ReadOnly = false;
-
+            DropDownList2.Attributes.Remove("disabled");
         }
     }
 
-    protected void Limpia(object sender, EventArgs e)
+    protected void ChkFechas_CheckedChanged_Carga(object sender, EventArgs e)
     {
-        try
-        {
-            SelProv.Items.Clear();
-            CargaProv();
-            List.SelectedValue = "1";
-            //SelProv.SelectedValue = "1";
-            Folio.Text = "";
-            Factura.Text = "";
-            F1.Text = "";
-            F2.Text = "";
-            Monto.Text = "";
-            ChkFechas.Checked = false;
-            BindGridView();
-        }
-        catch (Exception ex)
-        {
-
-        }
+        CambiaProv();
     }
+
+    //protected void Limpia(object sender, EventArgs e)
+    //{
+    //    try
+    //    {
+    //        SelProv.Items.Clear();
+    //        //CargaProv();
+    //        List.SelectedValue = "1";
+    //        //SelProv.SelectedValue = "1";
+    //        Folio.Text = "";
+    //        Factura.Text = "";
+    //        F1.Text = "";
+    //        F2.Text = "";
+    //        Monto.Text = "";
+    //        ChkFechas.Checked = false;
+    //        BindGridView();
+    //    }
+    //    catch (Exception ex)
+    //    {
+
+    //    }
+    //}
 
     protected void List_SelectedIndexChanged(object sender, EventArgs e)
     {
         //CargarCombos();
-        BindGridView();
+        //BindGridView();
+        CambiaProv();
     }
 
 }

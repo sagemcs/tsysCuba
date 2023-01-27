@@ -25,7 +25,7 @@
             <input id="btn_print" class="btn btn-primary" type="button" value="Imprimir" style="position: relative; left: 45%;"  /> 
         </div>
         <div class="col-lg-3 col-sm-3 col-xs-3">
-            <asp:Button runat="server" id="btn_back" class="btn btn-primary" type="button" Text="Regresar a Reembolsos" OnClick="btn_back_Click" style="position: relative; left: 45%;" /> 
+            <asp:Button runat="server" id="btn_back" class="btn btn-primary" type="button" Text="Regresar a Gastos Médicos Menores" OnClick="btn_back_Click" style="position: relative; left: 45%;" /> 
         </div>
     </div>
     <br/>

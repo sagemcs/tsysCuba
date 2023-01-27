@@ -232,6 +232,6 @@ public partial class Logged_Reports_Comprobacion_Gastos_Tarjeta : System.Web.UI.
 
     protected void btn_back_Click(object sender, EventArgs e)
     {
-        Response.Redirect("~/Logged/Administradores/ReembolsoEmpleados");
+        Response.Redirect("~/Logged/Administradores/TarjetaEmpleado");
     }
 }

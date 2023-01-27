@@ -1422,7 +1422,7 @@ public static class Doc_Tools
         switch (notification)
         {
             case NotificationType.Aprobacion:
-                using (StreamReader reader = new StreamReader("~/Account/Templates Email/AprobacionPago.html"))
+                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/AprobacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);

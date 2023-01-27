@@ -781,7 +781,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         HttpContext.Current.Session["terminar_comprobacion_reembolso"] = false;
         btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];       
 
-        Response.Redirect("~/Logged/Reports/Reembolsos");
+        Response.Redirect("~/Logged/Reports/ComprobacionGastosReembolso");
     }      
 
     protected void STipoGasto_SelectedIndexChanged(object sender, EventArgs e)

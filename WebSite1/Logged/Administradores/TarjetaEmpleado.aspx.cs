@@ -698,7 +698,7 @@ public partial class Logged_Administradores_TarjetaEmpleado : System.Web.UI.Page
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
         HttpContext.Current.Session["terminar_comprobacion"] = null;
-        Response.Redirect("~/Logged/Reports/TarjetaEmpleado");
+        Response.Redirect("~/Logged/Reports/ComprobacionGastosTarjeta");
     }    
 
     protected void STipoGasto_SelectedIndexChanged(object sender, EventArgs e)

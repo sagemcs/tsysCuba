@@ -1053,4 +1053,11 @@ public partial class Logged_Administradores_EditReembolso : System.Web.UI.Page
     {
 
     }
+
+    protected void tbx_fecha_articulo_TextChanged(object sender, EventArgs e)
+    {
+        HttpContext.Current.Session["is_valid"] = false;
+        btn_Guardar.Enabled = (bool)HttpContext.Current.Session["is_valid"];
+        MultiView1.SetActiveView(View_Articulos);
+    }
 }

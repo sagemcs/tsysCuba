@@ -1344,6 +1344,7 @@ public static class Doc_Tools
         string tipo_documento = TiposDocumentos().FirstOrDefault(x => x.Key == (int)type).Value;
         string to = string.Empty;
         string from = string.Empty;
+        string subject = string.Empty;
         switch (type)
         {
             case Doc_Tools.DocumentType.Advance:
@@ -1426,25 +1427,27 @@ public static class Doc_Tools
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
                 }
+                subject = string.Format("El usuario {0} ha aprobado un {1} para su revisión", from, tipo_documento);
                 break;
             case NotificationType.Denegacion:
-                using (StreamReader reader = new StreamReader("~/Account/Templates Email/DenegacionPago.html"))
+                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory +  "/Account/Templates Email/DenegacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
                 }
+                subject = string.Format("El usuario {0} ha denegado un {1} para su revisión", from, tipo_documento);
                 break;
             case NotificationType.Revision:
-                using (StreamReader reader = new StreamReader("~/Account/Templates Email/RevisionPago.html"))
+                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/RevisionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from ).Replace("{documento}", tipo_documento);
-                }              
+                }
+                subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, tipo_documento);
                 break;           
         }
-        string subject = string.Format(texto, from, type.ToString());
-        string text = string.Format(texto, from, type.ToString());     
-        bool SendEmail = Global.EmailGlobal(to, text, subject);
+             
+        bool SendEmail = Global.EmailGlobal(to, texto, subject);
     }
 
     public static int GetGerenteToNotify(int userkey)

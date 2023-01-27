@@ -811,7 +811,7 @@ public class FacturasAll
             List<FacturasAllDTO> facturas = new List<FacturasAllDTO>();
             PortalProveedoresEntities db = new PortalProveedoresEntities();
 
-            List<Invoice> list = db.Invoice.Where(predicate).ToList();
+            List<Invoice> list = db.Invoice.Where(i => i.Status >= 6 && i.Status < 8).ToList();
 
             foreach (Invoice invoice in list)
             {

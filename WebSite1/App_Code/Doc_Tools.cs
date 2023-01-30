@@ -1336,13 +1336,13 @@ public static class Doc_Tools
            
             
         }
-    }
+    }   
 
-    public static void EnviarCorreo(Doc_Tools.DocumentType type, int userkey, int aproval_level, NotificationType notification)
+    public static void EnviarCorreo(Doc_Tools.DocumentType type, int userkey, int aproval_level, NotificationType notification, int logged_user)
     {      
         var matrix = Doc_Tools.get_MatrizValidadores(userkey, aproval_level);
         string tipo_documento = TiposDocumentos().FirstOrDefault(x => x.Key == (int)type).Value;
-        string to = string.Empty;
+        List<string> to = new List<string>();
         string from = string.Empty;
         string subject = string.Empty;
         switch (type)
@@ -1351,51 +1351,80 @@ public static class Doc_Tools
                 switch (aproval_level)
                 {
                     case 1:
-                        to = Doc_Tools.getUserEmail(matrix.Gerente);
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                break;                           
+                        }                        
                         break;
-                    case 2:
-                        to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
+                    case 2:                       
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;                           
+                        }
                         break;
                     case 3:
-                        to = Doc_Tools.getUserEmail(matrix.Tesoreria);
-                        break;
-                    case 4:
-                        to = Doc_Tools.getUserEmail(matrix.Finanzas);
-                        break;
-                    
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;                           
+                        }                        
+                        break;                   
                 }
                 break;
             case Doc_Tools.DocumentType.Expense:
                 switch (aproval_level)
                 {
                     case 1:
-                        to = Doc_Tools.getUserEmail(matrix.Gerente);
+                        to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
                         break;
                     case 2:
-                        to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
+                        to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
                         break;
                     case 3:
-                        to = Doc_Tools.getUserEmail(matrix.Tesoreria);
+                        to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
                         break;
                     case 4:
-                        to = Doc_Tools.getUserEmail(matrix.Finanzas);
+                        to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
                         break;
                 }
                 break;
             case Doc_Tools.DocumentType.CorporateCard:
                 switch (aproval_level)
-                {
-                    case 1:
-                        to = Doc_Tools.getUserEmail(matrix.Gerente);
-                        break;
+                {                   
                     case 2:
-                        to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
+                        to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
                         break;
                     case 3:
-                        to = Doc_Tools.getUserEmail(matrix.Tesoreria);
+                        to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
                         break;
                     case 4:
-                        to = Doc_Tools.getUserEmail(matrix.Finanzas);
+                        to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
                         break;
                 }
                 break;
@@ -1403,25 +1432,26 @@ public static class Doc_Tools
                 switch (aproval_level)
                 {
                     case 1:
-                        to = Doc_Tools.getUserEmail(matrix.Gerente);
+                        to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
                         break;
                     case 2:
-                        to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
+                        to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
                         break;
                     case 3:
-                        to = Doc_Tools.getUserEmail(matrix.Tesoreria);
+                        to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
                         break;
                     case 4:
-                        to = Doc_Tools.getUserEmail(matrix.Finanzas);
+                        to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
                         break;
                 }
                 break;
         }
         string texto = string.Empty;       
-        from = Doc_Tools.getUserEmail(userkey);
+        
         switch (notification)
         {
             case NotificationType.Aprobacion:
+                from = Doc_Tools.getUserEmail(logged_user);
                 using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/AprobacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
@@ -1430,6 +1460,7 @@ public static class Doc_Tools
                 subject = string.Format("El usuario {0} ha aprobado un {1} para su revisión", from, tipo_documento);
                 break;
             case NotificationType.Denegacion:
+                from = Doc_Tools.getUserEmail(logged_user);
                 using (StreamReader reader = new StreamReader(AppContext.BaseDirectory +  "/Account/Templates Email/DenegacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
@@ -1438,6 +1469,7 @@ public static class Doc_Tools
                 subject = string.Format("El usuario {0} ha denegado un {1} para su revisión", from, tipo_documento);
                 break;
             case NotificationType.Revision:
+                from = Doc_Tools.getUserEmail(userkey);
                 using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/RevisionPago.html"))
                 {
                     texto = reader.ReadToEnd();
@@ -1446,8 +1478,11 @@ public static class Doc_Tools
                 subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, tipo_documento);
                 break;           
         }
-             
-        bool SendEmail = Global.EmailGlobal(to, texto, subject);
+        foreach (var direccion in to)
+        {
+            bool SendEmail = Global.EmailGlobal(direccion, texto, subject);
+        }       
+
     }
 
     public static int GetGerenteToNotify(int userkey)
@@ -1571,7 +1606,7 @@ public static class Doc_Tools
             {
                 foreach (AdvanceDTO anticipo_pendients in user.ToList())
                 {                    
-                    EnviarCorreo(DocumentType.Advance, user.Key, 1, NotificationType.Revision);                
+                    EnviarCorreo(DocumentType.Advance, user.Key, 1, NotificationType.Revision, user.Key);                
                    
                 }
             }

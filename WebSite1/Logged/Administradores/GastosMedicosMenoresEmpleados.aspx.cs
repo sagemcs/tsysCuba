@@ -572,7 +572,7 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
             HttpContext.Current.Session["terminar_comprobacion"] = true;
             btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
-            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.MinorMedicalExpense, pUserKey, 1, Doc_Tools.NotificationType.Revision);
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.MinorMedicalExpense, pUserKey, 1, Doc_Tools.NotificationType.Revision, pUserKey);
         }
         else
         {

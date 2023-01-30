@@ -183,8 +183,10 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
         Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
 
         Doc_Tools.VerificarAnticiposPendientes();
-
+        HttpContext.Current.Session["level_notificacion"] = 1;
         List<RolDTO> roles = Doc_Tools.get_Roles();
+        
+       
         try
         {
             if (!roles.Any(x => x.ID == HttpContext.Current.Session["RolUser"].ToString()))
@@ -200,6 +202,14 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
                     pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
                     pUserKey = Convert.ToInt32(HttpContext.Current.Session["UserKey"].ToString());
                     pCompanyID = Convert.ToString(HttpContext.Current.Session["IDCompany"].ToString());
+
+                    var rol = HttpContext.Current.Session["RolUser"].ToString();
+                    var roles_validadores = Doc_Tools.get_RolesValidadores();
+                    if (roles_validadores.Any(x => x.ID == rol))
+                    {
+                        HttpContext.Current.Session["level_notificacion"] = roles_validadores.FirstOrDefault(x => x.ID == rol).Key + 1;
+                    }
+
                     if (!IsPostBack)
                     {
                         //Limpiar Variables de sesion del Gastos
@@ -492,7 +502,8 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
 
             HttpContext.Current.Session["terminar_comprobacion"] = true;
             btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion"];
-            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, pUserKey, 1, Doc_Tools.NotificationType.Revision);
+            int level_notificacion = int.Parse(HttpContext.Current.Session["level_notificacion"].ToString());
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, pUserKey, level_notificacion , Doc_Tools.NotificationType.Revision, pUserKey);
             BindGridView();
             ClearControls();
             HttpContext.Current.Session["is_valid"] = false;

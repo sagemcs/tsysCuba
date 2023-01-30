@@ -436,7 +436,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
 
             Update_Advance(advance_id, paquete.PackageId, status, motivo.Text, level: level_validador);
             var advance = LoadAdvanceById(advance_id);            
-            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, advance.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Denegacion);
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, advance.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Denegacion, pUserKey);
             BindPackageInfo();
             BindGridView(user_id, status_id, type);
         }
@@ -941,7 +941,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         }
 
         status_id = int.Parse(drop_status.SelectedValue);       
-        Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, pUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion);
+        Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, pUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion, pUserKey);
         BindGridView(user_id, status_id, type);
 
     }

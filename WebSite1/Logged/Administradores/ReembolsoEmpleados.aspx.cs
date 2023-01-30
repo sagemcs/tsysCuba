@@ -490,7 +490,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
             HttpContext.Current.Session["terminar_comprobacion_reembolso"] = true;
             btnFinalizar.Enabled = (bool)HttpContext.Current.Session["terminar_comprobacion_reembolso"];
-            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Expense, pUserKey, 1, Doc_Tools.NotificationType.Revision);
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Expense, pUserKey, 1, Doc_Tools.NotificationType.Revision, pUserKey);
             Response.Redirect(Page.Request.RawUrl);
         }
         else

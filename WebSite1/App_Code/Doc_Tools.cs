@@ -817,35 +817,13 @@ public static class Doc_Tools
         return nivel;
     }
 
-    public static ValidatingUserDTO get_MatrizValidadores(int pUserKey, int level)
-    {
-        
+    public static ValidatingUserDTO get_MatrizValidadores(int pUserKey)
+    {        
         ValidatingUserDTO matriz = new ValidatingUserDTO();
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            switch (level)
-            {
-                case 1:
-                    cmd.CommandText = "SELECT UserKey, Isnull(UserValidadorCX,0), Isnull(UserGerente,0), Isnull(UserRH,0), Isnull(UserTesoreria,0), Isnull(UserFinanzas,0) FROM validatingUser where UserKey = @UserKey";
-                    break;
-                case 2:
-                    cmd.CommandText = "SELECT UserKey,Isnull(UserValidadorCX,0), Isnull(UserGerente,0), Isnull(UserRH,0), Isnull(UserTesoreria,0), Isnull(UserFinanzas,0) FROM validatingUser where UserValidadorCX = @UserKey";
-                    break;
-                case 3:
-                    cmd.CommandText = "SELECT UserKey,Isnull(UserValidadorCX,0), Isnull(UserGerente,0), Isnull(UserRH,0), Isnull(UserTesoreria,0), Isnull(UserFinanzas,0) FROM validatingUser where UserGerente = @UserKey";
-                    break;
-                case 4:
-                    cmd.CommandText = "SELECT UserKey,Isnull(UserValidadorCX,0), Isnull(UserGerente,0), Isnull(UserRH,0), Isnull(UserTesoreria,0), Isnull(UserFinanzas,0) FROM validatingUser where UserRH = @UserKey";
-                    break;
-                case 5:
-                    cmd.CommandText = "SELECT UserKey,Isnull(UserValidadorCX,0), Isnull(UserGerente,0), Isnull(UserRH,0), Isnull(UserTesoreria,0), Isnull(UserFinanzas,0) FROM validatingUser where UserTesoreria = @UserKey";
-                    break;
-                case 6:
-                    cmd.CommandText = "SELECT UserKey,Isnull(UserValidadorCX,0), Isnull(UserGerente,0), Isnull(UserRH,0), Isnull(UserTesoreria,0), Isnull(UserFinanzas,0) FROM validatingUser where UserFinanzas = @UserKey";
-                    break;              
-            }
-
+            cmd.CommandText = "SELECT UserKey, Isnull(UserValidadorCX,0), Isnull(UserGerente,0), Isnull(UserRH,0), Isnull(UserTesoreria,0), Isnull(UserFinanzas,0) FROM validatingUser where UserKey = @UserKey";
             cmd.Parameters.Add("@UserKey", SqlDbType.Int).Value = pUserKey;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -908,7 +886,7 @@ public static class Doc_Tools
 
     public enum NotificationType
     {
-        Aprobacion, Denegacion, Revision
+        Aprobacion, Denegacion, Revision, Integracion
     }
    
     public  class Paquete
@@ -1340,7 +1318,7 @@ public static class Doc_Tools
 
     public static void EnviarCorreo(Doc_Tools.DocumentType type, int userkey, int aproval_level, NotificationType notification, int logged_user)
     {      
-        var matrix = Doc_Tools.get_MatrizValidadores(userkey, aproval_level);
+        var matrix = Doc_Tools.get_MatrizValidadores(userkey);
         string tipo_documento = TiposDocumentos().FirstOrDefault(x => x.Key == (int)type).Value;
         List<string> to = new List<string>();
         string from = string.Empty;
@@ -1361,7 +1339,8 @@ public static class Doc_Tools
                                 break;
                             case NotificationType.Revision:
                                 to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
-                                break;                           
+                                break;                            
+                                
                         }                        
                         break;
                     case 2:                       
@@ -1392,7 +1371,10 @@ public static class Doc_Tools
                                 break;
                             case NotificationType.Revision:
                                 to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
-                                break;                           
+                                break;
+                            case NotificationType.Integracion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
                         }                        
                         break;                   
                 }
@@ -1401,16 +1383,69 @@ public static class Doc_Tools
                 switch (aproval_level)
                 {
                     case 1:
-                        to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                break;
+                        }
                         break;
                     case 2:
-                        to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                        }
                         break;
                     case 3:
-                        to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                        }
                         break;
                     case 4:
-                        to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Integracion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                        }
                         break;
                 }
                 break;
@@ -1418,13 +1453,52 @@ public static class Doc_Tools
                 switch (aproval_level)
                 {                   
                     case 2:
-                        to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                        }
                         break;
                     case 3:
-                        to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                        }
                         break;
                     case 4:
-                        to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Integracion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                        }
                         break;
                 }
                 break;
@@ -1432,16 +1506,69 @@ public static class Doc_Tools
                 switch (aproval_level)
                 {
                     case 1:
-                        to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                break;
+                        }
                         break;
                     case 2:
-                        to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                        }
                         break;
                     case 3:
-                        to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                        }
                         break;
                     case 4:
-                        to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                        switch (notification)
+                        {
+                            case NotificationType.Aprobacion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Denegacion:
+                                to.Add(Doc_Tools.getUserEmail(userkey));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
+                                break;
+                            case NotificationType.Revision:
+                                to.Add(Doc_Tools.getUserEmail(matrix.Finanzas));
+                                break;
+                            case NotificationType.Integracion:
+                                to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
+                                break;
+                        }
                         break;
                 }
                 break;
@@ -1476,7 +1603,16 @@ public static class Doc_Tools
                     texto = texto.Replace("{empleado}", from ).Replace("{documento}", tipo_documento);
                 }
                 subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, tipo_documento);
-                break;           
+                break;
+            case NotificationType.Integracion:
+                from = Doc_Tools.getUserEmail(userkey);
+                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/IntegracionPago.html"))
+                {
+                    texto = reader.ReadToEnd();
+                    texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
+                }
+                subject = string.Format("El usuario {0} ha aprobado un {1} para su integracion", from, tipo_documento);
+                break;
         }
         foreach (var direccion in to)
         {

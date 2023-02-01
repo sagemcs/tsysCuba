@@ -926,8 +926,9 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         int status = 2;
         var paquete = get_Package(pUserKey);
         string rol = HttpContext.Current.Session["RolUser"].ToString();
-        var roles = Doc_Tools.get_RolesValidadores();
-        int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;        
+        var roles = Doc_Tools.get_RolesValidadores().Where(x=> x.Key != 4).ToList();
+        int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
+        var advance = LoadAdvanceById(expense_id);
         if (drop_tipo.SelectedItem != null)
         {
             type = int.Parse(drop_tipo.SelectedItem.Value);
@@ -940,8 +941,17 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
             user_id = int.Parse(drop_empleados.SelectedItem.Value);
         }
 
-        status_id = int.Parse(drop_status.SelectedValue);       
-        Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, pUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion, pUserKey);
+        status_id = int.Parse(drop_status.SelectedValue);
+       
+        if (roles.FirstOrDefault(x => x.ID == rol).Key == roles.Max(z => z.Key))
+        {
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, advance.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Integracion, pUserKey);
+        }
+        else 
+        {
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, advance.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion, pUserKey);
+        }
+        
         BindGridView(user_id, status_id, type);
 
     }

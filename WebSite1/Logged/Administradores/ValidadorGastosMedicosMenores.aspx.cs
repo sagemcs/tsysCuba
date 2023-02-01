@@ -387,7 +387,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT MinorMedicalExpenseId , Date ,Amount, Status,  CompanyId FROM MinorMedicalExpense where  MinorMedicalExpenseId = @MinorMedicalExpenseId;";
+            cmd.CommandText = "SELECT MinorMedicalExpenseId , Date ,Amount, Status,  CompanyId, UpdateUserKey FROM MinorMedicalExpense where  MinorMedicalExpenseId = @MinorMedicalExpenseId;";
             cmd.Parameters.Add("@MinorMedicalExpenseId", SqlDbType.Int).Value = expense_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -398,6 +398,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 expense.Amount = dataReader.GetDecimal(2);
                 expense.Status = Doc_Tools.Dict_status().First(x => x.Key == dataReader.GetInt32(3)).Value;             
                 expense.CompanyId = dataReader.GetString(4);
+                expense.UpdateUserKey = dataReader.GetInt32(5);
             }
         }
         return expense;
@@ -444,7 +445,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         var roles = Doc_Tools.get_RolesValidadores();
         int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
-
+        var medical_expense = LoadMedicalExpenseById(expense_id);
         if (level_validador == 1)
         {
             if (paquete.PackageId == 0)
@@ -470,7 +471,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
             }
 
             Update_Expense(expense_id, paquete.PackageId, status, motivo.Text, level: level_validador);
-            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.MinorMedicalExpense, pUserKey, level_validador, Doc_Tools.NotificationType.Denegacion, pUserKey);
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.MinorMedicalExpense, medical_expense.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Denegacion, pUserKey);
             BindPackageInfo();
         }
 
@@ -491,7 +492,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         if (e.CommandName == "Integrate")
         {
             //Coger los datos del documento y lanzar las api Integrar
-            var medical_expense = LoadMedicalExpenseById(expense_id);  
+           
             if (!medical_expense.SageIntegration)
             {
                 var details = Load_Articles_By_Expense(expense_id, pCompanyID);
@@ -892,56 +893,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         }
     }
 
-    public void EnviarCorreo(bool accion)
-    {
-        string acction_text = accion ? "Aprobado" : "Denegado";
-        //Segun el nivel del usuario logueado traer la matriz
-        string rol = HttpContext.Current.Session["RolUser"].ToString();
-        List<RolDTO> roles = Doc_Tools.get_RolesValidadores().ToList();
-        int level = roles.FirstOrDefault(x => x.ID == rol).Key;
-        var matrix = Doc_Tools.get_MatrizValidadores(pUserKey, level);
-        var jerarquia = Doc_Tools.get_JerarquiaValidadores(((int)Doc_Tools.DocumentType.MinorMedicalExpense));
-        var orden = jerarquia.Get_Orden(jerarquia);
-        string server_address = ConfiguracionCorreoElectronico.server_address;
-        int server_port = ConfiguracionCorreoElectronico.server_port;
-        string user = ConfiguracionCorreoElectronico.user;
-        string password = ConfiguracionCorreoElectronico.password;
-        bool enable_ssl = ConfiguracionCorreoElectronico.enable_ssl;
-        CorreoElectronico email = new CorreoElectronico(server_address, server_port, user, password, enable_ssl);
-
-        //Tomar el nivel superior que corresponde
-        string from = Doc_Tools.getUserEmail(pUserKey);
-        string to = string.Empty;
-        foreach (var item in orden) if (to == string.Empty)
-            {
-                if (item.Value == "RecursosHumanos" && matrix.Rh != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.Rh);
-                }
-                if (item.Value == "GerenciaArea" && matrix.Gerente != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.Rh);
-                }
-                if (item.Value == "CuentasxPagar" && matrix.ValidadorCx != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.ValidadorCx);
-                }
-                if (item.Value == "Tesoreria" && matrix.Tesoreria != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.Tesoreria);
-                }
-                if (item.Value == "Finanzas" && matrix.Finanzas != 0)
-                {
-                    to = Doc_Tools.getUserEmail(matrix.Finanzas);
-                }
-
-            }
-        string subject = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.MinorMedicalExpense.ToString());
-        string text = string.Format("El usuario {0} ha añadido un {1} para su revisión", from, Doc_Tools.DocumentType.MinorMedicalExpense.ToString());
-        bool is_text_html = false;
-        email.Enviar(from, to, subject, text, is_text_html);
-    }
-
+   
     protected void btnVisualize_Command(object sender, CommandEventArgs e)
     {
         int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
@@ -966,8 +918,18 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         string rol = HttpContext.Current.Session["RolUser"].ToString();
         var roles = Doc_Tools.get_RolesValidadores();
         int level_validador = roles.FirstOrDefault(x => x.ID == rol).Key;
+        var medical_expense = LoadMedicalExpenseById(expense_id);
+
         Update_Expense(expense_id, paquete.PackageId, status, string.Empty, level: level_validador);
-        Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.MinorMedicalExpense, pUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion, pUserKey);
+        if (roles.FirstOrDefault(x => x.ID == rol).Key == roles.Max(z => z.Key))
+        {
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.MinorMedicalExpense, medical_expense.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Integracion, pUserKey);
+        }
+        else 
+        {
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.MinorMedicalExpense, medical_expense.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Aprobacion, pUserKey);
+        }
+            
         BindPackageInfo();
         if (drop_empleados.SelectedItem != null)
         {

@@ -32,7 +32,7 @@ public partial class Logged_ReportsFilter_ErroresFilter : System.Web.UI.Page
         Page.Title = "Errores";
         if (!IsPostBack)
         {
-            if (HttpContext.Current.Session["IDCompany"] == null)
+            if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
             {
                 Context.GetOwinContext().Authentication.SignOut();
                 Response.Redirect("~/Account/Login.aspx");

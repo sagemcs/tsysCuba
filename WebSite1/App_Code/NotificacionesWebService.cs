@@ -1668,7 +1668,7 @@ public class NotificacionesWebService : System.Web.Services.WebService
                 SqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "select u.UserID From Users u inner join UsersInRoles ur on u.UserKey = ur.UserKey where ur.RoleKey = 7";
                 if (rol == "T|SYS| - Finanzas")
-                    cmd.CommandText = cmd.CommandText + " and ur.RoleKey = 13;";
+                    cmd.CommandText = cmd.CommandText + " or ur.RoleKey = 13;";
                 cmd.Connection.Open();
                 SqlDataReader dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())

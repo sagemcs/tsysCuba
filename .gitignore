@@ -241,3 +241,5 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 WebSite1/connections.config
+WebSite1/connections.config
+WebSite1/connections.config

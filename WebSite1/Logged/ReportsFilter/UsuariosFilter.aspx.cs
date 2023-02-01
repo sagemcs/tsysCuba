@@ -31,7 +31,7 @@ public partial class Logged_ReportsFilter_UsuariosFilter : System.Web.UI.Page
 
         if (!IsPostBack)
         {
-            if (HttpContext.Current.Session["IDCompany"] == null)
+            if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
             {
                 Context.GetOwinContext().Authentication.SignOut();
                 Response.Redirect("~/Account/Login.aspx");

@@ -185,12 +185,12 @@ public partial class Logged_AdmFacturas : System.Web.UI.Page
         try
         {
 
-                if (HttpContext.Current.Session["IDCompany"] == null)
-                {
-                    Context.GetOwinContext().Authentication.SignOut();
-                    Response.Redirect("~/Account/Login.aspx");
-                }
-                else
+            if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
+            {
+                Context.GetOwinContext().Authentication.SignOut();
+                Response.Redirect("~/Account/Login.aspx");
+            }
+            else
                 {
                     if (HttpContext.Current.Session["RolUser"].ToString() != "Proveedor")
                     {

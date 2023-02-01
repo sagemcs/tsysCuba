@@ -112,7 +112,7 @@ public partial class Logged_Reports_AprobacionSolicitudCheque : System.Web.UI.Pa
 
     protected void Page_Init(object sender, EventArgs e)
     {
-        if (HttpContext.Current.Session["IDCompany"] == null)
+        if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
         {
             Context.GetOwinContext().Authentication.SignOut();
             Response.Redirect("~/Account/Login.aspx");
@@ -137,7 +137,7 @@ public partial class Logged_Reports_AprobacionSolicitudCheque : System.Web.UI.Pa
 
         if (!IsPostBack)
         {
-            if (HttpContext.Current.Session["IDCompany"] == null)
+            if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
             {
                 Context.GetOwinContext().Authentication.SignOut();
                 Response.Redirect("~/Account/Login.aspx");

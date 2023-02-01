@@ -46,7 +46,7 @@ public partial class AutorizacionProveedores : System.Web.UI.Page
 
         if (!IsPostBack)
         {
-            if (HttpContext.Current.Session["IDCompany"] == null)
+            if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
             {
                 Context.GetOwinContext().Authentication.SignOut();
                 Response.Redirect("~/Account/Login.aspx");

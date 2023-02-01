@@ -90,7 +90,7 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
 
     protected void Page_Init(object sender, EventArgs e)
     {
-        if (HttpContext.Current.Session["IDCompany"] == null)
+        if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
         {
             Context.GetOwinContext().Authentication.SignOut();
             Response.Redirect("~/Account/Login.aspx");
@@ -115,7 +115,7 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
 
         if (!IsPostBack)
         {
-            if (HttpContext.Current.Session["IDCompany"] == null)
+            if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
             {
                 Context.GetOwinContext().Authentication.SignOut();
                 Response.Redirect("~/Account/Login.aspx");

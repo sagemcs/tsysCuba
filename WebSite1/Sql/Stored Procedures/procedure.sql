@@ -30,8 +30,8 @@ BEGIN
 	BEGIN
 		SELECT d.Moneda,d.InvcRcptKey,d.Folio,f.VendName,c.VendDBA as RFC,t1.CreateDate,t1.PaymentDate,t1.Total,d.InvoiceKey, e.DueDayOrMonth AS condiciones, e.[Description] AS condiciones_desc
 		FROM InvoiceReceipt t1 
-		LEFT join sage500_Portal081122.dbo.TapVendor c on t1.vendorKey = c.VendKey ---AQUI CAMBIAR A PROD
-		LEFT JOIN [sage500_Portal081122].dbo.tciPaymentTerms e ON c.PmtTermsKey = e.PmtTermsKey
+		LEFT join mas500_u_app.dbo.TapVendor c on t1.vendorKey = c.VendKey ---AQUI CAMBIAR A PROD
+		LEFT JOIN [mas500_u_app].dbo.tciPaymentTerms e ON c.PmtTermsKey = e.PmtTermsKey
 		LEFT JOIN Vendors f on c.VendKey = f.VendorKey
 		LEFT join InvcRcptDetails d on d.InvcRcptKey = t1.InvcRcptKey
 		WHERE NOT EXISTS (SELECT NULL FROM ChkReqDetail t2  WHERE t2.InvcRcptKey = t1.InvcRcptKey) 
@@ -42,7 +42,7 @@ BEGIN
 	BEGIN
 		Select CONVERT(VARCHAR(10), AprovDate, 103) As Fecha,c.Vendname as VendID,RFCEmisor as RFC,NodeOc as OC,b.TranNo as Folio,Moneda,b.TranAmt as Total, b.Balance as Saldo
 		From invoice a inner join vendors c on a.VendorKey = c.VendorKey 
-		inner join [sage500_Portal081122].dbo.tapVoucher b on a.Folio =b.TranNo AND a.VendorKey = b.VendKey
+		inner join [mas500_u_app].dbo.tapVoucher b on a.Folio =b.TranNo AND a.VendorKey = b.VendKey
 		Where a.Status >= 6 AND a.Status < 8
 		AND c.Superior = @UserKey AND b.CompanyID = @CompanyID and c.Vendname = @Prov
 	END
@@ -53,7 +53,7 @@ BEGIN
 		BEGIN
 			--Select CONVERT(VARCHAR(10), AprovDate, 103) As Fecha,c.Vendname as VendID,RFCEmisor as RFC,NodeOc as OC,b.TranNo as Folio,Moneda,b.TranAmt as Total, b.Balance as Saldo
 			--From invoice a inner join vendors c on a.VendorKey = c.VendorKey 
-			--inner join [sage500_Portal081122].dbo.tapVoucher b on a.Folio =b.TranNo AND a.VendorKey = b.VendKey
+			--inner join [mas500_u_app].dbo.tapVoucher b on a.Folio =b.TranNo AND a.VendorKey = b.VendKey
 			--Where a.Status >= 6 AND a.Status < 8 
 			--and a.Folio + '-' + a.NodeOc not in (select UUID from Payment )
 
@@ -87,15 +87,15 @@ BEGIN
 			--(select convert(varchar, p.CreateDate, 3) From PaymentAppl pa inner join Payment p on pa.PaymentKey = p.PaymentKey Where pa.ApplInvoiceKey = a.InvoiceKey) as FechaRecepComplPago,
 			--(select convert(varchar, p.AprovDate, 3) From PaymentAppl pa inner join Payment p on pa.PaymentKey = p.PaymentKey Where pa.ApplInvoiceKey = a.InvoiceKey) as FechaAprobComplPago
 			--From invoice a inner join vendors c on a.VendorKey = c.VendorKey
-			--inner join [sage500_Portal081122].dbo.tapVoucher b on a.Folio = b.TranNo AND a.VendorKey = b.VendKey
+			--inner join [mas500_u_app].dbo.tapVoucher b on a.Folio = b.TranNo AND a.VendorKey = b.VendKey
 			--left join InvcRcptDetails id on a.InvoiceKey = id.InvoiceKey
 			--left join InvoiceReceipt ir on id.InvcRcptKey = ir.InvcRcptKey
 			--left join ChkReqDetail crd on ir.InvcRcptKey = crd.InvcRcptKey
 			--left join CheckRequest cr on crd.ChkReqKey = cr.ChkReqKey
-			--left JOIN [sage500_Portal081122].dbo.tapVendPmtAppl tvpa on tvpa.ApplyToVouchKey = b.VoucherKey
-			--left join [sage500_Portal081122].dbo.tapVendPmt tvp on tvp.VendPmtKey = tvpa.ApplyFromPmtKey
-			--left JOIN [sage500_Portal081122].dbo.tcmCashAcct e ON tvp.CashAcctKey = e.CashAcctKey
-			--left JOIN [sage500_Portal081122].dbo.tcmBank f ON e.BankKey = f.BankKey
+			--left JOIN [mas500_u_app].dbo.tapVendPmtAppl tvpa on tvpa.ApplyToVouchKey = b.VoucherKey
+			--left join [mas500_u_app].dbo.tapVendPmt tvp on tvp.VendPmtKey = tvpa.ApplyFromPmtKey
+			--left JOIN [mas500_u_app].dbo.tcmCashAcct e ON tvp.CashAcctKey = e.CashAcctKey
+			--left JOIN [mas500_u_app].dbo.tcmBank f ON e.BankKey = f.BankKey
 			--WHERE a.Status >= 6 AND a.Status < 8 and a.Folio  + '-'  + a.NodeOc not in (select UUID from Payment)
 
 
@@ -108,15 +108,15 @@ BEGIN
 			set @SQLString = @SQLString + '(select convert(varchar, p.CreateDate, 3) From PaymentAppl pa inner join Payment p on pa.PaymentKey = p.PaymentKey Where pa.ApplInvoiceKey = a.InvoiceKey) as FechaRecepComplPago,'
 			set @SQLString = @SQLString + '(select convert(varchar, p.AprovDate, 3) From PaymentAppl pa inner join Payment p on pa.PaymentKey = p.PaymentKey Where pa.ApplInvoiceKey = a.InvoiceKey) as FechaAprobComplPago'
 			set @SQLString = @SQLString + ' From invoice a inner join vendors c on a.VendorKey = c.VendorKey'
-			set @SQLString = @SQLString + ' inner join [sage500_Portal081122].dbo.tapVoucher b on a.Folio = b.TranNo AND a.VendorKey = b.VendKey'
+			set @SQLString = @SQLString + ' inner join [mas500_u_app].dbo.tapVoucher b on a.Folio = b.TranNo AND a.VendorKey = b.VendKey'
 			set @SQLString = @SQLString + ' left join InvcRcptDetails id on a.InvoiceKey = id.InvoiceKey'
 			set @SQLString = @SQLString + ' left join InvoiceReceipt ir on id.InvcRcptKey = ir.InvcRcptKey'
 			set @SQLString = @SQLString + ' left join ChkReqDetail crd on ir.InvcRcptKey = crd.InvcRcptKey'
 			set @SQLString = @SQLString + ' left join CheckRequest cr on crd.ChkReqKey = cr.ChkReqKey'
-			set @SQLString = @SQLString + ' left JOIN [sage500_Portal081122].dbo.tapVendPmtAppl tvpa on tvpa.ApplyToVouchKey = b.VoucherKey'
-			set @SQLString = @SQLString + ' left join [sage500_Portal081122].dbo.tapVendPmt tvp on tvp.VendPmtKey = tvpa.ApplyFromPmtKey'
-			set @SQLString = @SQLString + ' left JOIN [sage500_Portal081122].dbo.tcmCashAcct e ON tvp.CashAcctKey = e.CashAcctKey'
-			set @SQLString = @SQLString + ' left JOIN [sage500_Portal081122].dbo.tcmBank f ON e.BankKey = f.BankKey'
+			set @SQLString = @SQLString + ' left JOIN [mas500_u_app].dbo.tapVendPmtAppl tvpa on tvpa.ApplyToVouchKey = b.VoucherKey'
+			set @SQLString = @SQLString + ' left join [mas500_u_app].dbo.tapVendPmt tvp on tvp.VendPmtKey = tvpa.ApplyFromPmtKey'
+			set @SQLString = @SQLString + ' left JOIN [mas500_u_app].dbo.tcmCashAcct e ON tvp.CashAcctKey = e.CashAcctKey'
+			set @SQLString = @SQLString + ' left JOIN [mas500_u_app].dbo.tcmBank f ON e.BankKey = f.BankKey'
 			set @SQLString = @SQLString + ' WHERE a.Status >= 6 AND a.Status < 8'
 			set @SQLString = @SQLString +  ' and (a.Folio + ' + '''-''' + ' + a.NodeOc not in (select UUID from Payment))'
 
@@ -128,7 +128,7 @@ BEGIN
 		BEGIN
 			Select CONVERT(VARCHAR(10), AprovDate, 103) As Fecha,c.Vendname as VendID,RFCEmisor as RFC,NodeOc as OC,b.TranNo as Folio,Moneda,b.TranAmt as Total, b.Balance as Saldo
 			From invoice a inner join vendors c on a.VendorKey = c.VendorKey 
-			inner join [sage500_Portal081122].dbo.tapVoucher b on a.Folio =b.TranNo AND a.VendorKey = b.VendKey
+			inner join [mas500_u_app].dbo.tapVoucher b on a.Folio =b.TranNo AND a.VendorKey = b.VendKey
 			Where a.Status >= 6 AND a.Status < 8 AND c.Vendname = @Prov
 			and a.Folio + '-' + a.NodeOc not in (select UUID from Payment ) 
 			--

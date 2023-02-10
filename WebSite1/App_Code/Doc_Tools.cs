@@ -1579,7 +1579,7 @@ public static class Doc_Tools
         {
             case NotificationType.Aprobacion:
                 from = Doc_Tools.getUserEmail(logged_user);
-                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/AprobacionPago.html"))
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "/Account/Templates Email/AprobacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
@@ -1588,7 +1588,7 @@ public static class Doc_Tools
                 break;
             case NotificationType.Denegacion:
                 from = Doc_Tools.getUserEmail(logged_user);
-                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory +  "/Account/Templates Email/DenegacionPago.html"))
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory +  "/Account/Templates Email/DenegacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
@@ -1597,7 +1597,7 @@ public static class Doc_Tools
                 break;
             case NotificationType.Revision:
                 from = Doc_Tools.getUserEmail(userkey);
-                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/RevisionPago.html"))
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "/Account/Templates Email/RevisionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from ).Replace("{documento}", tipo_documento);
@@ -1606,7 +1606,7 @@ public static class Doc_Tools
                 break;
             case NotificationType.Integracion:
                 from = Doc_Tools.getUserEmail(userkey);
-                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/IntegracionPago.html"))
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "/Account/Templates Email/IntegracionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);

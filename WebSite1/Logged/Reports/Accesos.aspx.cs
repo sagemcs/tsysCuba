@@ -31,6 +31,7 @@ public partial class Logged_Reports_AccesosB : System.Web.UI.Page
         {
             Context.GetOwinContext().Authentication.SignOut();
             Response.Redirect("~/Account/Login.aspx");
+            return;
         }
 
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);

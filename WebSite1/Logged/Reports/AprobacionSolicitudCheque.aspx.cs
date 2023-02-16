@@ -116,6 +116,7 @@ public partial class Logged_Reports_AprobacionSolicitudCheque : System.Web.UI.Pa
         {
             Context.GetOwinContext().Authentication.SignOut();
             Response.Redirect("~/Account/Login.aspx");
+            return;
         }
 
         pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());

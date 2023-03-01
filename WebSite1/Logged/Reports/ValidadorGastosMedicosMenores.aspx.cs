@@ -139,6 +139,7 @@ public partial class Logged_Reports_ValidadorGastosMedicosMenores : System.Web.U
         {
             Context.GetOwinContext().Authentication.SignOut();
             Response.Redirect("~/Account/Login.aspx");
+            return;
         }
 
         pLogKey = Convert.ToInt32(HttpContext.Current.Session["LogKey"].ToString());
@@ -227,6 +228,11 @@ public partial class Logged_Reports_ValidadorGastosMedicosMenores : System.Web.U
     }
     private void Page_Unload(object sender, EventArgs e)
     {
+        if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            return;
+        }
         CloseReports(report_document);
         report_document.Dispose();
         report_document.Dispose();

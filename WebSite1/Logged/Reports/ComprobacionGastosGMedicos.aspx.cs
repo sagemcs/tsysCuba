@@ -204,6 +204,11 @@ public partial class Logged_Reports_Comprobacion_Gastos_GMedicos : System.Web.UI
     }
     private void Page_Unload(object sender, EventArgs e)
     {
+        if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
+        {
+            Context.GetOwinContext().Authentication.SignOut();
+            return;
+        }
         CloseReports(report_document);
         report_document.Dispose();
         report_document.Dispose();

@@ -75,7 +75,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
     }
     string eventName = String.Empty;
     string titulo = "T|SYS|", Msj, tipo;
-
+    
     #endregion
 
     //Rutina Manejar Errores
@@ -351,8 +351,8 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
 
     private List<AdvanceDTO> ReadFromDb()
     {
-        List<AdvanceDTO> anticipos = new List<AdvanceDTO>();
-             
+        List<AdvanceDTO> anticipos = new List<AdvanceDTO>();       
+
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();    
@@ -383,7 +383,8 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 advance.Status = Doc_Tools.Dict_status().FirstOrDefault(x => x.Key == dataReader.GetInt32(12)).Value;
                 advance.PackageId = dataReader.GetInt32(13);
                 advance.DeniedReason = dataReader.GetString(14);
-                advance.ApprovalLevel = dataReader.GetInt32(15);                
+                advance.ApprovalLevel = dataReader.GetInt32(15);
+               // advance.Causante = _context.Users.FirstOrDefault(x => x.UserKey == advance.UpdateUserKey).UserName;
                 anticipos.Add(advance);                                                
             }
         }

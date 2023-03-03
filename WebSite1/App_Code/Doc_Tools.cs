@@ -379,13 +379,44 @@ public static class Doc_Tools
                 if (ChangeRates != null)
                 {
                    rate = ChangeRates.CurrExchRate;
-                }
-                
-               
+                }        
                     
                tapVoucher.iTranAmt = decimal.Multiply(tranAmount.Value, Convert.ToDecimal(rate));
             }
+
             vkey = Insert_tapVoucherCExGst(tapVoucher);
+
+            //articulo de pruaba para el Anticipo, pendiente a definir
+            ItemDTO item = articulos.First();
+
+            tapVoucherDtlCExGst tapVoucherDtl = new tapVoucherDtlCExGst
+            {
+                iLote = iLote,
+                vKey = vkey,
+                iTranNo = iLote.ToString(),
+                iTargetCompanyID = document.CompanyId,
+                iCmntOnly = 0,
+                iExtAmt = document.Amount,
+                iItemKey = item.ItemKey,
+                iQuantity = 1,
+                iGLAcctKey = articulos.FirstOrDefault(x => x.ItemKey == item.ItemKey).ExpAcctKey,
+                iSTaxClassKey = articulos.FirstOrDefault(x => x.ItemKey == item.ItemKey).STaxClassKey,
+                iSTaxClassID = taxes.FirstOrDefault(x => x.STaxCodeKey == articulos.FirstOrDefault(d => d.ItemKey == item.ItemKey).STaxClassKey).STaxClassID, 
+                iUnitCost = document.Amount,
+                iUnitMeasID = "Serv",
+                iFreightAmt = 0,
+                iSTaxSchdKey = 2,
+                iSTaxSchdID = "IVA 16",
+                iDefaultIfNull = 1,
+                iMatchStatus = 1,
+                iReturnType = 1,
+                iPOLineNo = null,
+                iPOKey = null,
+                iPONo = null,
+                iPOLineKey = null,
+                oRetVal = null
+            };
+            dtlKey = Insert_tapVoucherDtlCExGst(tapVoucherDtl);
 
             RetVal = Exec_sppaVoucherAPIGst(iLote, vkey, document.CompanyId.Trim());
             if (RetVal != 1)
@@ -688,7 +719,7 @@ public static class Doc_Tools
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT dbo.vluItem.ItemKey, dbo.vluItem.LongDesc, dbo.vluItem.CompanyID, dbo.vluItem.PriceUnitMeasID, dbo.vluItem.STaxClassKey, dbo.timItem.ExpAcctKey,dbo.timItem.STaxClassKey FROM dbo.vluItem WITH(NOLOCK) INNER JOIN dbo.timItem ON dbo.vluItem.ItemKey = dbo.timItem.ItemKey WHERE ('IEP' = dbo.vluItem.CompanyID) AND (dbo.vluItem.Status = 1) AND (dbo.vluItem.ItemType = 1 OR dbo.vluItem.ItemType = 3 OR dbo.vluItem.ItemType = 4) ORDER BY dbo.vluItem.ItemID, dbo.vluItem.ShortDesc;";
+            cmd.CommandText = "SELECT dbo.vluItem.ItemKey, dbo.vluItem.LongDesc, dbo.vluItem.CompanyID, dbo.vluItem.PriceUnitMeasID, dbo.vluItem.STaxClassKey, dbo.timItem.ExpAcctKey,dbo.timItem.STaxClassKey FROM dbo.vluItem WITH(NOLOCK) INNER JOIN dbo.timItem ON dbo.vluItem.ItemKey = dbo.timItem.ItemKey WHERE (@CompanyID = dbo.vluItem.CompanyID) AND (dbo.vluItem.Status = 1) AND (dbo.vluItem.ItemType = 1 OR dbo.vluItem.ItemType = 3 OR dbo.vluItem.ItemType = 4) ORDER BY dbo.vluItem.ItemID, dbo.vluItem.ShortDesc;";
             cmd.Parameters.Add("@CompanyID", SqlDbType.VarChar).Value = company_id;
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -1241,7 +1272,7 @@ public static class Doc_Tools
                     cmd.CommandText = "Delete from Expense where ExpenseId = @Id";
                     break;
                 case DocumentType.CorporateCard:
-                    cmd.CommandText = "Delete from CorporateCard where Id = @Id";
+                    cmd.CommandText = "Delete from CorporateCard where CorporateCardId = @Id";
                     break;
                 case DocumentType.MinorMedicalExpense:
                     cmd.CommandText = "Delete from MinorMedicalExpense where MinorMedicalExpenseId = @Id";
@@ -1515,7 +1546,7 @@ public static class Doc_Tools
                                 to.Add(Doc_Tools.getUserEmail(userkey));
                                 break;
                             case NotificationType.Revision:
-                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Rh));
                                 break;
                         }
                         break;
@@ -1527,7 +1558,7 @@ public static class Doc_Tools
                                 break;
                             case NotificationType.Denegacion:
                                 to.Add(Doc_Tools.getUserEmail(userkey));
-                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Rh));
                                 break;
                             case NotificationType.Revision:
                                 to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
@@ -1542,7 +1573,7 @@ public static class Doc_Tools
                                 break;
                             case NotificationType.Denegacion:
                                 to.Add(Doc_Tools.getUserEmail(userkey));
-                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Rh));
                                 to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
                                 break;
                             case NotificationType.Revision:
@@ -1558,7 +1589,7 @@ public static class Doc_Tools
                                 break;
                             case NotificationType.Denegacion:
                                 to.Add(Doc_Tools.getUserEmail(userkey));
-                                to.Add(Doc_Tools.getUserEmail(matrix.Gerente));
+                                to.Add(Doc_Tools.getUserEmail(matrix.Rh));
                                 to.Add(Doc_Tools.getUserEmail(matrix.ValidadorCx));
                                 to.Add(Doc_Tools.getUserEmail(matrix.Tesoreria));
                                 break;
@@ -1579,7 +1610,7 @@ public static class Doc_Tools
         {
             case NotificationType.Aprobacion:
                 from = Doc_Tools.getUserEmail(logged_user);
-                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/AprobacionPago.html"))
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "/Account/Templates Email/AprobacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
@@ -1588,7 +1619,7 @@ public static class Doc_Tools
                 break;
             case NotificationType.Denegacion:
                 from = Doc_Tools.getUserEmail(logged_user);
-                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory +  "/Account/Templates Email/DenegacionPago.html"))
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory +  "/Account/Templates Email/DenegacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
@@ -1597,7 +1628,7 @@ public static class Doc_Tools
                 break;
             case NotificationType.Revision:
                 from = Doc_Tools.getUserEmail(userkey);
-                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/RevisionPago.html"))
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "/Account/Templates Email/RevisionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from ).Replace("{documento}", tipo_documento);
@@ -1606,7 +1637,7 @@ public static class Doc_Tools
                 break;
             case NotificationType.Integracion:
                 from = Doc_Tools.getUserEmail(userkey);
-                using (StreamReader reader = new StreamReader(AppContext.BaseDirectory + "/Account/Templates Email/IntegracionPago.html"))
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "/Account/Templates Email/IntegracionPago.html"))
                 {
                     texto = reader.ReadToEnd();
                     texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
@@ -1796,5 +1827,6 @@ public static class Doc_Tools
         }        
         return null;
     }
+   
 
 }

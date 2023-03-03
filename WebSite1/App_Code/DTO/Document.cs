@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using static Doc_Tools;
 
 /// <summary>
 /// Summary description for Document
@@ -18,48 +17,48 @@ public class Document
     public int? ApprovalLevel { get; set; }
     public int Currency { get; set; }   
    
-    public int GetCurrency(DocumentType type)
+    public int GetCurrency(Doc_Tools.DocumentType type)
     {
         int currendyid = 0;
         switch (type)
         {
-            case DocumentType.Advance:
+            case Doc_Tools.DocumentType.Advance:
                 var anticipo = (AdvanceDTO)this;
                 currendyid = anticipo.Currency;
                 break;
-            case DocumentType.Expense:
+            case Doc_Tools.DocumentType.Expense:
                 var reembolso = (ExpenseDTO)this;
                 currendyid = reembolso.Currency;
                 break;
-            case DocumentType.CorporateCard:
+            case Doc_Tools.DocumentType.CorporateCard:
                 var tarjeta = (CorporateCardDTO)this;
                 currendyid = tarjeta.Currency;
                 break;
-            case DocumentType.MinorMedicalExpense:
+            case Doc_Tools.DocumentType.MinorMedicalExpense:
                 var medico = (MinorMedicalExpenseDTO)this;
                 currendyid = 1;
                 break;
         }
         return currendyid;
     }
-    public DateTime GetDate(DocumentType type)
+    public DateTime GetDate(Doc_Tools.DocumentType type)
     {
         var date = new DateTime();
         switch (type)
         {
-            case DocumentType.Advance:
+            case Doc_Tools.DocumentType.Advance:
                var anticipo =  (AdvanceDTO)this;
                 date = anticipo.CreateDate;
                 break;
-            case DocumentType.Expense:
+            case Doc_Tools.DocumentType.Expense:
                 var reembolso = (ExpenseDTO)this;
                 date = reembolso.Date;
                 break;
-            case DocumentType.CorporateCard:
+            case Doc_Tools.DocumentType.CorporateCard:
                 var tarjeta = (CorporateCardDTO)this;
                 date = tarjeta.Date;
                 break;
-            case DocumentType.MinorMedicalExpense:
+            case Doc_Tools.DocumentType.MinorMedicalExpense:
                 var medico = (MinorMedicalExpenseDTO)this;
                 date = medico.Date;
                 break;           

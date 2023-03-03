@@ -499,13 +499,13 @@ public partial class Logged_Administradores_EditAnticipo : System.Web.UI.Page
         }
 
         //varios anticipos
-        if (ReadFromDb(pUserKey).Count(x => x.Status == "Vencido") > 0)
-        {           
-            tipo = "error";
-            Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B18").Value;           
-            ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
-            return;
-        }
+        //if (ReadFromDb(pUserKey).Count(x => x.Status == "Vencido") > 0)
+        //{           
+        //    tipo = "error";
+        //    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B18").Value;           
+        //    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+        //    return;
+        //}
 
         //Variables a insertar
         int advance_type;

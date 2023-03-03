@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using static Doc_Tools;
 
 /// <summary>
 /// Summary description for ExpenseFilesDTO
@@ -10,7 +9,7 @@ using static Doc_Tools;
 public class ExpenseFilesDTO
 {
 	public int Id { get; set; }
-	public DocumentType ExpenseType { get; set; }
+	public Doc_Tools.DocumentType ExpenseType { get; set; }
 	public int ExpenseId { get; set; }
 	public int ExpenseDetailId { get; set; }
 	public string FileName { get; set; }

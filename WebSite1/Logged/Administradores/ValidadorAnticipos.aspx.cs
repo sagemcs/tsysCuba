@@ -356,7 +356,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();    
-            cmd.CommandText = "SELECT AdvanceId, AdvanceType, Folio,Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey, CreateDate, UpdateDate,CompanyId,Status, Isnull(PackageId,0), IsNull(DeniedReason, ''), Isnull(ApprovalLevel , 0) FROM Advance;";
+            cmd.CommandText = "SELECT a.AdvanceId, a.AdvanceType, a.Folio,a.Amount,a.DepartureDate,a.ArrivalDate,a.CheckDate,a.ImmediateBoss,a.UpdateUserKey, a.CreateDate, a.UpdateDate,a.CompanyId,a.Status, Isnull(a.PackageId,0), IsNull(a.DeniedReason, ''), Isnull(a.ApprovalLevel , 0), u.Username FROM Advance a inner join Users u on a.UpdateUserKey = u.UserKey;";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -384,7 +384,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 advance.PackageId = dataReader.GetInt32(13);
                 advance.DeniedReason = dataReader.GetString(14);
                 advance.ApprovalLevel = dataReader.GetInt32(15);
-               // advance.Causante = _context.Users.FirstOrDefault(x => x.UserKey == advance.UpdateUserKey).UserName;
+                advance.Causante = dataReader.GetString(16);
                 anticipos.Add(advance);                                                
             }
         }
@@ -426,7 +426,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         if (e.CommandName == "Deny")
         {
             int status = 3;
-            TextBox motivo = (TextBox)(Control)row.Cells[11].Controls[1];
+            TextBox motivo = (TextBox)(Control)row.Cells[12].Controls[1];
             if (string.IsNullOrEmpty(motivo.Text))
             {
                 tipo = "error";
@@ -811,13 +811,13 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
             int advance_id = int.Parse(e.Row.Cells[0].Text);
             var anticipo = anticipos.FirstOrDefault(x => x.AdvanceId == advance_id);
             
-            Button btn_aprobar = (Button)e.Row.Cells[9].Controls[1];
-            Button btn_denegar = (Button)e.Row.Cells[10].Controls[1];
-            TextBox tbx_motivo = (TextBox)e.Row.Cells[11].Controls[1];
-            Button btn_comentar = (Button)e.Row.Cells[12].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[13].Controls[1];
+            Button btn_aprobar = (Button)e.Row.Cells[10].Controls[1];
+            Button btn_denegar = (Button)e.Row.Cells[11].Controls[1];
+            TextBox tbx_motivo = (TextBox)e.Row.Cells[12].Controls[1];
+            Button btn_comentar = (Button)e.Row.Cells[13].Controls[1];
+            Button btn_integrar = (Button)e.Row.Cells[14].Controls[1];
             
-            switch (e.Row.Cells[8].Text)
+            switch (e.Row.Cells[9].Text)
             {
                 case "Pendiente":
                     if (level - anticipo.ApprovalLevel == 1)

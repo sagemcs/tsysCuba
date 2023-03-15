@@ -15,6 +15,8 @@ public class CorporateCardDTO : Document
     public string ExpenseReason { get; set; }
     public bool SageIntegration { get; set; }
     public string Nivel { get; set; }
+    public string Causante { get; set; }
+
     public CorporateCardDTO()
 	{
 		//

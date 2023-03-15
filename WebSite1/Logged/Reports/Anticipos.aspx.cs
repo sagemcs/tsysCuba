@@ -184,7 +184,12 @@ public partial class Logged_Reports_Anticipos : System.Web.UI.Page
             Company company = Tools.EmpresaAutenticada();
             if (company == null)
                 return;
+            Users user = Tools.UsuarioAutenticado();
+            Tuple<string, string> data = Tools.GetUsuarioPuestoArea(pUserKey);
             report_document.SetParameterValue("compannia", company != null ? company.CompanyName : "Nombre de la compañia");
+            report_document.SetParameterValue("beneficiario", user != null ? user.UserName : "Beneficiario");
+            report_document.SetParameterValue("puesto", user != null ? data.Item1 : "Puesto");
+            report_document.SetParameterValue("area", user != null ? data.Item2 : "Área");
 
             //report_document.SetParameterValue("logo", "~/Img/TSYS.png");
             Reporte_Anticipos.ReportSource = report_document;

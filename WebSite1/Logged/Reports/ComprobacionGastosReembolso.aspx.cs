@@ -105,6 +105,38 @@ public partial class Logged_Reports_Comprobacion_Gastos_Reembolso : System.Web.U
         return articles;
     }
 
+    public string getAdvanceFolio(int docKey)
+    {
+        string folio = string.Empty;
+
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            int advanceId = -1;
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT AdvanceId FROM Expense where ExpenseId = @docKey";
+            cmd.Parameters.Add("@docKey", SqlDbType.Int).Value = docKey;
+            cmd.Connection.Open();
+            SqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                advanceId = dataReader.GetInt32(0);
+            }
+            cmd.Connection.Close();
+
+            SqlCommand cmd2 = conn.CreateCommand();
+            cmd2.CommandText = "SELECT Folio FROM Advance where AdvanceId = @advanceId";
+            cmd2.Parameters.Add("@advanceId", SqlDbType.Int).Value = advanceId;
+            cmd2.Connection.Open();
+            SqlDataReader dataReader2 = cmd2.ExecuteReader();
+            while (dataReader2.Read())
+            {
+                folio = dataReader2.GetString(0);
+            }
+            cmd2.Connection.Close();
+        }
+        return folio;
+    }
+
     protected void Page_Init(object sender, EventArgs e)
     {
         if (HttpContext.Current.Session["IDCompany"] == null || HttpContext.Current.Session["UserKey"] == null)
@@ -185,7 +217,13 @@ public partial class Logged_Reports_Comprobacion_Gastos_Reembolso : System.Web.U
             Company company = Tools.EmpresaAutenticada();
             //if (company == null)
             //    return;
+            Users user = Tools.UsuarioAutenticado();
+            Tuple<string, string> data = Tools.GetUsuarioPuestoArea(pUserKey);
             report_document.SetParameterValue("compannia", company != null ? company.CompanyName : "Nombre de la compañia");
+            report_document.SetParameterValue("beneficiario", user != null ? user.UserName : "Beneficiario");
+            report_document.SetParameterValue("puesto", user != null ? data.Item1 : "Puesto");
+            report_document.SetParameterValue("area", user != null ? data.Item2 : "Área");
+            report_document.SetParameterValue("folio", getAdvanceFolio(Convert.ToInt32(HttpContext.Current.Session["DocKey"].ToString())));
 
             //report_document.SetParameterValue("logo", "~/Img/TSYS.png");
             if (list_dto.Count > 0)

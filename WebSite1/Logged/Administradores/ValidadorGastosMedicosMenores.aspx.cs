@@ -359,7 +359,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();           
-            cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel , 0) , UpdateUserKey FROM MinorMedicalExpense;";                             
+            cmd.CommandText = "SELECT m.MinorMedicalExpenseId ,m.Date ,m.Amount, m.Status, Isnull(m.DeniedReason,''), Isnull(m.PackageId,0), Isnull(m.ApprovalLevel , 0) , m.UpdateUserKey, u.Username FROM MinorMedicalExpense m inner join Users u on m.UpdateUserKey = u.UserKey;";                             
           
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
@@ -374,6 +374,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 expense.PackageId = dataReader.GetInt32(5);
                 expense.ApprovalLevel = dataReader.GetInt32(6);
                 expense.UpdateUserKey = dataReader.GetInt32(7);
+                expense.Causante = dataReader.GetString(8);
                 gastos.Add(expense);
             }
         }
@@ -460,7 +461,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         if (e.CommandName == "Deny")
         {
             int status = 3;
-            TextBox motivo = (TextBox)(Control)row.Cells[7].Controls[1];
+            TextBox motivo = (TextBox)(Control)row.Cells[8].Controls[1];
             
             if (string.IsNullOrEmpty(motivo.Text))
             {
@@ -775,14 +776,14 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
             int expense_id = int.Parse(e.Row.Cells[0].Text);
             var gasto = gastos_medicos.FirstOrDefault(x => x.MinorMedicalExpenseId == expense_id);
 
-            Button btn_aprobar = (Button)e.Row.Cells[5].Controls[1];
-            Button btn_denegar = (Button)e.Row.Cells[6].Controls[1];
-            Button btn_comentar = (Button)e.Row.Cells[8].Controls[1];
-            TextBox tbx_motivo = (TextBox)e.Row.Cells[7].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[9].Controls[1];
+            Button btn_aprobar = (Button)e.Row.Cells[6].Controls[1];
+            Button btn_denegar = (Button)e.Row.Cells[7].Controls[1];
+            Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
+            TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
+            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
 
 
-            switch (e.Row.Cells[4].Text)
+            switch (e.Row.Cells[5].Text)
             {
                 case "Pendiente":
                     if (level - gasto.ApprovalLevel == 1)

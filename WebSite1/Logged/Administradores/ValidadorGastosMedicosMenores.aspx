@@ -318,12 +318,13 @@
         <Columns>
          <asp:BoundField DataField="MinorMedicalExpenseId" HeaderText="Id" ReadOnly="True" SortExpression="MinorMedicalExpenseId" />           
          <asp:BoundField DataField="PackageId" HeaderText="Paquete" ReadOnly="True" SortExpression="PackageId" />
-         <asp:BoundField DataField="Date" HeaderText="Fecha del Gasto" ReadOnly="True" SortExpression="Date" DataFormatString="{0:dd/MM/yyyy}" />           
+         <asp:BoundField DataField="Date" HeaderText="Fecha del Gasto" ReadOnly="True" SortExpression="Date" DataFormatString="{0:dd/MM/yyyy}" />
+         <asp:BoundField DataField="Causante" HeaderText="Causante" ReadOnly="True" SortExpression="Causante" />
          <asp:BoundField DataField="Amount" HeaderText="Importe del Gasto" ReadOnly="True" SortExpression="Amount" DataFormatString="{0:c}"/>
          <asp:BoundField DataField="Status" HeaderText="Estado del Gasto" ReadOnly="True" SortExpression="Status" />
           <asp:TemplateField HeaderText="Aprobar">
             <ItemTemplate>
-                <asp:Button ID="btnAprobar" runat="server" ClientIDMode="Static" CssClass="btn-success" CommandName="Aprove" Text="Aprobar" OnClientClick="$('#passwordValue').val(''); $('#hh1').val($('#btnAprobar:hover').parent().prev().prev().prev().prev().prev().text()); $('#myModal_Aprobar').modal(); $('#myModalLabel1').text('Teclee el Password para verificar su identidad'); $('#insert').show(); $('#showToken').hide(); $('#TextBox1').val(''); $('#validarToken').show(); $('#Button1').hide()"></asp:Button>
+                <asp:Button ID="btnAprobar" runat="server" ClientIDMode="Static" CssClass="btn-success" CommandName="Aprove" Text="Aprobar" OnClientClick="$('#passwordValue').val(''); $('#hh1').val($('#btnAprobar:hover').parent().prev().prev().prev().prev().prev().prev().text()); $('#myModal_Aprobar').modal(); $('#myModalLabel1').text('Teclee el Password para verificar su identidad'); $('#insert').show(); $('#showToken').hide(); $('#TextBox1').val(''); $('#validarToken').show(); $('#Button1').hide()"></asp:Button>
             </ItemTemplate>
          </asp:TemplateField>        
          <asp:TemplateField HeaderText="Denegar">

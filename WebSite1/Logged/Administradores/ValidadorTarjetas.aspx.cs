@@ -377,6 +377,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
                 expense.PackageId = dataReader.GetInt32(7);
                 expense.ApprovalLevel = dataReader.GetInt32(8);
                 expense.UpdateUserKey = dataReader.GetInt32(9);
+                expense.Causante = Doc_Tools.get_causante(expense.UpdateUserKey);
                 gastos.Add(expense);
             }
         }
@@ -469,7 +470,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         if (e.CommandName == "Deny")
         {
             int status = 3;
-            TextBox motivo = (TextBox)(Control)row.Cells[8].Controls[1];
+            TextBox motivo = (TextBox)(Control)row.Cells[9].Controls[1];
             if (string.IsNullOrEmpty(motivo.Text))
             {
                 tipo = "error";
@@ -773,13 +774,13 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
             int card_id = int.Parse(e.Row.Cells[0].Text);
             var card = tarjetas.FirstOrDefault(x => x.CorporateCardId == card_id);
 
-            Button btn_aprobar = (Button)e.Row.Cells[6].Controls[1];
-            Button btn_denegar = (Button)e.Row.Cells[7].Controls[1];
-            TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
-            Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
+            Button btn_aprobar = (Button)e.Row.Cells[7].Controls[1];
+            Button btn_denegar = (Button)e.Row.Cells[8].Controls[1];
+            TextBox tbx_motivo = (TextBox)e.Row.Cells[9].Controls[1];
+            Button btn_comentar = (Button)e.Row.Cells[10].Controls[1];
+            Button btn_integrar = (Button)e.Row.Cells[11].Controls[1];
 
-            switch (e.Row.Cells[5].Text)
+            switch (e.Row.Cells[6].Text)
             {
                 case "Pendiente":
                     if (level - card.ApprovalLevel == 2)

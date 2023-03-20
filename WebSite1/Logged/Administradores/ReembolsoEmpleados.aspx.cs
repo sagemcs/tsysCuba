@@ -423,6 +423,26 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         return true;
     }
 
+
+    public T GetEnumValue<T>(int intValue) where T : struct, IConvertible
+    {
+        if (!typeof(T).IsEnum)
+        {
+            throw new Exception("T must be an Enumeration type.");
+        }
+        T val = ((T[])Enum.GetValues(typeof(T)))[0];
+
+        foreach (T enumValue in (T[])Enum.GetValues(typeof(T)))
+        {
+            if (Convert.ToInt32(enumValue).Equals(intValue))
+            {
+                val = enumValue;
+                break;
+            }
+        }
+        return val;
+    }
+
     private void Sage() 
     {
         is_valid = (bool)HttpContext.Current.Session["is_valid"];
@@ -432,16 +452,20 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             if(HttpContext.Current.Session["motivo"]!=null &&  string.IsNullOrEmpty(tbx_motivo.Text))
             {
                 tbx_motivo.Text = HttpContext.Current.Session["motivo"].ToString();
-            }          
-            if(drop_anticipos.SelectedValue!="0")
-            {
-                advance_id = int.Parse(drop_anticipos.SelectedValue);
-                var advance = LoadAdvanceById(advance_id, pUserKey);
-            }          
+            }
 
             int tipo_moneda = int.Parse(drop_currency.SelectedValue);
-            DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);            
-            decimal importe_gasto = decimal.Parse(tbx_importe.Text);           
+            DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);
+            decimal importe_gasto = decimal.Parse(tbx_importe.Text);
+            if (drop_anticipos.SelectedValue!="0")
+            {
+                advance_id = int.Parse(drop_anticipos.SelectedValue);
+                var advance = LoadAdvanceById(advance_id, pUserKey);               
+            }
+
+
+            //Comprobar monto del reembolso contra el anticipo
+
             string motivo_gasto = tbx_motivo.Text;
             int status = 1;
             var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridItems"];
@@ -455,6 +479,8 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 }
             }
 
+
+            
             int carga = WriteToDb(tipo_moneda, fecha_gasto, importe_gasto, pUserKey, pCompanyID, advance_id, lista_detalles, status, motivo_gasto);
 
             if (carga == -1)
@@ -519,12 +545,15 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
                 advance_amount = lector.GetDecimal(0);
             }
             cmd.Parameters.Clear();
+            cmd.Connection.Close();
             cmd.CommandText = "SELECT sum(Amount) as Amount FROM Expense where AdvanceId = @AdvanceId and UpdateUserKey = @UpdateUserKey";
             cmd.Parameters.Add("@AdvanceId", SqlDbType.Int).Value = advance_id;
             cmd.Parameters.Add("@UpdateUserKey", SqlDbType.Int).Value = user_key;
-            while (lector.Read())
+            cmd.Connection.Open();
+            var lector2 = cmd.ExecuteReader();
+            while (lector2.Read())
             {
-                expense_amount += lector.GetDecimal(0);
+                expense_amount += lector2.GetDecimal(0);
             }
             cmd.Connection.Close();
 
@@ -1293,8 +1322,7 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         HttpContext.Current.Session["pdf_file"] = null;
         HttpContext.Current.Session["xml_file"] = null;
         MultiView1.SetActiveView(View_General);
-    }
-       
+    }       
 
     protected void drop_anticipos_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -1346,19 +1374,46 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
             Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B15").Value;           
             ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
             return;
-        }
-        
-        HttpContext.Current.Session["motivo"] = tbx_motivo.Text;       
+        }        
 
-        if(drop_anticipos.SelectedValue != "0")
-        {
-            advance_id = int.Parse(drop_anticipos.SelectedValue);
-            var advance = LoadAdvanceById(advance_id, pUserKey);
-        }
+        HttpContext.Current.Session["motivo"] = tbx_motivo.Text;   
 
         int tipo_moneda = int.Parse(drop_currency.SelectedValue);
         DateTime fecha_gasto = DateTime.Parse(tbx_fechagasto.Text);        
-        decimal importe_gasto = decimal.Parse(tbx_importe.Text);             
+        decimal importe_gasto = decimal.Parse(tbx_importe.Text);
+
+        if (drop_anticipos.SelectedValue != "0")
+        {
+            advance_id = int.Parse(drop_anticipos.SelectedValue);
+            var advance = LoadAdvanceById(advance_id, pUserKey);
+
+            //Validacion del importe x anticipo
+            Doc_Tools.Currencys advance_currency = GetEnumValue<Doc_Tools.Currencys>(advance.Currency);
+            Doc_Tools.Currencys expense_currency = GetEnumValue<Doc_Tools.Currencys>(tipo_moneda);
+            if (advance.Currency != tipo_moneda)
+            {
+                var rate = Doc_Tools.get_ChangeRates().FirstOrDefault(x => x.EffectiveDate == fecha_gasto && x.SourceCurrID == advance_currency.ToString() && x.TargetCurrID == expense_currency.ToString());
+                if (rate != null)
+                {
+                    var importe_rateado = importe_gasto * (decimal)rate.CurrExchRate;
+                    if (importe_rateado > advance.Amount)
+                    {
+                        tipo = "error";
+                        Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B59").Value;
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                        return;
+                    }
+                }
+                else
+                {
+                    tipo = "error";
+                    Msj = Doc_Tools.get_msg().FirstOrDefault(x => x.Key == "B60").Value;
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ramdomtext", "alertme('" + titulo + "','" + Msj + "','" + tipo + "');", true);
+                    return;
+                }
+            }
+        }
+
 
         fill_fileUploads();
         var lista_detalles = (List<ExpenseDetailDTO>)HttpContext.Current.Session["GridItems"];       
@@ -1501,5 +1556,17 @@ public partial class Logged_Administradores_ReembolsoEmpleados : System.Web.UI.P
         HttpContext.Current.Session["is_valid"] = false;
         btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
         MultiView1.SetActiveView(View_Articulos);
+    }
+
+    protected void btn_comprobacion_Command(object sender, CommandEventArgs e)
+    {
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
+        GridViewRow row = gvGastos.Rows[rowIndex];
+        if (e.CommandName == "Imprimir")
+        {
+            int expense_id = int.Parse(row.Cells[0].Text);
+            HttpContext.Current.Session["DocKey"] = expense_id;
+            Response.Redirect("~/Logged/Reports/Reembolsos");
+        }
     }
 }

@@ -404,7 +404,8 @@
                             </asp:TemplateField>    
                             <asp:CommandField ShowSelectButton="True" ControlStyle-CssClass="btn-success" ButtonType="Button" SelectText="Eliminar" ShowCancelButton="False">
                                 <ControlStyle CssClass="btn-warning"></ControlStyle>
-                            </asp:CommandField>           
+                            </asp:CommandField>     
+                           
                         </Columns>
                         <EditRowStyle BackColor="#999999" />
                         <FooterStyle BackColor="#5D7B9D" ForeColor="White" Font-Bold="True" />
@@ -472,7 +473,12 @@
                    <ItemTemplate>
                       <asp:Button ID="btnDelete" runat="server" CssClass="btn-warning" CommandName="Delete" Text="Eliminar"  OnCommand="btnDelete_Command"></asp:Button>
                    </ItemTemplate>
-                 </asp:TemplateField>                      
+                 </asp:TemplateField>       
+                     <asp:TemplateField >
+                           <ItemTemplate>
+                              <asp:Button ID="btn_comprobacion" runat="server" CssClass="btn-success" CommandName="Imprimir" Text="Comprobacion"  OnCommand="btn_comprobacion_Command"></asp:Button>
+                           </ItemTemplate>
+                         </asp:TemplateField>  
                 </Columns>                
                 <EditRowStyle BackColor="#999999" />
                 <FooterStyle BackColor="#5D7B9D" ForeColor="White" Font-Bold="True" />

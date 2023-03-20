@@ -79,6 +79,7 @@ public partial class Logged_Reports_MinorMedicalExpense : System.Web.UI.Page
                 gastos.Add(expense);
             }
         }
+        HttpContext.Current.Session["DocKey"] = null;
         return gastos;
     }
 

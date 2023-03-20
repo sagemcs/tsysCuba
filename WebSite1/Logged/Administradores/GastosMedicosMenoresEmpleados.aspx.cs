@@ -1113,4 +1113,16 @@ public partial class Logged_Administradores_GastosMedicosMenoresEmpleados : Syst
         btnSage.Enabled = (bool)HttpContext.Current.Session["is_valid"];
         MultiView1.SetActiveView(View_Articulos);
     }
+
+    protected void btn_comprobacion_Command(object sender, CommandEventArgs e)
+    {
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex;
+        GridViewRow row = gvGastos.Rows[rowIndex];
+        if (e.CommandName == "Imprimir")
+        {
+            int medical_id = int.Parse(row.Cells[0].Text);
+            HttpContext.Current.Session["DocKey"] = medical_id;
+            Response.Redirect("~/Logged/Reports/MinorMedicalExpense");
+        }
+    }
 }

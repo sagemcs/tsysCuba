@@ -106,7 +106,9 @@ public partial class Logged_Reports_Anticipos : System.Web.UI.Page
                 gastos.Add(advance);
             }
         }
+        HttpContext.Current.Session["DocKey"] = null;
         return gastos;
+        
     }
 
     protected void Page_Init(object sender, EventArgs e)

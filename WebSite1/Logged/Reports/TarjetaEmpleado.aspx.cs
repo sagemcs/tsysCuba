@@ -81,6 +81,7 @@ public partial class Logged_Reports_TarjetaEmpleado : System.Web.UI.Page
                 gastos.Add(corpCard);
             }
         }
+        HttpContext.Current.Session["DocKey"] = null;
         return gastos;
     }
 

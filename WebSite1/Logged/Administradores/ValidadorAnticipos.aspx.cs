@@ -384,7 +384,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 advance.PackageId = dataReader.GetInt32(13);
                 advance.DeniedReason = dataReader.GetString(14);
                 advance.ApprovalLevel = dataReader.GetInt32(15);
-               // advance.Causante = _context.Users.FirstOrDefault(x => x.UserKey == advance.UpdateUserKey).UserName;
+                advance.Causante = Doc_Tools.get_causante(advance.UpdateUserKey);
                 anticipos.Add(advance);                                                
             }
         }
@@ -426,7 +426,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         if (e.CommandName == "Deny")
         {
             int status = 3;
-            TextBox motivo = (TextBox)(Control)row.Cells[11].Controls[1];
+            TextBox motivo = (TextBox)(Control)row.Cells[12].Controls[1];
             if (string.IsNullOrEmpty(motivo.Text))
             {
                 tipo = "error";
@@ -437,7 +437,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
 
             Update_Advance(advance_id, paquete.PackageId, status, motivo.Text, level: level_validador);
             var advance = LoadAdvanceById(advance_id);            
-            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, advance.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Denegacion, pUserKey);
+            Doc_Tools.EnviarCorreo(Doc_Tools.DocumentType.Advance, advance.UpdateUserKey, level_validador, Doc_Tools.NotificationType.Denegacion, pUserKey, motivo.Text);
             BindPackageInfo();
             BindGridView(user_id, status_id, type);
         }
@@ -802,22 +802,19 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
                 paquete = null;
             }
         }
-
-        //9 - Aprobar
-        //10 - Denegar
-        //11 - Motivos Denegacion
+       
         if (e.Row.RowType == DataControlRowType.DataRow)
         {
             int advance_id = int.Parse(e.Row.Cells[0].Text);
             var anticipo = anticipos.FirstOrDefault(x => x.AdvanceId == advance_id);
             
-            Button btn_aprobar = (Button)e.Row.Cells[9].Controls[1];
-            Button btn_denegar = (Button)e.Row.Cells[10].Controls[1];
-            TextBox tbx_motivo = (TextBox)e.Row.Cells[11].Controls[1];
-            Button btn_comentar = (Button)e.Row.Cells[12].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[13].Controls[1];
+            Button btn_aprobar = (Button)e.Row.Cells[10].Controls[1];
+            Button btn_denegar = (Button)e.Row.Cells[11].Controls[1];
+            TextBox tbx_motivo = (TextBox)e.Row.Cells[12].Controls[1];
+            Button btn_comentar = (Button)e.Row.Cells[13].Controls[1];
+            Button btn_integrar = (Button)e.Row.Cells[14].Controls[1];
             
-            switch (e.Row.Cells[8].Text)
+            switch (e.Row.Cells[9].Text)
             {
                 case "Pendiente":
                     if (level - anticipo.ApprovalLevel == 1)

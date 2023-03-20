@@ -22,6 +22,7 @@ using System.Web;
         public string ExpenseReason { get; set; }
         public bool SageIntegration { get; set; }        
         public string Nivel { get; set; }
+        public string Causante { get; set; }
 
     public ExpenseDTO()
         {

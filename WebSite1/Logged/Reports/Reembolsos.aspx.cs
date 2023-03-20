@@ -85,7 +85,9 @@ public partial class Logged_Reports_Reembolsos : System.Web.UI.Page
                 gastos.Add(expense);
             }
         }
+        HttpContext.Current.Session["DocKey"] = null;
         return gastos;
+
     }
 
     protected void Page_Init(object sender, EventArgs e)

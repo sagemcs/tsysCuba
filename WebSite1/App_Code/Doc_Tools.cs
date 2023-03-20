@@ -912,7 +912,7 @@ public static class Doc_Tools
 
     public enum Currencys
     {
-        MNX = 1, USD = 2, EUR = 3
+        MNX = 1, USD = 2, EUR = 3        
     }
 
     public enum NotificationType
@@ -1135,6 +1135,8 @@ public static class Doc_Tools
             { "B56", "La fecha del de final debe ser mayor que la de inicio." },
             { "B57", "Ya existe un pago con esa fecha e importe." },
             { "B58", "Ya existe ese tipo de gasto en base de datos." },
+            { "B59", "El importe del reembolso según tipo de cambio excede el importe del anticipo en la moneda original." },
+            { "B60", "No existe un tipo de cambio definido para esa moneda en la fecha señalada del gasto ." },
 
 
         };
@@ -1347,7 +1349,7 @@ public static class Doc_Tools
         }
     }   
 
-    public static void EnviarCorreo(Doc_Tools.DocumentType type, int userkey, int aproval_level, NotificationType notification, int logged_user)
+    public static void EnviarCorreo(Doc_Tools.DocumentType type, int userkey, int aproval_level, NotificationType notification, int logged_user, string denial_reason = null)
     {      
         var matrix = Doc_Tools.get_MatrizValidadores(userkey);
         string tipo_documento = TiposDocumentos().FirstOrDefault(x => x.Key == (int)type).Value;
@@ -1622,7 +1624,7 @@ public static class Doc_Tools
                 using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory +  "/Account/Templates Email/DenegacionPago.html"))
                 {
                     texto = reader.ReadToEnd();
-                    texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento);
+                    texto = texto.Replace("{empleado}", from).Replace("{documento}", tipo_documento).Replace("{motivo}", denial_reason);
                 }
                 subject = string.Format("El usuario {0} ha denegado un {1} para su revisión", from, tipo_documento);
                 break;
@@ -1826,6 +1828,26 @@ public static class Doc_Tools
             return item;
         }        
         return null;
+    }
+
+    public static string get_causante(int userkey)
+    {
+        string empleado = string.Empty;
+        ItemDTO item = new ItemDTO();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT isnull(UserID, '') FROM [dbo].[Users] where UserKey = @UserKey";
+            cmd.Parameters.Add("@UserKey", SqlDbType.NVarChar).Value = userkey;
+            cmd.Connection.Open();
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                empleado = reader.GetString(0);
+            }
+            cmd.Connection.Close();
+        }        
+        return empleado;
     }
    
 

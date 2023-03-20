@@ -334,23 +334,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         tbx_no_paquete.Text = paquete.PackageId.ToString();
         tbx_cant_reembolsos.Text = get_expenses_package(paquete.PackageId).ToString();
         
-    }    
-
-    public Dictionary<int, string> Dict_policy()
-    {
-        Dictionary<int, string> dict = new Dictionary<int, string>
-        {
-            { 1, "Politica 1" },
-            { 2, "Politica 2" },
-            { 3, "Politica 3" },
-            { 4, "Politica 4" },
-            { 5, "Politica 5" },
-            { 6, "Politica 6" },
-            { 7, "Politica 7" },
-            { 8, "Politica 8" }
-        };
-        return dict;
-    }
+    }        
 
     private List<MinorMedicalExpenseDTO> ReadFromDb()
     {
@@ -374,6 +358,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 expense.PackageId = dataReader.GetInt32(5);
                 expense.ApprovalLevel = dataReader.GetInt32(6);
                 expense.UpdateUserKey = dataReader.GetInt32(7);
+                expense.Causante = Doc_Tools.get_causante(expense.UpdateUserKey);
                 gastos.Add(expense);
             }
         }
@@ -460,7 +445,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         if (e.CommandName == "Deny")
         {
             int status = 3;
-            TextBox motivo = (TextBox)(Control)row.Cells[7].Controls[1];
+            TextBox motivo = (TextBox)(Control)row.Cells[8].Controls[1];
             
             if (string.IsNullOrEmpty(motivo.Text))
             {
@@ -766,7 +751,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
                 paquete = null;
             }
         }
-        
+
         //5 - Aprobar
         //6 - Denegar
         //7 - Motivos Denegacion
@@ -775,14 +760,14 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
             int expense_id = int.Parse(e.Row.Cells[0].Text);
             var gasto = gastos_medicos.FirstOrDefault(x => x.MinorMedicalExpenseId == expense_id);
 
-            Button btn_aprobar = (Button)e.Row.Cells[5].Controls[1];
-            Button btn_denegar = (Button)e.Row.Cells[6].Controls[1];
-            Button btn_comentar = (Button)e.Row.Cells[8].Controls[1];
-            TextBox tbx_motivo = (TextBox)e.Row.Cells[7].Controls[1];
-            Button btn_integrar = (Button)e.Row.Cells[9].Controls[1];
+            Button btn_aprobar = (Button)e.Row.Cells[6].Controls[1];
+            Button btn_denegar = (Button)e.Row.Cells[7].Controls[1];
+            Button btn_comentar = (Button)e.Row.Cells[9].Controls[1];
+            TextBox tbx_motivo = (TextBox)e.Row.Cells[8].Controls[1];
+            Button btn_integrar = (Button)e.Row.Cells[10].Controls[1];
 
 
-            switch (e.Row.Cells[4].Text)
+            switch (e.Row.Cells[5].Text)
             {
                 case "Pendiente":
                     if (level - gasto.ApprovalLevel == 1)

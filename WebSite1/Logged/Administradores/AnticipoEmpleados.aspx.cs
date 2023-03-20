@@ -177,6 +177,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
             HttpContext.Current.Session["terminar_comprobacion"] = false;
         }
 
+        
         Page.Response.Cache.SetCacheability(HttpCacheability.ServerAndNoCache);
         Page.Response.Cache.SetAllowResponseInBrowserHistory(false);
         Page.Response.Cache.SetNoStore();
@@ -833,7 +834,7 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
       
         HttpContext.Current.Session["Advance"] = null;
 
-        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex; //int.Parse(e.CommandArgument.ToString());
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex; 
         GridViewRow row = gvAnticipos.Rows[rowIndex];
         
         if (e.CommandName == "Delete")
@@ -842,5 +843,17 @@ public partial class Logged_Administradores_AnticipoEmpleados : System.Web.UI.Pa
             Doc_Tools.DeleteExpense(Doc_Tools.DocumentType.Advance,advance_id, pUserKey);
             BindGridView();
         }
+    }
+
+    protected void btn_comprobacion_Command(object sender, CommandEventArgs e)
+    {
+        int rowIndex = ((System.Web.UI.WebControls.GridViewRow)((System.Web.UI.Control)sender).NamingContainer).RowIndex; 
+        GridViewRow row = gvAnticipos.Rows[rowIndex];
+        if (e.CommandName == "Imprimir")
+        {
+            int advance_id = int.Parse(row.Cells[0].Text);
+            HttpContext.Current.Session["DocKey"] = advance_id;
+            Response.Redirect("~/Logged/Reports/Anticipos");
+        }        
     }
 }

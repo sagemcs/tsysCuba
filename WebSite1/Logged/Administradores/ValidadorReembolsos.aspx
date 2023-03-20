@@ -361,6 +361,7 @@
          <asp:BoundField DataField="ExpenseId" HeaderText="Id Gasto" ReadOnly="True" SortExpression="ExpenseId" />
          <asp:BoundField DataField="PackageId" HeaderText="Paquete" ReadOnly="True" SortExpression="PackageId" />        
          <asp:BoundField DataField="Date" HeaderText="Fecha" ReadOnly="True" SortExpression="Date" DataFormatString="{0:dd/MM/yyyy}" />
+         <asp:BoundField DataField="Causante" HeaderText="Causante" ReadOnly="True" SortExpression="Causante" />
          <asp:BoundField DataField="Currency" HeaderText="Moneda" ReadOnly="True" SortExpression="Currency" />
          <asp:BoundField DataField="Amount" HeaderText="Importe" ReadOnly="True" SortExpression="Amount" DataFormatString="{0:c}"/>
          <asp:BoundField DataField="Causante" HeaderText="Causante" ReadOnly="True" SortExpression="Causante" />

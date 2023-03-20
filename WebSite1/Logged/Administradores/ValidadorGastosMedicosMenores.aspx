@@ -318,7 +318,8 @@
         <Columns>
          <asp:BoundField DataField="MinorMedicalExpenseId" HeaderText="Id" ReadOnly="True" SortExpression="MinorMedicalExpenseId" />           
          <asp:BoundField DataField="PackageId" HeaderText="Paquete" ReadOnly="True" SortExpression="PackageId" />
-         <asp:BoundField DataField="Date" HeaderText="Fecha del Gasto" ReadOnly="True" SortExpression="Date" DataFormatString="{0:dd/MM/yyyy}" />           
+         <asp:BoundField DataField="Date" HeaderText="Fecha del Gasto" ReadOnly="True" SortExpression="Date" DataFormatString="{0:dd/MM/yyyy}" />
+         <asp:BoundField DataField="Causante" HeaderText="Causante" ReadOnly="True" SortExpression="Causante" />
          <asp:BoundField DataField="Amount" HeaderText="Importe del Gasto" ReadOnly="True" SortExpression="Amount" DataFormatString="{0:c}"/>
          <asp:BoundField DataField="Causante" HeaderText="Causante" ReadOnly="True" SortExpression="Causante" />
             <asp:BoundField DataField="Status" HeaderText="Estado del Gasto" ReadOnly="True" SortExpression="Status" />

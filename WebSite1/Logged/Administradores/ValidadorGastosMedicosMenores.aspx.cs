@@ -343,7 +343,7 @@ public partial class Logged_Administradores_ValidadorGastosMedicosMenores : Syst
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();           
-            cmd.CommandText = "SELECT MinorMedicalExpenseId ,Date ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel , 0) , UpdateUserKey FROM MinorMedicalExpense;";                             
+            cmd.CommandText = "SELECT m.MinorMedicalExpenseId ,m.Date ,m.Amount, m.Status, Isnull(m.DeniedReason,''), Isnull(m.PackageId,0), Isnull(m.ApprovalLevel , 0) , m.UpdateUserKey, u.Username FROM MinorMedicalExpense m inner join Users u on m.UpdateUserKey = u.UserKey;";                             
           
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();

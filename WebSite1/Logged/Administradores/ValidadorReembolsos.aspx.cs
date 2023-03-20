@@ -343,7 +343,7 @@ public partial class Logged_Administradores_ValidadorReembolsos : System.Web.UI.
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();            
-            cmd.CommandText = "SELECT ExpenseId ,Date ,Currency ,Amount, Status, Isnull(DeniedReason,''), Isnull(PackageId,0), Isnull(ApprovalLevel, 0), UpdateUserKey FROM Expense ;";
+            cmd.CommandText = "SELECT e.ExpenseId ,e.Date ,e.Currency ,e.Amount, e.Status, Isnull(e.DeniedReason,''), Isnull(e.PackageId,0), Isnull(e.ApprovalLevel, 0), e.UpdateUserKey, u.Username FROM Expense e inner join Users u on e.UpdateUserKey = u.UserKey;";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())

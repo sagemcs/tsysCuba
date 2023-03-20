@@ -1540,4 +1540,26 @@ public static class Tools
         }
         return empleados;
     }
+
+    public static Tuple<String, String> GetUsuarioPuestoArea(int logged_user)
+    {
+        string puesto = string.Empty;
+        string area = string.Empty;
+
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
+        {
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT Puesto, Area FROM AspEmpleado where UserKey = @UserKey";
+            cmd.Parameters.Add("@UserKey", SqlDbType.Int).Value = logged_user;
+            cmd.Connection.Open();
+            SqlDataReader dataReader = cmd.ExecuteReader();
+            while (dataReader.Read())
+            {
+                puesto = dataReader.GetString(0);
+                area = dataReader.GetString(1);
+            }
+        }
+        Tuple<string, string> tupla = new Tuple<string, string>(puesto, area);
+        return tupla;
+    }
 }

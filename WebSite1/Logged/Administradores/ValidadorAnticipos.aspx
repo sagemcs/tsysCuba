@@ -337,6 +337,7 @@
                     <asp:BoundField DataField="DepartureDate" HeaderText="Salida" ReadOnly="True" SortExpression="DepartureDate" DataFormatString="{0:dd/MM/yyyy}" />
                     <asp:BoundField DataField="ArrivalDate" HeaderText="LLegada" ReadOnly="True" SortExpression="ArrivalDate" DataFormatString="{0:dd/MM/yyyy}" />
                     <asp:BoundField DataField="CheckDate" HeaderText="Comprobación" ReadOnly="True" SortExpression="CheckDate" DataFormatString="{0:dd/MM/yyyy}" />
+                    <asp:BoundField DataField="Causante" HeaderText="Causante" ReadOnly="True" SortExpression="Causante" />
                     <asp:BoundField DataField="ImmediateBoss" HeaderText="Jefe Inmediato" ReadOnly="True" SortExpression="ImmediateBoss" />
                     <asp:BoundField DataField="Causante" HeaderText="Causante" ReadOnly="True" SortExpression="Causante" />
                     <asp:BoundField DataField="Status" HeaderText="Estado" ReadOnly="True" SortExpression="Status" />

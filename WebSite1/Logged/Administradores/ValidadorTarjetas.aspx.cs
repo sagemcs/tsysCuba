@@ -361,7 +361,7 @@ public partial class Logged_Administradores_ValidadorTarjetas : System.Web.UI.Pa
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT CorporateCardId ,Date ,Currency ,Amount, Status, CreateDate, Isnull(DeniedReason,''), Isnull(PackageId,0) , Isnull(ApprovalLevel,0), UpdateUserKey FROM CorporateCard;";                
+            cmd.CommandText = "SELECT c.CorporateCardId ,c.Date ,c.Currency ,c.Amount, c.Status, c.CreateDate, Isnull(c.DeniedReason,''), Isnull(c.PackageId,0) , Isnull(c.ApprovalLevel,0), c.UpdateUserKey, u.Username FROM CorporateCard c inner join Users u on c.UpdateUserKey = u.UserKey;";                
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())

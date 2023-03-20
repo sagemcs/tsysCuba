@@ -356,7 +356,7 @@ public partial class Logged_Administradores_ValidadorAnticipos : System.Web.UI.P
         using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["PortalConnection"].ToString()))
         {
             SqlCommand cmd = conn.CreateCommand();    
-            cmd.CommandText = "SELECT AdvanceId, AdvanceType, Folio,Amount,DepartureDate,ArrivalDate,CheckDate,ImmediateBoss,UpdateUserKey, CreateDate, UpdateDate,CompanyId,Status, Isnull(PackageId,0), IsNull(DeniedReason, ''), Isnull(ApprovalLevel , 0) FROM Advance;";
+            cmd.CommandText = "SELECT a.AdvanceId, a.AdvanceType, a.Folio,a.Amount,a.DepartureDate,a.ArrivalDate,a.CheckDate,a.ImmediateBoss,a.UpdateUserKey, a.CreateDate, a.UpdateDate,a.CompanyId,a.Status, Isnull(a.PackageId,0), IsNull(a.DeniedReason, ''), Isnull(a.ApprovalLevel , 0), u.Username FROM Advance a inner join Users u on a.UpdateUserKey = u.UserKey;";
             cmd.Connection.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
